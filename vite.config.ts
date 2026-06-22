@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react-swc' // <-- Kembalikan ke swc
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
@@ -8,6 +8,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  // PERBAIKAN: Tambahkan garis miring (/) di awal dan di akhir nama repo
-  base: '/projeck-portal-siswa/', 
+  base: '/projeck-portal-siswa/', // Jalur GitHub Pages yang sudah benar
 })
