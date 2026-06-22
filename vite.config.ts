@@ -1,19 +1,13 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-// Hapus import viteSingleFile jika sudah tidak digunakan
 
+// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    // Hapus viteSingleFile() dari sini
   ],
-  // Ubah base sesuai nama repositori GitHub Pages Anda
+  // PERBAIKAN: Tambahkan garis miring (/) di awal dan di akhir nama repo
   base: '/projeck-portal-siswa/', 
-  build: {
-    // Kembalikan ke default agar CSS dan JS terpisah dengan benar
-    cssCodeSplit: true, 
-    target: 'esnext'
-  }
 })
