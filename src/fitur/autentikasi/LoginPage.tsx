@@ -9,26 +9,17 @@ import PanelAdminModal from '../admin/PanelAdminModal';
 import TutorialModal from './TutorialModal';
 import ExpectationModal from './ExpectationModal';
 
-// ───────────────────────────────────────────────
-// VITE ASSET IMPORTS — Pastikan file ada di src/assets/
-// atau gunakan path public/ jika file di public/images/
-// ───────────────────────────────────────────────
-
-// OPSI A: Import dari src/assets/ (Vite akan bundle & hash)
-// import bgImage from '../../assets/images/login-bg.jpg';
-// import logoSmp from '../../assets/images/logo-smpn1-majenang.png';
-
-// OPSI B: Path absolut ke public/ (Vite serve langsung dari public/)
-// File HARUS ada di: project-root/public/images/login-bg.jpg
-// File HARUS ada di: project-root/public/images/logo-smpn1-majenang.png
-const BG_IMAGE = '/images/login-bg.jpg';
-const LOGO_SMP = '/images/smp.png';
-
+// ═══════════════════════════════════════════════
+// ✅ PATH DINAMIS — otomatis sesuai base URL
+// Gambar tetap di: public/images/
+// ═══════════════════════════════════════════════
+const BG_IMAGE = `${import.meta.env.BASE_URL}images/login-bg.jpg`;
+const LOGO_SMP = `${import.meta.env.BASE_URL}images/smp.png`;
 const IS_VIDEO_BG = BG_IMAGE.match(/\.(mp4|webm|ogg)$/i);
 
-// ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════
 // ADMIN LOGIN CONFIG
-// ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════
 const ADMIN_LOGIN = {
   teacher: { username: 'adm_guru', password: 'admin123' },
   student: { username: 'adm_siswa', password: 'admin123' },
@@ -190,7 +181,6 @@ export default function LoginPage() {
                     className="w-full h-full object-contain p-2.5 transition-transform duration-500 group-hover:scale-105"
                     onError={() => {
                       console.error("[LOGO] Gagal memuat logo di path:", LOGO_SMP);
-                      console.error("[LOGO] Pastikan file ada di: public/images/logo-smpn1-majenang.png");
                       setMainLogoError(true);
                     }}
                   />
