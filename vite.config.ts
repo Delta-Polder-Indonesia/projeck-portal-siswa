@@ -1,17 +1,19 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
-import { viteSingleFile } from 'vite-plugin-singlefile'
+// Hapus import viteSingleFile jika sudah tidak digunakan
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    viteSingleFile()
+    // Hapus viteSingleFile() dari sini
   ],
-  base: './',
+  // Ubah base sesuai nama repositori GitHub Pages Anda
+  base: '/projeck-portal-siswa/', 
   build: {
-    cssCodeSplit: false,
+    // Kembalikan ke default agar CSS dan JS terpisah dengan benar
+    cssCodeSplit: true, 
     target: 'esnext'
   }
 })
