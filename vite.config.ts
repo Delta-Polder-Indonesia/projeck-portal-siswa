@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'  // ⭐ Ganti ke SWC
+import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
-    react(),        // Sekarang pakai SWC
+    react(),
     tailwindcss(),
   ],
-  base: './',
+  base: '/projeck-portal-siswa/',  // ✅ Sesuaikan dengan nama repo
 })
