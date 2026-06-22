@@ -241,102 +241,103 @@ export default function TagihanSekolahPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 text-slate-600 antialiased">
+      
+      {/* Top Summary Card */}
+      <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-lg font-semibold text-gray-800">Tagihan Uang Sekolah</h1>
-            <p className="text-sm text-gray-500 mt-1">Daftar tagihan bulanan per tahun dan status pembayarannya.</p>
+            <h1 className="text-base font-semibold text-slate-900 tracking-tight">Tagihan Uang Sekolah</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Daftar rekonsiliasi kas bulanan siswa berdasarkan tahun ajaran.</p>
           </div>
-          <label className="text-sm text-gray-700 flex items-center gap-2">
-            Tahun
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400 font-medium">Tahun</span>
             <select
               value={activeYear}
               onChange={(event) => setSelectedYear(Number(event.target.value))}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-slate-200 rounded px-2.5 py-1.5 text-xs font-medium bg-white text-slate-700 focus:outline-hidden"
             >
               {availableYears.map(year => (
                 <option key={year} value={year}>{year}</option>
               ))}
             </select>
-          </label>
+          </div>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-3 mt-4">
-          <div className="rounded-lg border border-gray-200 px-4 py-3">
-            <p className="text-xs text-gray-500">Total Tagihan</p>
-            <p className="text-base font-semibold text-gray-800 mt-1">{formatRupiah(ringkasan.totalTagihan)}</p>
+        {/* Clean Flat Metric Cards (No AI Gradients/Pills) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
+          <div className="rounded-lg border border-slate-100 p-3.5 bg-slate-50/50">
+            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Tagihan</p>
+            <p className="text-base font-semibold text-slate-800 mt-1">{formatRupiah(ringkasan.totalTagihan)}</p>
           </div>
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-            <p className="text-xs text-green-700">Sudah Dibayar</p>
-            <p className="text-base font-semibold text-green-700 mt-1">{ringkasan.jumlahLunas} bulan</p>
+          <div className="rounded-lg border border-slate-200/60 p-3.5">
+            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Sudah Dibayar</p>
+            <p className="text-base font-semibold text-slate-800 mt-1">{ringkasan.jumlahLunas} Bulan</p>
           </div>
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-            <p className="text-xs text-red-700">Belum Dibayar</p>
-            <p className="text-base font-semibold text-red-700 mt-1">{ringkasan.jumlahBelumLunas} bulan</p>
+          <div className="rounded-lg border border-slate-200/60 p-3.5">
+            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Belum Dibayar</p>
+            <p className="text-base font-semibold text-slate-800 mt-1">{ringkasan.jumlahBelumLunas} Bulan</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-base font-semibold text-gray-800">Daftar Bulanan Tahun {activeYear}</h2>
+      {/* Main Logs Table */}
+      <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <h2 className="text-xs uppercase font-bold tracking-wider text-slate-800">Daftar Bulanan Tahun {activeYear}</h2>
           <button
             onClick={handleUnduhDaftarTahunanPdf}
-            className="px-3 py-2 rounded-lg border border-blue-200 text-blue-700 text-xs font-medium hover:bg-blue-50"
+            className="px-3 py-1.5 rounded border border-slate-200 text-slate-700 text-xs font-medium bg-white hover:bg-slate-50 transition-colors"
           >
-            Unduh PDF Pembayaran Tahun {activeYear}
+            Unduh Laporan PDF
           </button>
         </div>
-        <div className="overflow-x-auto mt-3">
-          <table className="w-full min-w-[760px] text-sm">
+        
+        <div className="overflow-x-auto mt-2">
+          <table className="w-full min-w-[760px] text-xs">
             <thead>
-              <tr>
-                <th className="text-left px-3 py-2 border-b border-gray-200 text-gray-500">Bulan</th>
-                <th className="text-left px-3 py-2 border-b border-gray-200 text-gray-500">Nominal</th>
-                <th className="text-left px-3 py-2 border-b border-gray-200 text-gray-500">Jatuh Tempo</th>
-                <th className="text-left px-3 py-2 border-b border-gray-200 text-gray-500">Status</th>
-                <th className="text-left px-3 py-2 border-b border-gray-200 text-gray-500">Metode Bayar</th>
-                <th className="text-left px-3 py-2 border-b border-gray-200 text-gray-500">Aksi</th>
+              <tr className="text-slate-400 border-b border-slate-100 font-semibold">
+                <th className="text-left px-2 py-3">Bulan</th>
+                <th className="text-left px-2 py-3">Nominal</th>
+                <th className="text-left px-2 py-3">Jatuh Tempo</th>
+                <th className="text-left px-2 py-3">Status</th>
+                <th className="text-left px-2 py-3">Metode Bayar</th>
+                <th className="text-right px-2 py-3">Aksi</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {bills.map(item => (
-                <tr key={item.id}>
-                  <td className="px-3 py-2 border-b border-gray-100 text-gray-700">{MONTH_NAMES[item.month - 1]}</td>
-                  <td className="px-3 py-2 border-b border-gray-100 text-gray-700">{formatRupiah(item.amount)}</td>
-                  <td className="px-3 py-2 border-b border-gray-100 text-gray-700">{item.dueDate}</td>
-                  <td className="px-3 py-2 border-b border-gray-100">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                        item.status === 'lunas'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-700'
-                      }`}
-                    >
-                      {item.status === 'lunas' ? 'Lunas' : 'Belum Lunas'}
-                    </span>
+                <tr key={item.id} className="hover:bg-slate-50/40 transition-colors">
+                  <td className="px-2 py-3 font-semibold text-slate-800">{MONTH_NAMES[item.month - 1]}</td>
+                  <td className="px-2 py-3 font-mono">{formatRupiah(item.amount)}</td>
+                  <td className="px-2 py-3 text-slate-400">{item.dueDate}</td>
+                  <td className="px-2 py-3">
+                    {/* Raw Clean Text Status Indicator */}
+                    <div className="flex items-center gap-1.5">
+                      <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'lunas' ? 'bg-slate-800' : 'bg-slate-300'}`} />
+                      <span>{item.status === 'lunas' ? 'Lunas' : 'Belum Lunas'}</span>
+                    </div>
                   </td>
-                  <td className="px-3 py-2 border-b border-gray-100 text-gray-700">{getPaymentMethodLabel(item.paymentMethod)}</td>
-                  <td className="px-3 py-2 border-b border-gray-100">
+                  <td className="px-2 py-3 text-slate-500">{getPaymentMethodLabel(item.paymentMethod)}</td>
+                  <td className="px-2 py-3 text-right">
                     {item.status === 'belum_lunas' ? (
                       <button
                         onClick={() => {
                           setSelectedBillId(item.id);
                           setInfoMessage('');
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700"
+                        className="px-3 py-1 rounded bg-slate-900 text-white font-medium hover:bg-black transition-colors"
                       >
                         Bayar
                       </button>
-                     ) : (
-                       <button
-                         onClick={() => handleUnduhBuktiPdf(item)}
-                         className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-50"
-                       >
-                         Bukti Bulanan
-                       </button>
-                     )}
+                    ) : (
+                      <button
+                        onClick={() => handleUnduhBuktiPdf(item)}
+                        className="px-3 py-1 rounded border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors"
+                      >
+                        Bukti Bulanan
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -345,37 +346,46 @@ export default function TagihanSekolahPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-gray-800">Mode Pembayaran</h2>
-        <p className="text-sm text-gray-500 mt-1">Pilih metode lalu proses pembayaran bulan yang dipilih.</p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
-          {PAYMENT_METHODS.map(method => (
-            <button
-              key={method.value}
-              onClick={() => setSelectedMethod(method.value)}
-              className={`rounded-lg border px-3 py-3 text-left ${
-                selectedMethod === method.value
-                  ? 'border-emerald-500 bg-emerald-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-center gap-2 text-gray-700">
-                {method.value === 'atm' && <Landmark className="w-4 h-4" />}
-                {method.value === 'mobile_banking' && <CreditCard className="w-4 h-4" />}
-                {method.value === 'internet_banking' && <CreditCard className="w-4 h-4" />}
-                {method.value === 'ewallet' && <Wallet className="w-4 h-4" />}
-                {method.value === 'tunai' && <CircleDollarSign className="w-4 h-4" />}
-                <span className="text-sm font-medium">{method.label}</span>
-              </div>
-            </button>
-          ))}
+      {/* Payment Hub Station */}
+      <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+        <div>
+          <h2 className="text-xs uppercase font-bold tracking-wider text-slate-800">Mode Pembayaran</h2>
+          <p className="text-xs text-slate-400 mt-0.5">Pilih salah satu metode yang tersedia untuk melakukan kliring tagihan.</p>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        {/* Flat Border Buttons without Artificial Highlights */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          {PAYMENT_METHODS.map(method => {
+            const isTarget = selectedMethod === method.value;
+            return (
+              <button
+                key={method.value}
+                onClick={() => setSelectedMethod(method.value)}
+                className={`rounded border p-2.5 text-left transition-all ${
+                  isTarget
+                    ? 'border-slate-900 bg-slate-50/50 ring-1 ring-slate-900'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                }`}
+              >
+                <div className="flex items-center gap-2 text-slate-700">
+                  {method.value === 'atm' && <Landmark className="w-3.5 h-3.5" />}
+                  {method.value === 'mobile_banking' && <CreditCard className="w-3.5 h-3.5" />}
+                  {method.value === 'internet_banking' && <CreditCard className="w-3.5 h-3.5" />}
+                  {method.value === 'ewallet' && <Wallet className="w-3.5 h-3.5" />}
+                  {method.value === 'tunai' && <CircleDollarSign className="w-3.5 h-3.5" />}
+                  <span className="text-xs font-medium tracking-tight">{method.label}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Form Controls */}
+        <div className="pt-2 flex flex-wrap items-center gap-3">
           <select
             value={selectedBillId}
             onChange={(event) => setSelectedBillId(event.target.value)}
-            className="min-w-[280px] border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="min-w-[280px] border border-slate-200 rounded px-3 py-1.5 text-xs bg-white text-slate-700 focus:outline-hidden"
           >
             <option value="">Pilih bulan yang ingin dibayar</option>
             {bills
@@ -389,17 +399,23 @@ export default function TagihanSekolahPage() {
           <button
             onClick={handleBayar}
             disabled={!billToPay}
-            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700"
+            className="px-4 py-1.5 rounded bg-slate-900 text-white text-xs font-semibold disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed hover:bg-black transition-all"
           >
             Proses Pembayaran
           </button>
         </div>
+
         {billToPay && (
-          <p className="text-xs text-gray-500 mt-2">
-            Pembayaran untuk {MONTH_NAMES[billToPay.month - 1]} {billToPay.year} sebesar {formatRupiah(billToPay.amount)}.
+          <p className="text-xs text-slate-400 font-medium">
+            Mekanisme mutasi: {MONTH_NAMES[billToPay.month - 1]} {billToPay.year} sebesar <span className="text-slate-700 font-mono font-semibold">{formatRupiah(billToPay.amount)}</span>.
           </p>
         )}
-        {infoMessage && <p className="text-sm text-green-700 mt-3">{infoMessage}</p>}
+        
+        {infoMessage && (
+          <div className="text-xs font-medium text-slate-800 p-2 border border-slate-200 bg-slate-50 rounded">
+            {infoMessage}
+          </div>
+        )}
       </div>
     </div>
   );

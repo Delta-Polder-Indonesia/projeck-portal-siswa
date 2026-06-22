@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext';
 import {
   getAttendance,
   getClasses,
-  getPengumumanAdminUntukGuru,
   getStudents,
   getTeachers,
 } from '../../data/store';
@@ -13,7 +12,6 @@ import { useStoreVersion } from '../../hooks/useStoreVersion';
 export default function DasborGuru() {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
-  const [previewImage, setPreviewImage] = useState<{ src: string; title: string } | null>(null);
 
   const stats = useMemo(() => {
     const teacher = getTeachers().find(t => t.id === user?.id);
@@ -71,18 +69,13 @@ export default function DasborGuru() {
   }, [user, storeVersion]);
 
   const maxBar = Math.max(...stats.last7Days.map(d => d.percentage), 1);
-  const pengumumanAdmin = useMemo(() => {
-    const teacher = getTeachers().find((item) => item.id === user?.id);
-    if (!teacher) return [];
-    return getPengumumanAdminUntukGuru(teacher.classIds).slice(0, 5);
-  }, [user, storeVersion]);
 
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard Guru</h1>
-		<p className="text-sm text-gray-500 mt-1">
-        Selamat datang, {user?.name}</p>
+        <p className="text-sm text-gray-500 mt-1">
+          Selamat datang, {user?.name}</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -206,58 +199,6 @@ export default function DasborGuru() {
         <p className="text-sm text-blue-900 font-medium">Pengaturan kelas sudah dipisah ke menu guru:</p>
         <p className="text-sm text-blue-700 mt-1">Gunakan menu Atur Roster, Atur Pengumuman, dan Atur Tugas Online di sidebar.</p>
       </div>
-
-      <section className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-        <h2 className="font-semibold text-gray-800">Pengumuman Admin Sekolah</h2>
-        <p className="text-xs text-gray-500 mt-1">Pengumuman resmi dari admin sekolah untuk guru dan siswa.</p>
-        <div className="space-y-3 mt-3">
-          {pengumumanAdmin.map((item) => (
-            <article key={item.id} className="border border-gray-200 rounded-lg p-3">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="text-sm font-semibold text-gray-800">{item.title}</h3>
-                <p className="text-xs text-gray-500">{new Date(item.createdAt).toLocaleString('id-ID')}</p>
-              </div>
-              <p className="text-sm text-gray-700 mt-1">{item.message}</p>
-              {item.imageDataUrl && (
-                <button
-                  type="button"
-                  onClick={() => setPreviewImage({ src: item.imageDataUrl || '', title: item.title })}
-                  className="mt-2 block w-full overflow-hidden rounded-md border border-gray-200 bg-gray-50"
-                >
-                  <img
-                    src={item.imageDataUrl}
-                    alt={item.imageName || item.title}
-                    className="w-full h-auto object-contain"
-                  />
-                </button>
-              )}
-            </article>
-          ))}
-          {pengumumanAdmin.length === 0 && <p className="text-sm text-gray-400">Belum ada pengumuman admin.</p>}
-        </div>
-      </section>
-
-      {previewImage && (
-        <div
-          className="fixed inset-0 z-50 bg-black/75 p-4"
-          role="button"
-          tabIndex={0}
-          onClick={() => setPreviewImage(null)}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
-              setPreviewImage(null);
-            }
-          }}
-        >
-          <div className="h-full w-full flex items-center justify-center">
-            <img
-              src={previewImage.src}
-              alt={previewImage.title}
-              className="max-h-[92vh] max-w-[96vw] w-auto h-auto object-contain rounded-md"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -131,6 +131,23 @@ export interface PengumumanAdmin {
   createdBy: string;
 }
 
+export interface NilaiRapot {
+  id: string;
+  studentId: string;
+  classId: string;
+  semester: 'ganjil' | 'genap';
+  tahunAjaran: string; // contoh: '2024/2025'
+  mataPelajaran: string;
+  nilaiTugas: number;
+  nilaiUTS: number;
+  nilaiUAS: number;
+  nilaiAkhir: number;
+  predikat: 'A' | 'B' | 'C' | 'D' | 'E';
+  catatanGuru?: string;
+  inputBy: string; // teacher id
+  updatedAt: number;
+}
+
 export type UserRole = 'teacher' | 'student';
 
 export interface AuthUser {

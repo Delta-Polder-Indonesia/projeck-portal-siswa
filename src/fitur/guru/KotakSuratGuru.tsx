@@ -123,7 +123,7 @@ export default function KotakSuratGuru() {
     <div className="space-y-5">
       <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
         <h1 className="text-2xl font-bold text-gray-800">Kotak Surat Siswa</h1>
-		<p className="text-sm text-gray-500 mt-1">
+    <p className="text-sm text-gray-500 mt-1">
         Lihat surat izin/sakit siswa sesuai kelas yang Anda ajar.</p>
       </div>
 

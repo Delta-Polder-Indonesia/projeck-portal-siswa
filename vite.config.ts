@@ -1,12 +1,17 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
+import { viteSingleFile } from 'vite-plugin-singlefile'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    viteSingleFile()
   ],
-  base: './', // ⭐ PENTING: Untuk GitHub Pages
+  base: './',
+  build: {
+    cssCodeSplit: false,
+    target: 'esnext'
+  }
 })

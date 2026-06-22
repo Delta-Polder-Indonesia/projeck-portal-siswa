@@ -11,6 +11,7 @@ import {
   TagihanSekolah,
   PengaturanTagihan,
   PengumumanAdmin,
+  NilaiRapot,
 } from '../types';
 import { kompresDataUrlGambar } from '../utils/gambar';
 
@@ -27,12 +28,14 @@ const STORAGE_KEYS = {
   bills: 'absensi_bills',
   adminBillingSettings: 'absensi_admin_billing_settings',
   adminAnnouncements: 'absensi_admin_announcements',
+  rapot: 'absensi_rapot',
   initialized: 'absensi_initialized',
 };
 
 const STORE_UPDATED_EVENT = 'absensi_store_updated';
 
 const APPROX_LOCAL_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024;
+let storeVersion = 0;
 
 function readJsonFromStorage<T>(key: string, fallback: T): T {
   const raw = localStorage.getItem(key);
@@ -69,8 +72,14 @@ export interface HasilPulihkanCadangan {
 }
 
 function notifyStoreUpdated() {
+  storeVersion += 1;
   window.dispatchEvent(new CustomEvent(STORE_UPDATED_EVENT));
 }
+
+export const store = {
+  getSnapshot: () => storeVersion,
+  subscribe: (listener: () => void) => subscribeStore(listener),
+};
 
 export function getRingkasanPenyimpananBrowser(): RingkasanPenyimpananBrowser {
   let usedBytes = 0;
@@ -506,10 +515,15 @@ export function subscribeStore(listener: () => void) {
 
 export function getSuratIzin(): SuratIzin[] {
   const letters = readArrayFromStorage<SuratIzin>(STORAGE_KEYS.letters);
+  const students = getStudents();
   // Backward compatibility for older data that did not store status yet.
   return letters
     .map(item => ({
       ...item,
+      classId: item.classId || students.find((student) => student.id === item.studentId)?.classId || '',
+      type: item.type || 'izin',
+      subject: item.subject || 'Surat',
+      letterDate: item.letterDate || new Date(item.createdAt).toISOString().split('T')[0],
       status: item.status || 'menunggu',
     }))
     .sort((a, b) => b.createdAt - a.createdAt);
@@ -873,4 +887,58 @@ export async function kompresUlangSemuaFotoTersimpan(): Promise<RingkasanKompres
 
   notifyStoreUpdated();
   return summary;
+}
+
+// ==================== RAPOT ====================
+
+export function getNilaiRapot(): NilaiRapot[] {
+  return readArrayFromStorage<NilaiRapot>(STORAGE_KEYS.rapot);
+}
+
+export function getNilaiRapotBySiswa(studentId: string, tahunAjaran?: string, semester?: string): NilaiRapot[] {
+  return getNilaiRapot().filter(item => {
+    if (item.studentId !== studentId) return false;
+    if (tahunAjaran && item.tahunAjaran !== tahunAjaran) return false;
+    if (semester && item.semester !== semester) return false;
+    return true;
+  });
+}
+
+export function getNilaiRapotByKelas(classId: string, tahunAjaran: string, semester: string): NilaiRapot[] {
+  return getNilaiRapot().filter(
+    item => item.classId === classId && item.tahunAjaran === tahunAjaran && item.semester === semester,
+  );
+}
+
+export function upsertNilaiRapot(item: NilaiRapot) {
+  const all = getNilaiRapot();
+  const index = all.findIndex(
+    existing =>
+      existing.studentId === item.studentId
+      && existing.classId === item.classId
+      && existing.tahunAjaran === item.tahunAjaran
+      && existing.semester === item.semester
+      && existing.mataPelajaran === item.mataPelajaran,
+  );
+
+  if (index >= 0) {
+    all[index] = item;
+  } else {
+    all.push(item);
+  }
+
+  localStorage.setItem(STORAGE_KEYS.rapot, JSON.stringify(all));
+  notifyStoreUpdated();
+}
+
+export function deleteNilaiRapot(id: string) {
+  const all = getNilaiRapot().filter(item => item.id !== id);
+  localStorage.setItem(STORAGE_KEYS.rapot, JSON.stringify(all));
+  notifyStoreUpdated();
+}
+
+export function getTahunAjaranRapotSiswa(studentId: string): string[] {
+  const all = getNilaiRapot().filter(item => item.studentId === studentId);
+  const set = new Set(all.map(item => item.tahunAjaran));
+  return Array.from(set).sort((a, b) => b.localeCompare(a));
 }

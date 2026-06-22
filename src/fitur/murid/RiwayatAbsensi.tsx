@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getAttendanceByStudent } from '../../data/store';
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Clock, FileText, Info } from 'lucide-react';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
 export default function HistoryPage() {
@@ -78,126 +78,187 @@ export default function HistoryPage() {
 
   const statusLabel = (status: string) => {
     switch (status) {
-      case 'hadir': return 'Masuk (Hadir)';
+      case 'hadir': return 'Hadir';
       case 'izin': return 'Izin';
       case 'sakit': return 'Sakit';
-      case 'alpha': return 'Alpha';
+      case 'alpha': return 'Alpha (Tanpa Keterangan)';
       default: return '-';
     }
   };
 
-  const statusClasses = (status?: string) => {
+  // Konfigurasi CSS Kalender berdasarkan Instruksi Warna Baru
+  const statusClasses = (status?: string, isSelected?: boolean) => {
+    if (isSelected) return 'ring-2 ring-slate-800 ring-offset-1 z-10';
     switch (status) {
-      case 'hadir': return 'bg-green-500 text-white';
-      case 'izin': return 'bg-yellow-400 text-white';
-      case 'sakit': return 'bg-orange-400 text-white';
-      case 'alpha': return 'bg-red-500 text-white';
-      default: return 'bg-gray-50 text-gray-400';
+      case 'hadir': return 'bg-emerald-500 text-white border border-emerald-600'; // Hijau
+      case 'izin': return 'bg-blue-500 text-white border border-blue-600';     // Biru
+      case 'sakit': return 'bg-amber-400 text-slate-900 border border-amber-500'; // Kuning
+      case 'alpha': return 'bg-rose-500 text-white border border-rose-600';     // Merah
+      default: return 'bg-transparent text-slate-400 hover:bg-slate-50';
+    }
+  };
+
+  // Konfigurasi Dot Status pada Panel Detail Informasi
+  const statusDotClass = (status: string) => {
+    switch (status) {
+      case 'hadir': return 'bg-emerald-500';
+      case 'izin': return 'bg-blue-500';
+      case 'sakit': return 'bg-amber-400';
+      case 'alpha': return 'bg-rose-500';
+      default: return 'bg-slate-200';
     }
   };
 
   return (
-    <div className="space-y-5">
-      <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800">Riwayat Absensi</h1>
-		 <p className="text-sm text-gray-500 mt-1">
-        Klik tanggal pada kalender untuk melihat catatan absensi harian.</p>
+    <div className="space-y-4 max-w-[1600px] mx-auto p-1 antialiased text-slate-600">
+      
+      {/* Top Bar Header */}
+      <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-xs">
+        <h1 className="text-base font-semibold text-slate-800 tracking-tight">Riwayat Absensi & Kehadiran</h1>
+        <p className="text-xs text-slate-400 mt-0.5">Pantau log data presensi harian individual dan catatan verifikasi instruktur.</p>
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_360px] gap-6">
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <h2 className="font-semibold text-gray-800 mb-2">Info Catatan Kehadiran</h2>
-          {!selectedDate && (
-            <p className="text-sm text-gray-500">Pilih tanggal pada kalender di sebelah kanan untuk melihat detail absensi.</p>
-          )}
-          {selectedDate && (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-700 font-medium">
-                {new Date(`${selectedDate}T00:00:00`).toLocaleDateString('id-ID', {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
+      {/* Main Split Interface Layout */}
+      <div className="grid lg:grid-cols-[340px_1fr] gap-4 items-start">
+        
+        {/* Left Side: Calendar Control Station */}
+        <div className="bg-white rounded-xl p-4 shadow-xs border border-slate-200/60 h-fit space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-slate-500" />
+              <h2 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">Navigasi Kalender</h2>
+            </div>
+            <div className="flex items-center gap-1">
+              <button 
+                type="button"
+                onClick={() => navigateMonth(-1)} 
+                className="p-1 hover:bg-slate-50 border border-slate-200 rounded transition-colors"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 text-slate-600" />
+              </button>
+              <span className="text-xs font-mono font-semibold text-slate-700 min-w-[100px] text-center">{monthLabel}</span>
+              <button 
+                type="button"
+                onClick={() => navigateMonth(1)} 
+                className="p-1 hover:bg-slate-50 border border-slate-200 rounded transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+              </button>
+            </div>
+          </div>
+
+          {/* Weekday Grid Label */}
+          <div className="grid grid-cols-7 gap-1">
+            {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => (
+              <div key={day} className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider py-0.5">{day}</div>
+            ))}
+          </div>
+
+          {/* Calendar Day Grid Matrix */}
+          <div className="space-y-1">
+            {calendarData.weeks.map((week, weekIndex) => (
+              <div key={`${selectedMonth}-w-${weekIndex}`} className="grid grid-cols-7 gap-1">
+                {week.map((day, dayIndex) => {
+                  const isBlank = day.day === 0;
+                  const isSelected = selectedDate === day.date;
+                  return (
+                    <button
+                      type="button"
+                      key={`${day.date}-${dayIndex}`}
+                      disabled={isBlank}
+                      onClick={() => setSelectedDate(day.date)}
+                      className={`aspect-square rounded text-xs font-mono font-semibold transition-all ${
+                        isBlank ? 'bg-transparent border-0 pointer-events-none' : ''
+                      } ${statusClasses(day.record?.status, isSelected)}`}
+                    >
+                      {!isBlank ? day.day : ''}
+                    </button>
+                  );
                 })}
-              </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Legend Warna Sesuai Instruksi Baru */}
+          <div className="flex flex-wrap gap-x-3 gap-y-1.5 pt-3 border-t border-slate-100 text-[11px] font-medium text-slate-400">
+            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-xs bg-emerald-500" /> Hadir</div>
+            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-xs bg-blue-500" /> Izin</div>
+            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-xs bg-amber-400" /> Sakit</div>
+            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-xs bg-rose-500" /> Alpha</div>
+            <span className="text-[10px] font-mono font-semibold text-slate-500 ml-auto bg-slate-50 px-1.5 py-0.5 border border-slate-200 rounded">{calendarData.monthAttendance.length} Log</span>
+          </div>
+        </div>
+
+        {/* Right Side: Operational Log Specifications */}
+        <div className="bg-white rounded-xl p-4 shadow-xs border border-slate-200/60 min-h-[305px]">
+          <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2.5 mb-4">
+            <Info className="w-3.5 h-3.5 text-slate-500" />
+            <h2 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">Spesifikasi Catatan Harian</h2>
+          </div>
+          
+          {!selectedDate ? (
+            <div className="h-[200px] flex flex-col items-center justify-center text-center">
+              <Calendar className="w-8 h-8 text-slate-200 mb-1.5" />
+              <p className="text-xs font-semibold text-slate-700">Pangkalan Data Siap</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Pilih indeks tanggal aktif pada kalender untuk memuat ringkasan log.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="bg-slate-50/60 border border-slate-100 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tanggal Terpilih</span>
+                  <p className="text-sm font-semibold text-slate-800 mt-0.5">
+                    {new Date(`${selectedDate}T00:00:00`).toLocaleDateString('id-ID', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+                <span className="text-xs font-mono font-medium text-slate-400 bg-white px-2 py-0.5 border border-slate-200 rounded">{selectedDate}</span>
+              </div>
+
               {selectedRecord ? (
-                <>
+                <div className="space-y-3.5">
                   <div className="grid sm:grid-cols-2 gap-3">
-                    <div className="border border-gray-200 rounded-lg p-3">
-                      <p className="text-xs text-gray-500">Status Kehadiran</p>
-                      <p className="text-sm font-semibold text-gray-800 mt-1">{statusLabel(selectedRecord.status)}</p>
+                    <div className="border border-slate-200/70 rounded-lg p-3">
+                      <div className="flex items-center gap-1.5 text-slate-400">
+                        <div className={`w-2.5 h-2.5 rounded-xs ${statusDotClass(selectedRecord.status)}`} />
+                        <span className="text-[10px] uppercase font-bold tracking-wider ml-0.5">Status Kehadiran</span>
+                      </div>
+                      <p className="text-sm font-bold text-slate-800 mt-1">{statusLabel(selectedRecord.status)}</p>
                     </div>
-                    <div className="border border-gray-200 rounded-lg p-3">
-                      <p className="text-xs text-gray-500">Waktu Dicatat</p>
-                      <p className="text-sm font-semibold text-gray-800 mt-1">{new Date(selectedRecord.timestamp).toLocaleTimeString('id-ID')}</p>
+                    
+                    <div className="border border-slate-200/70 rounded-lg p-3">
+                      <div className="flex items-center gap-1.5 text-slate-400">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-[10px] uppercase font-bold tracking-wider">Waktu Sinkronisasi</span>
+                      </div>
+                      <p className="text-sm font-mono font-semibold text-slate-800 mt-1">
+                        {new Date(selectedRecord.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} WIB
+                      </p>
                     </div>
                   </div>
-                  <div className="border border-gray-200 rounded-lg p-3">
-                    <p className="text-xs text-gray-500">Catatan Guru</p>
-                    <p className="text-sm text-gray-700 mt-1">{selectedRecord.note || '-'}</p>
+
+                  <div className="border border-slate-200/70 rounded-lg p-3 space-y-1">
+                    <div className="flex items-center gap-1.5 text-slate-400">
+                      <FileText className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-[10px] uppercase font-bold tracking-wider">Catatan Evaluasi / Keterangan</span>
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed pt-0.5 font-medium">{selectedRecord.note || 'Tidak ada klausa catatan tambahan dari instruktur.'}</p>
                   </div>
-                </>
+                </div>
               ) : (
-                <p className="text-sm text-gray-500">Tidak ada catatan absensi pada tanggal ini.</p>
+                <div className="border border-dashed border-slate-200 rounded-lg p-8 text-center text-slate-400">
+                  <p className="text-xs font-semibold text-slate-600">Kosong (No Record)</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Tidak ditemukan berkas komparasi absensi siswa pada pangkalan sistem untuk tanggal ini.</p>
+                </div>
               )}
             </div>
           )}
         </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 h-fit">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-emerald-600" />
-              <h2 className="font-semibold text-gray-800 text-sm">Kalender</h2>
-            </div>
-            <div className="flex items-center gap-1">
-              <button onClick={() => navigateMonth(-1)} className="p-1 hover:bg-gray-100 rounded-lg">
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-xs font-medium text-gray-700 min-w-[120px] text-center">{monthLabel}</span>
-              <button onClick={() => navigateMonth(1)} className="p-1 hover:bg-gray-100 rounded-lg">
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-7 gap-1 mb-1">
-            {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => (
-              <div key={day} className="text-center text-[10px] font-semibold text-gray-400 py-1">{day}</div>
-            ))}
-          </div>
-
-          <div className="space-y-1">
-            {calendarData.weeks.map((week, weekIndex) => (
-              <div key={`${selectedMonth}-w-${weekIndex}`} className="grid grid-cols-7 gap-1">
-                {week.map((day, dayIndex) => (
-                  <button
-                    key={`${day.date}-${dayIndex}`}
-                    disabled={day.day === 0}
-                    onClick={() => setSelectedDate(day.date)}
-                    className={`aspect-square rounded-lg text-xs font-semibold transition ${
-                      day.day === 0
-                        ? 'bg-transparent'
-                        : selectedDate === day.date
-                          ? 'ring-2 ring-emerald-500 ring-offset-1'
-                          : ''
-                    } ${statusClasses(day.record?.status)}`}
-                  >
-                    {day.day > 0 ? day.day : ''}
-                  </button>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t">
-            <div className="flex items-center gap-1 text-[10px] text-gray-500"><div className="w-2.5 h-2.5 rounded bg-green-500" /> Hadir</div>
-            <div className="flex items-center gap-1 text-[10px] text-gray-500"><div className="w-2.5 h-2.5 rounded bg-yellow-400" /> Izin</div>
-            <div className="flex items-center gap-1 text-[10px] text-gray-500"><div className="w-2.5 h-2.5 rounded bg-orange-400" /> Sakit</div>
-            <div className="flex items-center gap-1 text-[10px] text-gray-500"><div className="w-2.5 h-2.5 rounded bg-red-500" /> Alpha</div>
-            <span className="text-[10px] text-gray-500 ml-auto">{calendarData.monthAttendance.length} catatan</span>
-          </div>
-        </div>
       </div>
     </div>
   );
