@@ -9,24 +9,25 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "clsx": "2.1.1",
+    "dompurify": "^3.4.11",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^1.7.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "clsx": "2.1.1",
-    "tailwind-merge": "3.4.0",
-    "lucide-react": "^1.7.0",
-    "jspdf": "^4.2.1",
-    "dompurify": "^3.4.11"
+    "tailwind-merge": "3.4.0"
   },
   "devDependencies": {
-    "vite": "7.3.5",
-    "@vitejs/plugin-react-swc": "^3.11.0",
-    "@tailwindcss/vite": "4.1.17",
-    "tailwindcss": "4.1.17",
-    "typescript": "5.9.3",
+    "@tailwindcss/vite": "^4.1.17",
+    "@types/node": "^22.0.0",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
-    "@types/node": "^22.0.0",
-    "vite-plugin-singlefile": "2.3.0",
-    "postcss": "^8.5.15"
+    "@vitejs/plugin-react-swc": "^3.11.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3",
+    "vite": "7.3.5",
+    "vite-plugin-singlefile": "2.3.0"
   }
 }
