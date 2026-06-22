@@ -1,19 +1,38 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
-import { GraduationCap, BookOpen, Eye, EyeOff, LogIn, ArrowLeft, School, User, AlertCircle, Info, MapPin, Phone } from 'lucide-react';
+import {
+  GraduationCap, BookOpen, Eye, EyeOff, LogIn, ArrowLeft,
+  School, User, AlertCircle, Info, MapPin, Phone
+} from 'lucide-react';
 import PanelAdminModal from '../admin/PanelAdminModal';
 import TutorialModal from './TutorialModal';
 import ExpectationModal from './ExpectationModal';
 
+// ───────────────────────────────────────────────
+// VITE ASSET IMPORTS — Pastikan file ada di src/assets/
+// atau gunakan path public/ jika file di public/images/
+// ───────────────────────────────────────────────
+
+// OPSI A: Import dari src/assets/ (Vite akan bundle & hash)
+// import bgImage from '../../assets/images/login-bg.jpg';
+// import logoSmp from '../../assets/images/logo-smpn1-majenang.png';
+
+// OPSI B: Path absolut ke public/ (Vite serve langsung dari public/)
+// File HARUS ada di: project-root/public/images/login-bg.jpg
+// File HARUS ada di: project-root/public/images/logo-smpn1-majenang.png
+const BG_IMAGE = '/images/login-bg.jpg';
+const LOGO_SMP = '/images/smp.png';
+
+const IS_VIDEO_BG = BG_IMAGE.match(/\.(mp4|webm|ogg)$/i);
+
+// ───────────────────────────────────────────────
+// ADMIN LOGIN CONFIG
+// ───────────────────────────────────────────────
 const ADMIN_LOGIN = {
   teacher: { username: 'adm_guru', password: 'admin123' },
   student: { username: 'adm_siswa', password: 'admin123' },
 } as const;
-
-const BG_IMAGE = '/public/images/DVD-1.mp4';
-const LOGO_SMP = '/images/Logo SMP 1 majenang.png';
-const IS_VIDEO_BG = BG_IMAGE.match(/\.(mp4|webm|ogg)$/i);
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -28,7 +47,7 @@ export default function LoginPage() {
   const [showExpectation, setShowExpectation] = useState(false);
 
   const [mainLogoError, setMainLogoError] = useState(false);
-
+  const [bgError, setBgError] = useState(false);
 
   const handleSelectRole = (selectedRole: UserRole) => {
     setRole(selectedRole);
@@ -53,9 +72,9 @@ export default function LoginPage() {
     if (!role) return;
 
     if (
-      role === 'teacher'
-      && id.trim() === ADMIN_LOGIN.teacher.username
-      && password === ADMIN_LOGIN.teacher.password
+      role === 'teacher' &&
+      id.trim() === ADMIN_LOGIN.teacher.username &&
+      password === ADMIN_LOGIN.teacher.password
     ) {
       setAdminScope('teacher');
       setOpenAdminPanel(true);
@@ -65,9 +84,9 @@ export default function LoginPage() {
     }
 
     if (
-      role === 'student'
-      && id.trim() === ADMIN_LOGIN.student.username
-      && password === ADMIN_LOGIN.student.password
+      role === 'student' &&
+      id.trim() === ADMIN_LOGIN.student.username &&
+      password === ADMIN_LOGIN.student.password
     ) {
       setAdminScope('student');
       setOpenAdminPanel(true);
@@ -83,8 +102,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* BACKGROUND */}
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900">
+      {/* ═══════════════════════════════════════════
+          BACKGROUND IMAGE / VIDEO
+          ═══════════════════════════════════════════ */}
       {IS_VIDEO_BG ? (
         <video
           autoPlay
@@ -92,16 +113,36 @@ export default function LoginPage() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
+          onError={() => {
+            console.error("[BG] Video gagal dimuat:", BG_IMAGE);
+            setBgError(true);
+          }}
         >
           <source src={BG_IMAGE} type={`video/${BG_IMAGE.split('.').pop()}`} />
         </video>
       ) : (
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${BG_IMAGE})` }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
+          style={{
+            backgroundImage: bgError
+              ? 'none'
+              : `url(${BG_IMAGE})`,
+            backgroundColor: bgError ? '#0f172a' : undefined,
+          }}
+          onError={() => {
+            console.error("[BG] Gambar gagal dimuat:", BG_IMAGE);
+            setBgError(true);
+          }}
         />
       )}
 
+      {/* Fallback background jika bg image gagal */}
+      {bgError && (
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900" />
+      )}
+
+      {/* Overlay Gelap */}
+      <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
 
       {/* Animated blur shapes */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
@@ -114,7 +155,7 @@ export default function LoginPage() {
         <div className="absolute left-6 top-6 z-20 flex items-center gap-3">
           <button
             onClick={handleBack}
-            className="p-2.5 rounded-xl text-white transition-all border border-white/20 hover:bg-white/20 hover:border-white/40"
+            className="p-2.5 rounded-xl text-white transition-all border border-white/20 hover:bg-white/20 hover:border-white/40 cursor-pointer"
             style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}
             title="Kembali ke pilihan peran"
           >
@@ -129,10 +170,10 @@ export default function LoginPage() {
       {/* Main Container */}
       <div className="relative z-10 flex w-full max-w-6xl items-center gap-16 px-8 py-12 max-[900px]:flex-col max-[900px]:gap-8 max-[900px]:px-6 max-[900px]:py-8">
 
-        {/* LEFT SIDE - Branding & Logo SMP */}
+        {/* LEFT SIDE - Branding & Logo */}
         <div className="flex-1 flex flex-col justify-center max-[900px]:items-center min-w-[360px] max-[900px]:min-w-full">
 
-          {/* BLOCK UTAMA: LOGO & TEXT SALAM (SEJAJAR) */}
+          {/* BLOCK UTAMA: LOGO & TEXT SALAM */}
           <div className="flex items-center gap-6 mb-6 max-[900px]:flex-col max-[900px]:text-center max-[900px]:gap-4">
 
             {/* LOGO SMP 1 MAJENANG */}
@@ -147,13 +188,17 @@ export default function LoginPage() {
                     src={LOGO_SMP}
                     alt="Logo SMP 1 Majenang"
                     className="w-full h-full object-contain p-2.5 transition-transform duration-500 group-hover:scale-105"
-                    onError={() => setMainLogoError(true)}
+                    onError={() => {
+                      console.error("[LOGO] Gagal memuat logo di path:", LOGO_SMP);
+                      console.error("[LOGO] Pastikan file ada di: public/images/logo-smpn1-majenang.png");
+                      setMainLogoError(true);
+                    }}
                   />
                 )}
               </div>
             </div>
 
-            {/* TEXT SALAM PEMBUKA (SEBELAH KANAN LOGO) */}
+            {/* TEXT SALAM PEMBUKA */}
             <div className="flex-1 space-y-1">
               <p className="text-white/90 font-medium text-base tracking-wide drop-shadow-sm">
                 Selamat Datang Di Portal Resmi Siswa:
@@ -168,7 +213,7 @@ export default function LoginPage() {
 
           </div>
 
-          {/* PENJELASAN AKREDITAS SEKOLAH (DI BAWAH LOGO & TEXT) */}
+          {/* PENJELASAN AKREDITAS SEKOLAH */}
           <div className="mb-8 max-w-md p-4 max-[900px]:mx-auto">
             <div className="flex items-center gap-2.5 mb-1.5 max-[900px]:justify-center">
               <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -185,34 +230,28 @@ export default function LoginPage() {
           <div className="flex gap-4 max-[900px]:justify-center max-[600px]:flex-col max-[600px]:w-full">
             <button
               onClick={() => setShowExpectation(true)}
-              className="px-5 py-3 rounded-xl text-white text-sm font-semibold transition-all border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/15 hover:border-white/30 active:scale-98"
+              className="px-5 py-3 rounded-xl text-white text-sm font-semibold transition-all border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/15 hover:border-white/30 active:scale-98 cursor-pointer"
             >
               Apa yang Diharapkan?
             </button>
             <button
               onClick={() => setShowTutorial(true)}
-              className="px-5 py-3 rounded-xl text-white text-sm font-semibold transition-all border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/15 hover:border-white/30 flex items-center justify-center gap-2 active:scale-98"
+              className="px-5 py-3 rounded-xl text-white text-sm font-semibold transition-all border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/15 hover:border-white/30 flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
             >
               <Info className="w-4 h-4 text-cyan-400" />
               Cara Login
             </button>
           </div>
 
-          {/* INFORMASI ALAMAT SEKOLAH CARD */}
+          {/* INFORMASI ALAMAT SEKOLAH */}
           <div className="mt-6 max-w-md max-[900px]:w-full max-[900px]:mx-auto">
             <div className="flex items-center gap-4 max-[600px]:flex-col max-[600px]:text-center">
-
-              {/* Divider Vertikal */}
               <div className="self-stretch w-px bg-gradient-to-b from-white/5 via-white/20 to-white/5 max-[600px]:hidden" />
-
-              {/* Alamat Detail */}
               <div className="flex-1 space-y-1">
                 <p className="text-white font-extrabold text-[10px] tracking-wider uppercase">
                   SMP NEGERI 1 MAJENANG
                 </p>
-
                 <div className="space-y-1 pt-1 border-t border-white/5">
-
                   <div className="flex items-start gap-2 max-[600px]:justify-center">
                     <MapPin className="w-3 h-3 text-cyan-400 mt-0.5 flex-shrink-0" />
                     <p className="text-white/60 text-[9px] leading-relaxed">
@@ -222,14 +261,12 @@ export default function LoginPage() {
                       </span>
                     </p>
                   </div>
-
                   <div className="flex items-center gap-2 max-[600px]:justify-center">
                     <Phone className="w-3 h-3 text-cyan-400 flex-shrink-0" />
                     <p className="text-white/60 text-[9px] font-medium">
                       (0280) 621 234
                     </p>
                   </div>
-
                   <div className="flex items-center gap-2 max-[600px]:justify-center">
                     <School className="w-3 h-3 text-cyan-400 flex-shrink-0" />
                     <a
@@ -241,10 +278,8 @@ export default function LoginPage() {
                       www.smpn1majenang.sch.id
                     </a>
                   </div>
-
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -271,7 +306,7 @@ export default function LoginPage() {
                 <div className="flex flex-col gap-4">
                   <button
                     onClick={() => handleSelectRole('teacher')}
-                    className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-white font-semibold transition-all border border-white/20 hover:bg-white/15 hover:border-white/40 hover:scale-[1.02] active:scale-[0.98]"
+                    className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-white font-semibold transition-all border border-white/20 hover:bg-white/15 hover:border-white/40 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                     style={{ background: 'rgba(255,255,255,0.08)' }}
                   >
                     <BookOpen className="w-6 h-6 text-blue-400" />
@@ -279,7 +314,7 @@ export default function LoginPage() {
                   </button>
                   <button
                     onClick={() => handleSelectRole('student')}
-                    className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-white font-semibold transition-all border border-white/20 hover:bg-white/15 hover:border-white/40 hover:scale-[1.02] active:scale-[0.98]"
+                    className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-white font-semibold transition-all border border-white/20 hover:bg-white/15 hover:border-white/40 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                     style={{ background: 'rgba(255,255,255,0.08)' }}
                   >
                     <GraduationCap className="w-6 h-6 text-emerald-400" />
@@ -337,7 +372,7 @@ export default function LoginPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -354,7 +389,7 @@ export default function LoginPage() {
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                    className="w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                     style={{
                       background: 'linear-gradient(135deg, #67E8F9, #22D3EE)',
                       color: '#1E1B4B',
@@ -365,7 +400,6 @@ export default function LoginPage() {
                     Masuk
                   </button>
                 </form>
-               
               </div>
             )}
           </div>
@@ -373,22 +407,9 @@ export default function LoginPage() {
       </div>
 
       {/* Modals */}
-      <TutorialModal
-        open={showTutorial}
-        onClose={() => setShowTutorial(false)}
-      />
-
-      <ExpectationModal
-        open={showExpectation}
-        onClose={() => setShowExpectation(false)}
-      />
-
-      <PanelAdminModal
-        open={openAdminPanel}
-        onClose={() => setOpenAdminPanel(false)}
-        scope={adminScope}
-        preAuthorized
-      />
+      <TutorialModal open={showTutorial} onClose={() => setShowTutorial(false)} />
+      <ExpectationModal open={showExpectation} onClose={() => setShowExpectation(false)} />
+      <PanelAdminModal open={openAdminPanel} onClose={() => setOpenAdminPanel(false)} scope={adminScope} preAuthorized />
     </div>
   );
 }

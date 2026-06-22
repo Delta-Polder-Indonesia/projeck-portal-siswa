@@ -13,7 +13,6 @@ import {
   Clock,
   Megaphone,
   XCircle,
-  X,
 } from 'lucide-react';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
