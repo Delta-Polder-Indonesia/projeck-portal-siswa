@@ -81,7 +81,6 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
     }
   ];
 
-  // --- PENYESUAIAN WARNA: Karena bg sekarang putih, warna aktif & hover disesuaikan ---
   const activeColor = 'bg-sky-50 text-sky-600 font-bold shadow-sm';
   const avatarBg = isTeacher ? 'bg-blue-600' : 'bg-emerald-600';
 
@@ -113,7 +112,6 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
     <nav className="flex-1 p-3 space-y-6 overflow-y-auto">
       {menuSections.map((section) => (
         <div key={section.title} className="space-y-1">
-          {/* Judul Kategori diubah jadi abu-abu/biru redup agar kontras dengan latar putih */}
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-2">
             {section.title}
           </p>
@@ -143,7 +141,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
 
   return (
     <>
-      {/* Header atas tetap utuh dengan bg-sky-500 */}
+      {/* Header atas */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-sky-500 shadow-md">
         <div className="flex items-center h-14 px-4">
           <div className="flex items-center gap-1">
@@ -156,8 +154,8 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
                 />
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-white font-bold text-sm leading-tight">PORTAL SISWA</h1>
-                <p className="text-sky-100 text-[10px] leading-tight">SMP N 1 Majenang</p>
+                <h1 className="text-white font-bold text-sm leading-tight border-none p-0 m-0 bg-transparent">PORTAL SISWA</h1>
+                <p className="text-sky-100 text-[10px] leading-tight m-0 p-0">SMP N 1 Majenang</p>
               </div>
             </div>
 
@@ -228,8 +226,8 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
                   </div>
                 )}
                 <div className="hidden lg:block text-left">
-                  <p className="text-white text-xs font-medium leading-tight">{user?.name || 'User'}</p>
-                  <p className="text-sky-100 text-[10px]">{isTeacher ? 'Guru' : 'Siswa'}</p>
+                  <p className="text-white text-xs font-medium leading-tight m-0">{user?.name || 'User'}</p>
+                  <p className="text-sky-100 text-[10px] m-0">{isTeacher ? 'Guru' : 'Siswa'}</p>
                 </div>
                 <ChevronDown className={`w-4 h-4 text-sky-100 transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -248,8 +246,8 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
                           </div>
                         )}
                         <div>
-                          <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
-                          <p className="text-xs text-gray-500">{isTeacher ? 'Guru' : 'Siswa'}</p>
+                          <p className="text-sm font-semibold text-gray-800 m-0">{user?.name}</p>
+                          <p className="text-xs text-gray-500 m-0">{isTeacher ? 'Guru' : 'Siswa'}</p>
                         </div>
                       </div>
                     </div>
@@ -300,7 +298,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
         <div className="md:hidden fixed inset-0 bg-black/50 z-40 top-14" onClick={() => setMobileOpen(false)} />
       )}
 
-      {/* DESKTOP SIDEBAR - MODIFIKASI: bg berubah dari bg-sky-500 ke bg-white & border-gray-200 */}
+      {/* DESKTOP SIDEBAR */}
       <aside
         className={`hidden md:flex md:flex-col bg-white border-r border-gray-200 min-h-[calc(100vh-3.5rem)] fixed left-0 top-14 bottom-0 z-30 transition-all duration-300 ${
           sidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-64 opacity-100'
@@ -309,7 +307,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
         {sidebarContent}
       </aside>
 
-      {/* MOBILE SIDEBAR - MODIFIKASI: bg berubah dari bg-sky-500 ke bg-white & border-gray-200 */}
+      {/* MOBILE SIDEBAR */}
       <aside className={`md:hidden fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 z-40 flex flex-col transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {sidebarContent}
       </aside>

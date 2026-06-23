@@ -22,74 +22,76 @@ export default function DaftarNamaGuru() {
     }, [storeVersion]);
 
     return (
-        <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600">
-            <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
-                <h1 className="text-xl font-bold text-slate-800">Daftar Nama Guru</h1>
-                <p className="text-sm text-slate-500 mt-1">
+        <div className="max-w-5xl mx-auto p-4 antialiased text-slate-700 bg-white">
+            {/* Header Judul - Polos & Menyatu Tanpa Box Container */}
+            <div className="border-b border-slate-200 pb-3 mb-4">
+                <h1 className="text-sm font-bold text-slate-900 tracking-tight">Daftar Nama Guru</h1>
+                <p className="text-[11px] text-slate-500 mt-0.5">
                     Informasi profil korespondensi staf pengajar dan kurikulum.
                 </p>
             </div>
 
-            <section className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[700px] text-sm">
-                        <thead>
-                            <tr className="border-b border-slate-100 text-slate-500 font-semibold bg-slate-50/50">
-                                <th className="text-left py-3 px-4 w-12 rounded-tl-lg">No</th>
-                                <th className="text-left py-3 px-4 w-16">Profil</th>
-                                <th className="text-left py-3 px-4">Nama Guru</th>
-                                <th className="text-left py-3 px-4 w-48">Mata Pelajaran</th>
-                                <th className="text-left py-3 px-4 w-48">Kelas Binaan</th>
-                                <th className="text-right py-3 px-4 w-36 rounded-tr-lg">Kontak</th>
+            {/* Area Tabel Data Tradisional */}
+            <div className="overflow-x-auto">
+                <table className="w-full min-w-[700px] text-xs">
+                    <thead>
+                        <tr className="border-b border-slate-300 text-slate-800 font-bold bg-white">
+                            <th className="text-left py-2 px-2 w-10">No</th>
+                            <th className="text-left py-2 px-2 w-12">Profil</th>
+                            <th className="text-left py-2 px-2">Nama Guru</th>
+                            <th className="text-left py-2 px-2 w-40">Mata Pelajaran</th>
+                            <th className="text-left py-2 px-2 w-44">Kelas Binaan</th>
+                            <th className="text-right py-2 px-2 w-32">Kontak</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                        {daftarGuru.map((guru, index) => (
+                            <tr key={guru.id} className="hover:bg-slate-50/50 transition-colors">
+                                <td className="py-2 px-2 text-slate-400 font-semibold">{index + 1}</td>
+                                <td className="py-2 px-2">
+                                    {guru.avatar ? (
+                                        <img
+                                            src={guru.avatar}
+                                            alt={guru.name}
+                                            className="w-6 h-6 border border-slate-200 object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-6 h-6 bg-slate-100 text-slate-700 font-bold flex items-center justify-center border border-slate-200 text-[10px]">
+                                            {guru.name.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+                                </td>
+                                <td className="py-2 px-2 font-bold text-slate-900">{guru.name}</td>
+                                <td className="py-2 px-2 text-slate-600 text-[11px]">{guru.subject}</td>
+                                <td className="py-2 px-2 text-slate-600 text-[11px] truncate max-w-[170px]" title={guru.kelasAjar}>
+                                    {guru.kelasAjar}
+                                </td>
+                                <td className="py-2 px-2 text-right">
+                                    {guru.whatsapp ? (
+                                        <a
+                                            href={`https://wa.me/${guru.whatsapp.replace(/[^\d]/g, '')}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="inline-block border border-slate-300 hover:border-slate-900 text-slate-800 text-[11px] font-semibold px-2 py-0.5 transition-colors bg-white"
+                                        >
+                                            {guru.whatsapp}
+                                        </a>
+                                    ) : (
+                                        <span className="text-slate-300 px-2">-</span>
+                                    )}
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                            {daftarGuru.map((guru, index) => (
-                                <tr key={guru.id} className="hover:bg-slate-50/40 transition-colors">
-                                    <td className="py-3 px-4 text-slate-400 font-semibold">{index + 1}</td>
-                                    <td className="py-3 px-4">
-                                        {guru.avatar ? (
-                                            <img
-                                                src={guru.avatar}
-                                                alt={guru.name}
-                                                className="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-sm"
-                                            />
-                                        ) : (
-                                            <div className="w-8 h-8 rounded-full bg-sky-50 text-sky-600 font-bold flex items-center justify-center border border-sky-100">
-                                                {guru.name.charAt(0).toUpperCase()}
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="py-3 px-4 font-semibold text-slate-800">{guru.name}</td>
-                                    <td className="py-3 px-4 text-slate-500">{guru.subject}</td>
-                                    <td className="py-3 px-4 text-slate-500">{guru.kelasAjar}</td>
-                                    <td className="py-3 px-4 text-right">
-                                        {guru.whatsapp ? (
-                                            <a
-                                                href={`https://wa.me/${guru.whatsapp.replace(/[^\d]/g, '')}`}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="inline-block border border-slate-200 hover:border-slate-800 hover:bg-slate-800 hover:text-white text-slate-700 font-semibold px-3 py-1.5 rounded transition-all shadow-sm"
-                                            >
-                                                {guru.whatsapp}
-                                            </a>
-                                        ) : (
-                                            <span className="text-slate-300">-</span>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                            {daftarGuru.length === 0 && (
-                                <tr>
-                                    <td colSpan={6} className="py-8 text-center text-slate-400">
-                                        Tidak ada data guru yang ditemukan.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                        ))}
+                        {daftarGuru.length === 0 && (
+                            <tr>
+                                <td colSpan={6} className="py-6 text-center text-[11px] text-slate-400">
+                                    Tidak ada data guru yang ditemukan.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

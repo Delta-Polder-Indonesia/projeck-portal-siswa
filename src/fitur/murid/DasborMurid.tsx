@@ -7,13 +7,7 @@ import {
   getStudents,
   getAttendanceByStudent,
 } from '../../data/store';
-import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Megaphone,
-  XCircle,
-} from 'lucide-react';
+import { Megaphone, Calendar } from 'lucide-react';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
 const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -46,7 +40,6 @@ export default function StudentDashboard() {
   }, []);
 
   const student = useMemo(() => getStudents().find(s => s.id === user?.id), [user, storeVersion]);
-  const studentInitial = (student?.name || '?').charAt(0).toUpperCase();
   const className = useMemo(() => {
     if (!student) return '';
     return getClasses().find(c => c.id === student.classId)?.name || '';
@@ -89,158 +82,150 @@ export default function StudentDashboard() {
     const minimumPeriods = 6;
     const totalRows = Math.max(minimumPeriods, todayRosters.length);
     return Array.from({ length: totalRows }, (_, index) => ({
-      periodLabel: `JP-${index + 1}`,
+      periodLabel: `JP ${index + 1}`,
       roster: todayRosters[index],
     }));
   }, [todayRosters, currentDayOfWeek]);
 
   return (
-    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600">
+    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-100">
+      
+      {/* HEADER UTAMA (High-Density & Sharp Layout) */}
+      <header className="mb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-2 border-b border-slate-100">
+        <div>
+          <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-none">{student?.name}</h1>
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-1 leading-none">
+            <span>NIS {student?.nis}</span>
+            <span>·</span>
+            <span>Kelas {className}</span>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium bg-slate-50 border border-slate-200/60 rounded-sm px-1.5 py-0.5 self-start sm:self-auto leading-none">
+          <Calendar className="w-3 h-3 text-slate-400" />
+          <span>{dayNames[currentDayOfWeek]}, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+        </div>
+      </header>
 
-      {/* Header Profile Section - Clean All-White Corporate Look */}
-      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-lg font-semibold text-slate-700">
-            {studentInitial}
+      {/* METRIK PERFORMA (Compact & Compressed Grid) */}
+      <section className="mb-5 bg-slate-50/50 border border-slate-100 rounded-sm p-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          <div className="border-r border-slate-200/40 last:border-0 pr-2">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none">Rasio Hadir</span>
+            <span className="text-base font-bold text-slate-900 mt-0.5 block leading-none">
+              {stats.percentage}<span className="text-[10px] font-normal text-slate-400 ml-0.5">%</span>
+            </span>
+          </div>
+          <div className="border-r border-slate-200/40 last:border-0 pr-2">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none">Hadir</span>
+            <span className="text-base font-bold text-slate-900 mt-0.5 block leading-none">
+              {stats.hadir}<span className="text-[10px] font-normal text-slate-400 ml-0.5">/{stats.total} d</span>
+            </span>
+          </div>
+          <div className="border-r border-slate-200/40 last:border-0 pr-2">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none">Sakit</span>
+            <span className="text-base font-bold text-slate-900 mt-0.5 block leading-none">{stats.sakit}</span>
+          </div>
+          <div className="border-r border-slate-200/40 last:border-0 pr-2">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none">Izin</span>
+            <span className="text-base font-bold text-slate-900 mt-0.5 block leading-none">{stats.izin}</span>
           </div>
           <div>
-            <h1 className="text-base font-semibold text-slate-900 tracking-tight">{student?.name}</h1>
-            <p className="text-xs text-slate-400 mt-0.5">NIS: {student?.nis} &bull; Kelas {className}</p>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none">Alpha</span>
+            <span className="text-base font-bold text-rose-600 mt-0.5 block leading-none">{stats.alpha}</span>
           </div>
         </div>
+      </section>
 
-        {/* Compact Quick Stats */}
-        <div className="flex gap-2 border-t border-slate-100 pt-3 sm:pt-0 sm:border-0">
-          <div className="bg-slate-50/60 border border-slate-200/80 rounded px-3 py-1 text-center min-w-[80px]">
-            <p className="text-xs font-semibold text-slate-800">{stats.percentage}%</p>
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Rasio</p>
-          </div>
-          <div className="bg-slate-50/60 border border-slate-200/80 rounded px-3 py-1 text-center min-w-[80px]">
-            <p className="text-xs font-semibold text-slate-800">{stats.hadir}</p>
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Hadir</p>
-          </div>
-          <div className="bg-slate-50/60 border border-slate-200/80 rounded px-3 py-1 text-center min-w-[80px]">
-            <p className="text-xs font-semibold text-slate-800">{stats.total}</p>
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total</p>
-          </div>
-        </div>
-      </div>
+      {/* GRID KONTEN UTAMA (Rapat & Seimbang) */}
+      <div className="grid lg:grid-cols-12 gap-4">
 
-      {/* Attendance Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/80 flex items-center gap-3">
-          <div className="w-8 h-8 border border-slate-200 rounded flex items-center justify-center flex-shrink-0 bg-slate-50">
-            <CheckCircle className="w-3.5 h-3.5 text-slate-500" />
-          </div>
-          <div>
-            <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Hadir</p>
-            <p className="text-sm font-bold text-slate-800 mt-0.5">{stats.hadir}</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/80 flex items-center gap-3">
-          <div className="w-8 h-8 border border-slate-200 rounded flex items-center justify-center flex-shrink-0 bg-slate-50">
-            <AlertCircle className="w-3.5 h-3.5 text-slate-500" />
-          </div>
-          <div>
-            <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Izin</p>
-            <p className="text-sm font-bold text-slate-800 mt-0.5">{stats.izin}</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/80 flex items-center gap-3">
-          <div className="w-8 h-8 border border-slate-200 rounded flex items-center justify-center flex-shrink-0 bg-slate-50">
-            <Clock className="w-3.5 h-3.5 text-slate-500" />
-          </div>
-          <div>
-            <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Sakit</p>
-            <p className="text-sm font-bold text-slate-800 mt-0.5">{stats.sakit}</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/80 flex items-center gap-3">
-          <div className="w-8 h-8 border border-slate-200 rounded flex items-center justify-center flex-shrink-0 bg-slate-50">
-            <XCircle className="w-3.5 h-3.5 text-slate-500" />
-          </div>
-          <div>
-            <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Alpha</p>
-            <p className="text-sm font-bold text-slate-800 mt-0.5">{stats.alpha}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Dashboard Panel Split */}
-      <div className="grid lg:grid-cols-2 gap-4">
-
-        {/* Roster Section */}
-        <div className="bg-white rounded-xl p-5 shadow-xs border border-slate-200/80 flex flex-col">
-          <div className="border-b border-slate-100 pb-3 mb-3">
-            <h2 className="text-xs uppercase font-bold tracking-wider text-slate-800">Roster Hari Ini</h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Hari {dayNames[currentDayOfWeek]} &bull; Sinkronisasi sistem terjadwal berkala.
-            </p>
+        {/* JADWAL HARI INI (Tabel Administrasi Super Padat) */}
+        <section className="lg:col-span-8">
+          <div className="mb-2 border-b border-slate-100 pb-1">
+            <h2 className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Jadwal Kelas Hari Ini</h2>
           </div>
 
-          <div className="flex-1 overflow-y-auto max-h-[420px]">
-            {currentDayOfWeek === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-400 font-medium">Hari Minggu, tidak terdapat aktivitas pendaftaran kelas.</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[550px] text-xs">
-                  <thead>
-                    <tr className="border-b border-slate-100 text-slate-400 font-semibold">
-                      <th className="text-left py-2 w-16">JP</th>
-                      <th className="text-left py-2">Mata Pelajaran</th>
-                      <th className="text-left py-2 w-28">Waktu</th>
-                      <th className="text-left py-2 w-20">Ruang</th>
-                      <th className="text-left py-2 w-44">Tenaga Pengajar</th>
+          {currentDayOfWeek === 0 ? (
+            <div className="py-2 text-[11px] text-slate-400 font-medium italic">
+              Tidak ada jadwal pelajaran pada hari Minggu.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left table-fixed">
+                <thead>
+                  <tr className="border-b border-slate-200 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                    <th className="py-1 pr-2 w-10">Sesi</th>
+                    <th className="py-1 px-1.5 w-auto">Mata Pelajaran</th>
+                    <th className="py-1 px-1.5 w-24">Waktu</th>
+                    <th className="py-1 px-1.5 w-14">Ruang</th>
+                    <th className="py-1 pl-1.5 w-36">Guru Pengajar</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-[11px] text-slate-600">
+                  {todayRosterRows.map(row => (
+                    <tr key={`${currentDayOfWeek}-${row.periodLabel}`} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-1 pr-2 font-mono font-medium text-slate-400 leading-tight">{row.periodLabel}</td>
+                      <td className="py-1 px-1.5 font-medium text-slate-900 truncate leading-tight">
+                        {row.roster?.subject || <span className="text-slate-300 font-normal">—</span>}
+                      </td>
+                      <td className="py-1 px-1.5 font-mono text-slate-400 text-[10px] leading-tight">
+                        {row.roster ? `${row.roster.startTime} - ${row.roster.endTime}` : '—'}
+                      </td>
+                      <td className="py-1 px-1.5 leading-tight">
+                        {row.roster?.room ? (
+                          <span className="font-mono text-[9px] font-medium text-slate-500 bg-slate-100 border border-slate-200 px-1 py-0.2 rounded-sm">
+                            {row.roster.room}
+                          </span>
+                        ) : '—'}
+                      </td>
+                      <td className="py-1 pl-1.5 text-slate-500 truncate leading-tight">
+                        {row.roster?.teacherName || '—'}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                    {todayRosterRows.map(row => (
-                      <tr key={`${currentDayOfWeek}-${row.periodLabel}`} className="hover:bg-slate-50/40 transition-colors">
-                        <td className="py-2.5 font-semibold text-slate-800">{row.periodLabel}</td>
-                        <td className="py-2.5 text-slate-800">{row.roster?.subject || '-'}</td>
-                        <td className="py-2.5 text-slate-500 font-mono">{row.roster ? `${row.roster.startTime} - ${row.roster.endTime}` : '-'}</td>
-                        <td className="py-2.5 text-slate-500">
-                          {row.roster?.room ? (
-                            <span className="border border-slate-200 bg-slate-50 px-1.5 py-0.5 rounded text-[11px] font-mono font-medium text-slate-600">
-                              {row.roster.room}
-                            </span>
-                          ) : '-'}
-                        </td>
-                        <td className="py-2.5 text-slate-400 truncate max-w-[170px]">{row.roster?.teacherName || '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            {currentDayOfWeek !== 0 && todayRosters.length === 0 && (
-              <div className="py-8 text-center text-xs text-slate-400 font-medium">Belum ada entri jadwal di rilis untuk hari ini.</div>
-            )}
-          </div>
-        </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-        {/* Class Announcement Section */}
-        <div className="bg-white rounded-xl p-5 shadow-xs border border-slate-200/80 flex flex-col">
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-3">
-            <Megaphone className="w-3.5 h-3.5 text-slate-400" />
-            <h2 className="text-xs uppercase font-bold tracking-wider text-slate-800">Lembar Pengumuman Kelas</h2>
+          {currentDayOfWeek !== 0 && todayRosters.length === 0 && (
+            <div className="py-2 text-[11px] text-slate-400 italic">
+              Belum ada data jadwal pelajaran untuk hari ini.
+            </div>
+          )}
+        </section>
+
+        {/* PENGUMUMAN KELAS (High Density List) */}
+        <section className="lg:col-span-4">
+          <div className="flex items-center gap-1 mb-2 border-b border-slate-100 pb-1">
+            <Megaphone className="w-3 h-3 text-slate-400" />
+            <h2 className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Pengumuman</h2>
           </div>
 
-          <div className="flex-1 overflow-y-auto max-h-[420px] space-y-2.5 pr-1">
+          <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
             {classAnnouncements.map(item => (
-              <div key={item.id} className="border border-slate-200/60 bg-slate-50/30 p-3 rounded hover:border-slate-300 transition-colors">
-                <div className="flex justify-between items-start gap-4">
-                  <p className="text-xs font-semibold text-slate-800">{item.title}</p>
-                  <p className="text-[10px] font-mono text-slate-400 shrink-0">{new Date(item.createdAt).toLocaleDateString('id-ID')}</p>
+              <div key={item.id} className="text-[11px] bg-slate-50/40 p-1.5 border border-slate-100 rounded-sm">
+                <div className="flex items-baseline justify-between gap-1.5 border-b border-slate-200/60 pb-0.5">
+                  <h3 className="font-bold text-slate-900 leading-tight truncate max-w-[70%]">{item.title}</h3>
+                  <span className="text-[9px] font-mono text-slate-400 shrink-0">
+                    {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed whitespace-pre-line font-medium">{item.message}</p>
+                <p className="text-slate-500 mt-1 leading-tight whitespace-pre-line font-normal text-[11px]">
+                  {item.message}
+                </p>
               </div>
             ))}
+
             {classAnnouncements.length === 0 && (
-              <div className="py-8 text-center text-xs text-slate-400 font-medium">Belum ada maklumat pengumuman khusus kelas.</div>
+              <div className="py-1 text-[11px] text-slate-400 italic">
+                Tidak ada pengumuman terbaru.
+              </div>
             )}
           </div>
-        </div>
+        </section>
+
       </div>
     </div>
   );

@@ -9,215 +9,151 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col" style={{ backgroundColor: '#f8fafc' }}>
-            {/* Header - Dipersempit agar lebih hemat tempat */}
-            <div className="flex items-center justify-between px-8 py-3 border-b" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#1e3a5f' }}>
-                        <Info className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-900 leading-tight">Panduan Penggunaan Portal</h2>
-                        <p className="text-gray-500 text-xs">SMP Negeri 1 Majenang</p>
-                    </div>
-                </div>
-                <button
-                    onClick={onClose}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                    <X className="w-5 h-5" />
-                </button>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-8 py-8 max-[600px]:px-5 max-[600px]:py-5">
-                <div className="max-w-4xl mx-auto">
-                    {/* Intro */}
-                    <div className="mb-6">
-                        <p className="text-gray-600 leading-relaxed text-sm">
-                            Portal ini digunakan untuk accessing informasi akademik, nilai, jadwal pelajaran,
-                            dan administrasi sekolah. Berikut adalah langkah-langkah untuk masuk ke dalam sistem.
+        <div className="fixed inset-0 z-[100] flex flex-col bg-white font-serif text-gray-900">
+            {/* Content Area (Scrollable) */}
+            {/* Mengubah max-w-4xl menjadi max-w-6xl agar lebar halaman konsisten dengan profil sekolah */}
+            <div className="flex-1 overflow-y-auto px-8 py-8 max-[600px]:px-4">
+                <div className="max-w-6xl mx-auto"> 
+                    
+                    {/* Banner / Judul Utama Gaya Koran - Menyatu di Paling Atas */}
+                    <div className="text-center pb-5 mb-6 border-b-4 border-double border-gray-900">
+                        <p className="text-xs uppercase tracking-widest font-sans font-bold text-gray-600 mb-1">
+                            Petunjuk Resmi • Jurnal Academic
+                        </p>
+                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight leading-none mb-2">
+                            PANDUAN AKSES PORTAL
+                        </h1>
+                        <p className="text-sm italic text-gray-600">
+                            Tata Cara dan Langkah-Langkah Memasuki Sistem Informasi SMP N 1 Majenang
                         </p>
                     </div>
 
-                    {/* Steps */}
-                    <div className="space-y-5 mb-8">
-                        {/* Step 1 */}
-                        <div className="flex gap-4">
-                            <div className="flex-shrink-0">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: '#1e3a5f' }}>
-                                    1
-                                </div>
-                                <div className="w-px h-full mx-auto mt-2" style={{ backgroundColor: '#e2e8f0', minHeight: '30px' }} />
-                            </div>
-                            <div className="pb-4">
-                                <h3 className="text-base font-bold text-gray-900 mb-1">Pilih Peran</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed mb-2">
-                                    Pada halaman utama, Anda akan melihat dua pilihan: <strong className="text-gray-800">Guru</strong> dan <strong className="text-gray-800">Siswa</strong>.
-                                    Klik sesuai dengan status Anda di sekolah.
-                                </p>
-                                <div className="p-2.5 rounded-lg text-xs" style={{ backgroundColor: '#f1f5f9', color: '#64748b' }}>
-                                    <strong>Catatan:</strong> Setiap peran memiliki akses fitur yang berbeda. Pastikan Anda memilih dengan benar.
-                                </div>
-                            </div>
+                    {/* Intro Artikel */}
+                    <div className="mb-6 pb-6 border-b border-gray-400">
+                        <p className="text-justify text-sm leading-relaxed text-gray-800 first-letter:text-4xl first-letter:font-bold first-letter:float-left first-letter:mr-2 first-letter:line-height-none">
+                            Portal informasi ini dirancang khusus untuk memfasilitasi seluruh warga sekolah dalam mengakses informasi akademik, rekapitulasi nilai, jadwal pelajaran berkala, serta kelengkapan administrasi. Demi kelancaran bersama, diharapkan seluruh pengguna mengikuti instruksi otentikasi di bawah ini dengan saksama.
+                        </p>
+                    </div>
+
+                    {/* Seksi Utama: Langkah-Langkah Masuk */}
+                    <div className="space-y-6 pb-6 border-b border-gray-400">
+                        <h3 className="text-base font-black uppercase tracking-tight border-b border-gray-900 pb-1 mb-4 font-serif">
+                            I. Prosedur Otentikasi Pengguna
+                        </h3>
+
+                        {/* Langkah 1 */}
+                        <div className="text-justify">
+                            <h4 className="font-bold text-sm uppercase font-sans text-gray-900 mb-1">
+                                Langkah 1: Penentuan Peran Pengguna
+                            </h4>
+                            <p className="text-sm leading-relaxed text-gray-700 pl-4 border-l-2 border-gray-900">
+                                Pada halaman muka sistem, Anda diwajibkan untuk memilih salah satu dari dua kategori peran yang tersedia, yaitu <span className="font-bold">Guru</span> atau <span className="font-bold">Siswa</span>. Klik tombol pembagi yang sesuai dengan status keanggotaan aktif Anda di lingkungan sekolah. 
+                                <span className="italic block text-xs text-gray-600 mt-1">*Catatan: Kekeliruan dalam memilih peran akan menyebabkan kegagalan sistem pengenalan identitas.</span>
+                            </p>
                         </div>
 
-                        {/* Step 2 */}
-                        <div className="flex gap-4">
-                            <div className="flex-shrink-0">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: '#1e3a5f' }}>
-                                    2
-                                </div>
-                                <div className="w-px h-full mx-auto mt-2" style={{ backgroundColor: '#e2e8f0', minHeight: '30px' }} />
-                            </div>
-                            <div className="pb-4">
-                                <h3 className="text-base font-bold text-gray-900 mb-1">Masukkan Data Login</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                                    Setelah memilih peran, isi kolom <strong className="text-gray-800">NIP/NIS</strong> dan <strong className="text-gray-800">Kata Sandi</strong>
-                                    dengan data yang telah diberikan oleh pihak sekolah.
-                                </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div className="p-2.5 rounded-lg border" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                                        <p className="text-xs font-semibold text-gray-700 mb-0.5">Untuk Guru</p>
-                                        <p className="text-xs text-gray-500">Gunakan NIP sebagai username</p>
-                                    </div>
-                                    <div className="p-2.5 rounded-lg border" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                                        <p className="text-xs font-semibold text-gray-700 mb-0.5">Untuk Siswa</p>
-                                        <p className="text-xs text-gray-500">Gunakan NIS sebagai username</p>
-                                    </div>
-                                </div>
-                            </div>
+                        {/* Langkah 2 */}
+                        <div className="text-justify">
+                            <h4 className="font-bold text-sm uppercase font-sans text-gray-900 mb-1">
+                                Langkah 2: Pengisian Kredensial Resmi
+                            </h4>
+                            <p className="text-sm leading-relaxed text-gray-700 mb-2 pl-4 border-l-2 border-gray-900">
+                                Setelah peran ditentukan, isilah kolom kosong yang tersedia dengan nomor identitas resmi. Bagi tenaga pendidik (<span className="font-bold">Guru</span>), gunakan Nomor Induk Pegawai (NIP) masing-masing. Sedangkan bagi seluruh <span className="font-bold">Siswa</span>, diwajibkan menggunakan Nomor Induk Siswa (NIS) yang terdaftar pada lembar administrasi pusat.
+                            </p>
                         </div>
 
-                        {/* Step 3 */}
-                        <div className="flex gap-4">
-                            <div className="flex-shrink-0">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: '#1e3a5f' }}>
-                                    3
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="text-base font-bold text-gray-900 mb-1">Klik Tombol Masuk</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed">
-                                    Setelah data terisi, tekan tombol <strong className="text-gray-800">Masuk</strong>.
-                                    Jika data benar, Anda akan diarahkan ke halaman dashboard sesuai peran yang dipilih.
-                                </p>
-                            </div>
+                        {/* Langkah 3 */}
+                        <div className="text-justify">
+                            <h4 className="font-bold text-sm uppercase font-sans text-gray-900 mb-1">
+                                Langkah 3: Pernyataan Masuk Sistem
+                            </h4>
+                            <p className="text-sm leading-relaxed text-gray-700 pl-4 border-l-2 border-gray-900">
+                                Pastikan kembali seluruh digit angka dan kombinasi kata sandi terisi dengan benar tanpa spasi tambahan. Tekan tombol <span className="font-bold uppercase font-sans text-xs border border-gray-900 px-1">Masuk</span> untuk mengirimkan perintah validasi data ke server pusat. Jika sesuai, Anda akan langsung dialihkan menuju bilah instrumen utama.
+                            </p>
                         </div>
                     </div>
 
-                    {/* Demo Accounts */}
-                    <div className="mb-8">
-                        <h3 className="text-base font-bold text-gray-900 mb-3">Akun untuk Uji Coba</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="p-4 rounded-lg border" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <BookOpen className="w-4 h-4 text-blue-600" />
-                                    <span className="font-semibold text-gray-900 text-sm">Akun Guru</span>
-                                </div>
-                                <table className="w-full text-xs">
-                                    <tbody>
-                                        <tr>
-                                            <td className="text-gray-500 py-0.5">NIP / Username</td>
-                                            <td className="text-gray-900 font-mono py-0.5 text-right">198501012010011001</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="text-gray-500 py-0.5">Password</td>
-                                            <td className="text-gray-900 font-mono py-0.5 text-right">guru123</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div className="p-4 rounded-lg border" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <GraduationCap className="w-4 h-4 text-emerald-600" />
-                                    <span className="font-semibold text-gray-900 text-sm">Akun Siswa</span>
-                                </div>
-                                <table className="w-full text-xs">
-                                    <tbody>
-                                        <tr>
-                                            <td className="text-gray-500 py-0.5">NIS / Username</td>
-                                            <td className="text-gray-900 font-mono py-0.5 text-right">2024001</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="text-gray-500 py-0.5">Password</td>
-                                            <td className="text-gray-900 font-mono py-0.5 text-right">siswa123</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div className="p-4 rounded-lg border" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <User className="w-4 h-4 text-purple-600" />
-                                    <span className="font-semibold text-gray-900 text-sm">Admin Guru</span>
-                                </div>
-                                <table className="w-full text-xs">
-                                    <tbody>
-                                        <tr>
-                                            <td className="text-gray-500 py-0.5">Username</td>
-                                            <td className="text-gray-900 font-mono py-0.5 text-right">adm_guru</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="text-gray-500 py-0.5">Password</td>
-                                            <td className="text-gray-900 font-mono py-0.5 text-right">admin123</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div className="p-4 rounded-lg border" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <User className="w-4 h-4 text-pink-600" />
-                                    <span className="font-semibold text-gray-900 text-sm">Admin Siswa</span>
-                                </div>
-                                <table className="w-full text-xs">
-                                    <tbody>
-                                        <tr>
-                                            <td className="text-gray-500 py-0.5">Username</td>
-                                            <td className="text-gray-900 font-mono py-0.5 text-right">adm_siswa</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="text-gray-500 py-0.5">Password</td>
-                                            <td className="text-gray-900 font-mono py-0.5 text-right">admin123</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    {/* Seksi Akun Uji Coba */}
+                    <div className="pt-6 pb-6 border-b border-gray-400">
+                        <h3 className="text-base font-black uppercase tracking-tight border-b border-gray-900 pb-1 mb-4 font-serif">
+                            II. Lampiran Akun Uji Coba (Demo)
+                        </h3>
+                        <p className="text-xs text-gray-600 italic mb-4">
+                            *Tabel di bawah ini memuat data akun percontohan guna keperluan pengujian sistem oleh pihak internal:
+                        </p>
+                        
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm border-collapse border-t-2 border-b-2 border-gray-950 font-sans">
+                                <thead>
+                                    <tr className="border-b border-gray-900 uppercase text-xs font-bold text-gray-700">
+                                        <th className="py-2 pr-4">Klasifikasi Peran</th>
+                                        <th className="py-2 pr-4">Nama Pengguna (Username)</th>
+                                        <th className="py-2 text-right">Kata Sandi (Password)</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-300">
+                                    <tr>
+                                        <td className="py-2.5 font-bold text-gray-900">A. Tenaga Pendidik (Guru)</td>
+                                        <td className="py-2.5 font-mono text-xs">198501012010011001</td>
+                                        <td className="py-2.5 font-mono text-xs text-right">guru123</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2.5 font-bold text-gray-900">B. Siswa Aktif</td>
+                                        <td className="py-2.5 font-mono text-xs">2024001</td>
+                                        <td className="py-2.5 font-mono text-xs text-right">siswa123</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2.5 font-bold text-gray-900">C. Administrator Guru</td>
+                                        <td className="py-2.5 font-mono text-xs">adm_guru</td>
+                                        <td className="py-2.5 font-mono text-xs text-right">admin123</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2.5 font-bold text-gray-900">D. Administrator Siswa</td>
+                                        <td className="py-2.5 font-mono text-xs">adm_siswa</td>
+                                        <td className="py-2.5 font-mono text-xs text-right">admin123</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    {/* Tips */}
-                    <div className="p-4 rounded-lg border mb-6" style={{ backgroundColor: '#fffbeb', borderColor: '#fcd34d' }}>
-                        <h4 className="font-bold text-amber-800 text-sm mb-2 flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4" />
-                            Beberapa Hal yang Perlu Diperhatikan
-                        </h4>
-                        <ul className="space-y-1.5 text-xs text-amber-900/80">
-                            <li className="flex items-start gap-2">
-                                <span className="mt-1.5 w-1 h-1 rounded-full bg-amber-400 flex-shrink-0" />
-                                <span>Jangan membagikan kata sandi Anda kepada orang lain.</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="mt-1.5 w-1 h-1 rounded-full bg-amber-400 flex-shrink-0" />
-                                <span>Selalu logout setelah selesai menggunakan portal di perangkat umum.</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="mt-1.5 w-1 h-1 rounded-full bg-amber-400 flex-shrink-0" />
-                                <span>Jika lupa kata sandi, hubungi admin sekolah untuk reset password.</span>
-                            </li>
-                        </ul>
+                    {/* Seksi Maklumat Keamanan */}
+                    <div className="pt-6 pb-8 border-b-2 border-gray-950">
+                        <div className="border border-gray-950 p-4">
+                            <h4 className="font-bold text-sm uppercase text-center tracking-wide mb-3 text-gray-900 font-sans">
+                                ! MAKLUMAT PENTING PERLINDUNGAN DATA !
+                            </h4>
+                            <ul className="space-y-2 text-xs text-justify text-gray-800">
+                                <li className="list-disc list-inside">
+                                    <span className="font-bold">Kerahasiaan Sandi:</span> Dilarang keras membagikan ataupun memperlihatkan kombinasi kata sandi Anda kepada pihak lain demi menghindari penyalahgunaan wewenang berkas.
+                                </li>
+                                <li className="list-disc list-inside">
+                                    <span className="font-bold">Terminasi Sesi:</span> Pastikan Anda selalu menekan opsi <span className="italic">Log Out</span> (Keluar Sistem) secara sempurna setelah selesai mengoperasikan portal, terutama jika menggunakan perangkat komputer umum.
+                                </li>
+                                <li className="list-disc list-inside">
+                                    <span className="font-bold">Pemulihan Akun:</span> Apabila terjadi kendala hilangnya akses atau lupa kata sandi, segeralah melapor ke ruang Tata Usaha untuk dilakukan penyetelan ulang oleh petugas operator.
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
-                    {/* Note Bantuan Terintegrasi */}
-                    <p className="text-center text-xs text-gray-400 pb-2">
-                        Butuh bantuan tambahan? Hubungi admin sekolah.
+                    {/* Catatan Kaki Kecil */}
+                    <p className="text-center text-[11px] text-gray-500 font-sans italic pt-4 mb-6">
+                        Layanan Bantuan Terintegrasi • Sekretariat SMP Negeri 1 Majenang
                     </p>
+
+                    {/* Tombol Aksi Penutup Koran di Paling Bawah */}
+                    <div className="flex justify-center pb-4">
+                        <button
+                            onClick={onClose}
+                            className="px-8 py-3 border-2 border-gray-950 font-sans text-sm font-black uppercase tracking-wider text-gray-900 hover:bg-gray-950 hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                        >
+                            KEMBALI KE PORTAL UTAMA [SELESAI MEMBACA]
+                        </button>
+                    </div>
+
                 </div>
             </div>
-
-            {/* Bagian Footer Bawah yang Kosong Telah Dihapus Sepenuhnya */}
         </div>
     );
 }

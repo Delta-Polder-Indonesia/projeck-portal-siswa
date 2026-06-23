@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
     getPengumumanAdmin,
@@ -15,6 +15,7 @@ export default function PengumumanSekolah() {
     const storeVersion = useStoreVersion();
     const [previewImage, setPreviewImage] = useState<{ src: string; title: string } | null>(null);
 
+    // Menghitung pengumuman berdasarkan role pengguna (Logika bisnis dipertahankan)
     const pengumumanAdmin = useMemo(() => {
         if (user?.role === 'student') {
             const student = getStudents().find((s) => s.id === user.id);
@@ -24,92 +25,111 @@ export default function PengumumanSekolah() {
             if (teacher) return getPengumumanAdminUntukGuru(teacher.classIds);
         }
         return getPengumumanAdmin();
-    }, [user, storeVersion]);
+    }, [user?.role, user?.id, storeVersion]);
+
+    // Menutup modal preview menggunakan tombol Escape
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setPreviewImage(null);
+        };
+
+        if (previewImage) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [previewImage]);
 
     return (
-        <div className="space-y-5 max-w-[1400px] mx-auto p-2 antialiased text-slate-600">
-            <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center gap-3">
-                <div className="w-12 h-12 bg-sky-50 rounded-lg flex items-center justify-center">
-                    <Megaphone className="w-6 h-6 text-sky-600" />
+        <div className="max-w-5xl mx-auto p-4 antialiased text-slate-700 bg-white">
+            {/* Header Judul - Polos & Menyatu dengan Halaman */}
+            <div className="border-b border-slate-200 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                    <Megaphone className="w-4 h-4 text-slate-800" />
+                    <h1 className="text-sm font-bold text-slate-900 tracking-tight">Pengumuman Sekolah</h1>
                 </div>
-                <div>
-                    <h1 className="text-xl font-bold text-slate-800">Pengumuman Sekolah</h1>
-                    <p className="text-sm text-slate-500 mt-1">
-                        Informasi resmi dan pemberitahuan penting dari sekolah.
-                    </p>
-                </div>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                    Informasi resmi dan pemberitahuan penting dari sekolah.
+                </p>
             </div>
 
-            <section className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {pengumumanAdmin.map((item) => (
-                        <article
-                            key={item.id}
-                            className="border border-slate-200 rounded-lg p-4 flex flex-col justify-between bg-white hover:border-slate-300 transition-colors"
-                        >
-                            <div>
-                                <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3 mb-3">
-                                    <h3 className="text-sm font-bold text-slate-800 break-words">{item.title}</h3>
-                                    <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                                        {new Date(item.createdAt).toLocaleDateString('id-ID')}
-                                    </span>
-                                </div>
-                                <p className="text-xs text-slate-500 font-medium leading-relaxed whitespace-pre-line mb-3">
-                                    {item.message}
-                                </p>
+            {/* List Pengumuman - Aliran List Normal & High Density */}
+            <div className="divide-y divide-slate-100">
+                {pengumumanAdmin.map((item) => (
+                    <div
+                        key={item.id}
+                        className="py-3 flex flex-col md:flex-row md:items-start justify-between gap-4 first:pt-0"
+                    >
+                        {/* Area Teks Informasi */}
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[10px] font-mono text-slate-400 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded-sm shrink-0">
+                                    {new Date(item.createdAt).toLocaleDateString('id-ID')}
+                                </span>
+                                <h2 className="text-xs font-bold text-slate-900 truncate">{item.title}</h2>
                             </div>
+                            <p className="text-[11px] text-slate-600 leading-relaxed whitespace-pre-line pl-1">
+                                {item.message}
+                            </p>
+                        </div>
 
-                            {item.imageDataUrl && (
+                        {/* Lampiran Gambar jika Ada */}
+                        {item.imageDataUrl && (
+                            <div className="shrink-0 md:w-28 w-full">
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setPreviewImage({ src: item.imageDataUrl || '', title: item.title })
                                     }
-                                    className="group relative mt-2 block w-full aspect-video overflow-hidden rounded border border-slate-200 bg-slate-50 cursor-zoom-in hover:border-slate-900 transition-colors"
+                                    className="block w-full aspect-video md:aspect-square overflow-hidden rounded-sm border border-slate-200 cursor-zoom-in"
                                 >
                                     <img
                                         src={item.imageDataUrl}
                                         alt={item.imageName || item.title}
-                                        className="w-full h-full object-cover transition-transform group-hover:scale-[1.01]"
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
                                     />
-                                    <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/5 transition-colors" />
                                 </button>
-                            )}
-                        </article>
-                    ))}
-                    {pengumumanAdmin.length === 0 && (
-                        <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4 py-12 text-center text-sm text-slate-400 font-medium bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                            Belum ada pengumuman sekolah saat ini.
-                        </div>
-                    )}
-                </div>
-            </section>
+                            </div>
+                        )}
+                    </div>
+                ))}
+                
+                {pengumumanAdmin.length === 0 && (
+                    <div className="py-6 text-center text-xs text-slate-400 font-medium">
+                        Belum ada pengumuman sekolah saat ini.
+                    </div>
+                )}
+            </div>
 
             {/* Image Preview Overlay Modal */}
             {previewImage && (
                 <div
-                    className="fixed inset-0 z-[120] bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4"
+                    className="fixed inset-0 z-[120] bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4"
                     role="dialog"
                     aria-modal="true"
+                    onClick={() => setPreviewImage(null)}
                 >
-                    <div className="relative max-w-4xl w-full flex flex-col bg-white rounded-xl overflow-hidden border border-slate-200 shadow-2xl">
-                        <div className="flex justify-between items-center px-4 py-3 border-b border-slate-100 bg-white">
-                            <span className="text-xs font-bold text-slate-800 truncate pr-4">
+                    <div 
+                        className="relative max-w-xl w-full flex flex-col bg-white rounded-sm overflow-hidden border border-slate-300 shadow-lg"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex justify-between items-center px-3 py-1.5 border-b border-slate-200 bg-white">
+                            <span className="text-xs font-bold text-slate-900 truncate pr-3">
                                 {previewImage.title}
                             </span>
                             <button
                                 type="button"
                                 onClick={() => setPreviewImage(null)}
-                                className="text-slate-500 hover:text-slate-950 p-1.5 rounded border border-slate-200 hover:border-slate-900 transition-colors"
+                                className="text-slate-400 hover:text-slate-700 p-0.5 transition-colors"
                             >
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
-                        <div className="p-3 bg-slate-50/50 flex items-center justify-center">
+                        <div className="p-1 bg-slate-50 flex items-center justify-center">
                             <img
                                 src={previewImage.src}
                                 alt={previewImage.title}
-                                className="max-h-[75vh] w-auto h-auto object-contain rounded border border-slate-200/60 shadow-sm"
+                                className="max-h-[65vh] w-auto h-auto object-contain"
                             />
                         </div>
                     </div>

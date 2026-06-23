@@ -81,24 +81,22 @@ export default function HistoryPage() {
       case 'hadir': return 'Hadir';
       case 'izin': return 'Izin';
       case 'sakit': return 'Sakit';
-      case 'alpha': return 'Alpha (Tanpa Keterangan)';
+      case 'alpha': return 'Alpha';
       default: return '-';
     }
   };
 
-  // Konfigurasi CSS Kalender berdasarkan Instruksi Warna Baru
   const statusClasses = (status?: string, isSelected?: boolean) => {
-    if (isSelected) return 'ring-2 ring-slate-800 ring-offset-1 z-10';
+    if (isSelected) return 'ring-2 ring-slate-900 ring-offset-1 z-10';
     switch (status) {
-      case 'hadir': return 'bg-emerald-500 text-white border border-emerald-600'; // Hijau
-      case 'izin': return 'bg-blue-500 text-white border border-blue-600';     // Biru
-      case 'sakit': return 'bg-amber-400 text-slate-900 border border-amber-500'; // Kuning
-      case 'alpha': return 'bg-rose-500 text-white border border-rose-600';     // Merah
-      default: return 'bg-transparent text-slate-400 hover:bg-slate-50';
+      case 'hadir': return 'bg-emerald-500 text-white hover:bg-emerald-600';
+      case 'izin': return 'bg-blue-500 text-white hover:bg-blue-600';
+      case 'sakit': return 'bg-amber-400 text-slate-900 hover:bg-amber-500';
+      case 'alpha': return 'bg-rose-500 text-white hover:bg-rose-600';
+      default: return 'bg-transparent text-slate-400 hover:bg-slate-50 border border-transparent';
     }
   };
 
-  // Konfigurasi Dot Status pada Panel Detail Informasi
   const statusDotClass = (status: string) => {
     switch (status) {
       case 'hadir': return 'bg-emerald-500';
@@ -110,51 +108,51 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="space-y-4 max-w-[1600px] mx-auto p-1 antialiased text-slate-600">
+    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-100">
       
-      {/* Top Bar Header */}
-      <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-xs">
-        <h1 className="text-base font-semibold text-slate-800 tracking-tight">Riwayat Absensi & Kehadiran</h1>
-        <p className="text-xs text-slate-400 mt-0.5">Pantau log data presensi harian individual dan catatan verifikasi instruktur.</p>
-      </div>
+      {/* HEADER HALAMAN */}
+      <header className="mb-4 pb-2 border-b border-slate-100">
+        <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-none">Riwayat Presensi</h1>
+        <p className="text-[11px] text-slate-400 mt-1 leading-none">Lihat rekam jejak absensi harian dan catatan evaluasi bulanan Anda.</p>
+      </header>
 
-      {/* Main Split Interface Layout */}
-      <div className="grid lg:grid-cols-[340px_1fr] gap-4 items-start">
+      {/* WORKSPACE MULTI-KOLOM */}
+      <div className="grid lg:grid-cols-[260px_1fr] gap-6 items-start">
         
-        {/* Left Side: Calendar Control Station */}
-        <div className="bg-white rounded-xl p-4 shadow-xs border border-slate-200/60 h-fit space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        {/* PANEL KALENDER (Kiri) */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
             <div className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-slate-500" />
-              <h2 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">Navigasi Kalender</h2>
+              <Calendar className="w-3.5 h-3.5 text-slate-700" />
+              <h2 className="text-[10px] font-bold text-slate-900 uppercase tracking-wider">Kalender</h2>
             </div>
             <div className="flex items-center gap-1">
               <button 
                 type="button"
                 onClick={() => navigateMonth(-1)} 
-                className="p-1 hover:bg-slate-50 border border-slate-200 rounded transition-colors"
+                className="p-0.5 hover:bg-slate-50 border border-slate-200 rounded-sm transition-colors"
               >
-                <ChevronLeft className="w-3.5 h-3.5 text-slate-600" />
+                <ChevronLeft className="w-3 h-3 text-slate-600" />
               </button>
-              <span className="text-xs font-mono font-semibold text-slate-700 min-w-[100px] text-center">{monthLabel}</span>
+              <span className="text-[11px] font-semibold text-slate-800 min-w-[80px] text-center">{monthLabel}</span>
               <button 
                 type="button"
                 onClick={() => navigateMonth(1)} 
-                className="p-1 hover:bg-slate-50 border border-slate-200 rounded transition-colors"
+                className="p-0.5 hover:bg-slate-50 border border-slate-200 rounded-sm transition-colors"
               >
-                <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+                <ChevronRight className="w-3 h-3 text-slate-600" />
               </button>
             </div>
           </div>
 
-          {/* Weekday Grid Label */}
+          {/* Nama-Nama Hari */}
           <div className="grid grid-cols-7 gap-1">
             {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => (
-              <div key={day} className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider py-0.5">{day}</div>
+              <div key={day} className="text-center text-[10px] font-medium text-slate-400 py-0.5">{day}</div>
             ))}
           </div>
 
-          {/* Calendar Day Grid Matrix */}
+          {/* Grid Matriks Tanggal */}
           <div className="space-y-1">
             {calendarData.weeks.map((week, weekIndex) => (
               <div key={`${selectedMonth}-w-${weekIndex}`} className="grid grid-cols-7 gap-1">
@@ -167,8 +165,8 @@ export default function HistoryPage() {
                       key={`${day.date}-${dayIndex}`}
                       disabled={isBlank}
                       onClick={() => setSelectedDate(day.date)}
-                      className={`aspect-square rounded text-xs font-mono font-semibold transition-all ${
-                        isBlank ? 'bg-transparent border-0 pointer-events-none' : ''
+                      className={`aspect-square rounded-sm text-[11px] font-mono font-semibold transition-all flex items-center justify-center ${
+                        isBlank ? 'bg-transparent border-0 pointer-events-none' : 'cursor-pointer'
                       } ${statusClasses(day.record?.status, isSelected)}`}
                     >
                       {!isBlank ? day.day : ''}
@@ -179,35 +177,36 @@ export default function HistoryPage() {
             ))}
           </div>
 
-          {/* Legend Warna Sesuai Instruksi Baru */}
-          <div className="flex flex-wrap gap-x-3 gap-y-1.5 pt-3 border-t border-slate-100 text-[11px] font-medium text-slate-400">
-            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-xs bg-emerald-500" /> Hadir</div>
-            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-xs bg-blue-500" /> Izin</div>
-            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-xs bg-amber-400" /> Sakit</div>
-            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-xs bg-rose-500" /> Alpha</div>
-            <span className="text-[10px] font-mono font-semibold text-slate-500 ml-auto bg-slate-50 px-1.5 py-0.5 border border-slate-200 rounded">{calendarData.monthAttendance.length} Log</span>
+          {/* Keterangan Warna Minimalis */}
+          <div className="flex flex-wrap gap-x-2 gap-y-1 pt-2 border-t border-slate-100 text-[10px] font-medium text-slate-400">
+            <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Hadir</div>
+            <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Izin</div>
+            <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Sakit</div>
+            <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-rose-500" /> Alpha</div>
+            <span className="text-[9px] font-mono font-medium text-slate-400 ml-auto bg-slate-50 px-1 py-0.5 border border-slate-100 rounded-sm">
+              {calendarData.monthAttendance.length} Entri
+            </span>
           </div>
         </div>
 
-        {/* Right Side: Operational Log Specifications */}
-        <div className="bg-white rounded-xl p-4 shadow-xs border border-slate-200/60 min-h-[305px]">
-          <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2.5 mb-4">
-            <Info className="w-3.5 h-3.5 text-slate-500" />
-            <h2 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">Spesifikasi Catatan Harian</h2>
+        {/* DETAIL DOKUMENTASI HARIAN (Kanan) */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2">
+            <Info className="w-3.5 h-3.5 text-slate-700" />
+            <h2 className="text-[10px] font-bold text-slate-900 uppercase tracking-wider">Detail Catatan Harian</h2>
           </div>
           
           {!selectedDate ? (
-            <div className="h-[200px] flex flex-col items-center justify-center text-center">
-              <Calendar className="w-8 h-8 text-slate-200 mb-1.5" />
-              <p className="text-xs font-semibold text-slate-700">Pangkalan Data Siap</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Pilih indeks tanggal aktif pada kalender untuk memuat ringkasan log.</p>
+            <div className="py-12 border border-dashed border-slate-200 rounded-sm text-center bg-slate-50/30">
+              <Calendar className="w-6 h-6 text-slate-300 mx-auto mb-1" />
+              <p className="text-[11px] text-slate-400 italic">Pilih salah satu tanggal aktif pada kalender untuk melihat rincian.</p>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="bg-slate-50/60 border border-slate-100 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="bg-slate-50/50 border border-slate-100 rounded-sm px-3 py-2 flex items-center justify-between gap-4">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tanggal Terpilih</span>
-                  <p className="text-sm font-semibold text-slate-800 mt-0.5">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block leading-none">Tanggal Terpilih</span>
+                  <p className="text-xs font-bold text-slate-900 mt-1 leading-none">
                     {new Date(`${selectedDate}T00:00:00`).toLocaleDateString('id-ID', {
                       weekday: 'long',
                       day: 'numeric',
@@ -216,43 +215,44 @@ export default function HistoryPage() {
                     })}
                   </p>
                 </div>
-                <span className="text-xs font-mono font-medium text-slate-400 bg-white px-2 py-0.5 border border-slate-200 rounded">{selectedDate}</span>
+                <span className="text-[10px] font-mono text-slate-400 bg-white px-1.5 py-0.5 border border-slate-200 rounded-sm">{selectedDate}</span>
               </div>
 
               {selectedRecord ? (
-                <div className="space-y-3.5">
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <div className="border border-slate-200/70 rounded-lg p-3">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="border border-slate-100 rounded-sm p-3 space-y-0.5">
                       <div className="flex items-center gap-1.5 text-slate-400">
-                        <div className={`w-2.5 h-2.5 rounded-xs ${statusDotClass(selectedRecord.status)}`} />
-                        <span className="text-[10px] uppercase font-bold tracking-wider ml-0.5">Status Kehadiran</span>
+                        <div className={`w-1.5 h-1.5 rounded-full ${statusDotClass(selectedRecord.status)}`} />
+                        <span className="text-[9px] uppercase font-bold tracking-wider">Status Kehadiran</span>
                       </div>
-                      <p className="text-sm font-bold text-slate-800 mt-1">{statusLabel(selectedRecord.status)}</p>
+                      <p className="text-xs font-bold text-slate-900 pt-0.5">{statusLabel(selectedRecord.status)}</p>
                     </div>
                     
-                    <div className="border border-slate-200/70 rounded-lg p-3">
+                    <div className="border border-slate-100 rounded-sm p-3 space-y-0.5">
                       <div className="flex items-center gap-1.5 text-slate-400">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-[10px] uppercase font-bold tracking-wider">Waktu Sinkronisasi</span>
+                        <Clock className="w-3 h-3 text-slate-400" />
+                        <span className="text-[9px] uppercase font-bold tracking-wider">Waktu Sinkronisasi</span>
                       </div>
-                      <p className="text-sm font-mono font-semibold text-slate-800 mt-1">
+                      <p className="text-xs font-mono font-bold text-slate-900 pt-0.5">
                         {new Date(selectedRecord.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} WIB
                       </p>
                     </div>
                   </div>
 
-                  <div className="border border-slate-200/70 rounded-lg p-3 space-y-1">
+                  <div className="border border-slate-100 rounded-sm p-3 space-y-1.5 bg-white">
                     <div className="flex items-center gap-1.5 text-slate-400">
-                      <FileText className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="text-[10px] uppercase font-bold tracking-wider">Catatan Evaluasi / Keterangan</span>
+                      <FileText className="w-3 h-3 text-slate-400" />
+                      <span className="text-[9px] uppercase font-bold tracking-wider">Catatan / Keterangan</span>
                     </div>
-                    <p className="text-xs text-slate-700 leading-relaxed pt-0.5 font-medium">{selectedRecord.note || 'Tidak ada klausa catatan tambahan dari instruktur.'}</p>
+                    <p className="text-xs text-slate-600 leading-normal font-medium">
+                      {selectedRecord.note || 'Tidak ada catatan tambahan dari instruktur atau guru pamong.'}
+                    </p>
                   </div>
                 </div>
               ) : (
-                <div className="border border-dashed border-slate-200 rounded-lg p-8 text-center text-slate-400">
-                  <p className="text-xs font-semibold text-slate-600">Kosong (No Record)</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Tidak ditemukan berkas komparasi absensi siswa pada pangkalan sistem untuk tanggal ini.</p>
+                <div className="py-8 border border-dashed border-slate-200 rounded-sm text-center bg-slate-50/20">
+                  <p className="text-[11px] text-slate-400 italic">Tidak ada catatan presensi yang terekam pada tanggal ini.</p>
                 </div>
               )}
             </div>

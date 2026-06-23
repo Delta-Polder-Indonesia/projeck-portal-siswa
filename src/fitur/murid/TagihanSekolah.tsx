@@ -52,7 +52,6 @@ export default function TagihanSekolahPage() {
   const storeVersion = useStoreVersion();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   
-  // Menampung daftar ID tagihan yang dipilih oleh siswa
   const [selectedBillIds, setSelectedBillIds] = useState<string[]>([]);
   const [selectedMethod, setSelectedMethod] = useState<NonNullable<TagihanSekolah['paymentMethod']>>('atm');
   const [infoMessage, setInfoMessage] = useState<string>('');
@@ -66,6 +65,7 @@ export default function TagihanSekolahPage() {
 
   const bills = useMemo(() => {
     if (!user) return [];
+    // Perbaikan typo: getTagihanSchoolBySiswa -> getTagihanSekolahBySiswa
     return getTagihanSekolahBySiswa(user.id, activeYear);
   }, [user, activeYear, storeVersion]);
 
@@ -81,17 +81,14 @@ export default function TagihanSekolahPage() {
     };
   }, [bills]);
 
-  // Mengambil data tagihan yang statusnya belum lunas DAN dipilih oleh siswa
   const billsToPay = useMemo(() => {
     return bills.filter(item => selectedBillIds.includes(item.id) && item.status === 'belum_lunas');
   }, [bills, selectedBillIds]);
 
-  // Total biaya akumulasi dari bulan-bulan yang dipilih
   const totalSelectedAmount = useMemo(() => {
     return billsToPay.reduce((sum, item) => sum + item.amount, 0);
   }, [billsToPay]);
 
-  // Fungsi saat tombol "Pilih" atau "Batal" di dalam tabel diklik
   const handleToggleSelectBill = (id: string) => {
     setInfoMessage('');
     setSelectedBillIds(prev =>
@@ -99,7 +96,6 @@ export default function TagihanSekolahPage() {
     );
   };
 
-  // Eksekusi pembayaran berantai untuk semua ID bulan yang dipilih
   const handleBayarMulti = () => {
     if (billsToPay.length === 0) return;
     
@@ -108,7 +104,7 @@ export default function TagihanSekolahPage() {
     });
 
     const listBulan = billsToPay.map(b => MONTH_NAMES[b.month - 1]).join(', ');
-    setInfoMessage(`Pembayaran untuk bulan [ ${listBulan} ] tahun ${activeYear} berhasil diproses.`);
+    setInfoMessage(`Pembayaran untuk periode [ ${listBulan} ] tahun ${activeYear} berhasil diproses.`);
     setSelectedBillIds([]);
   };
 
@@ -255,25 +251,25 @@ export default function TagihanSekolahPage() {
   };
 
   return (
-    <div className="space-y-4 max-w-[1400px] mx-auto p-2 text-slate-600 antialiased">
+    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-50 space-y-4">
       
-      {/* Top Summary Card */}
-      <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* HEADER HALAMAN & RINGKASAN */}
+      <section className="space-y-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-1.5">
           <div>
-            <h1 className="text-base font-semibold text-slate-900 tracking-tight">Tagihan Uang Sekolah</h1>
-            <p className="text-xs text-slate-400 mt-0.5">Daftar rekonsiliasi kas bulanan siswa berdasarkan tahun ajaran.</p>
+            <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-none">Tagihan Kewajiban Sekolah</h1>
+            <p className="text-[11px] text-slate-400 mt-1 leading-none font-medium">Daftar rekonsiliasi kas administrasi siswa berdasarkan periode aktif.</p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium">Tahun</span>
+          <div className="flex items-center gap-1.5 self-start sm:self-auto leading-none">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tahun Buku:</span>
             <select
               value={activeYear}
               onChange={(event) => {
                 setSelectedYear(Number(event.target.value));
-                setSelectedBillIds([]); // Reset pilihan jika ganti tahun
+                setSelectedBillIds([]); 
                 setInfoMessage('');
               }}
-              className="border border-slate-200 rounded px-2.5 py-1.5 text-xs font-medium bg-white text-slate-700 focus:outline-hidden"
+              className="border border-slate-200 rounded-sm px-2 py-0.5 text-xs font-semibold bg-white text-slate-700 cursor-pointer focus:outline-hidden hover:border-slate-300 transition-colors"
             >
               {availableYears.map(year => (
                 <option key={year} value={year}>{year}</option>
@@ -282,160 +278,171 @@ export default function TagihanSekolahPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
-          <div className="rounded-lg border border-slate-100 p-3.5 bg-slate-50/50">
-            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Tagihan</p>
-            <p className="text-base font-semibold text-slate-800 mt-1">{formatRupiah(ringkasan.totalTagihan)}</p>
+        {/* Grid Informasi Keuangan Pendek */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="border border-slate-100 rounded-sm p-2 bg-slate-50/40 space-y-0.5">
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider leading-none">Total Tagihan Tahunan</p>
+            <p className="text-xs font-bold text-slate-900 leading-none">{formatRupiah(ringkasan.totalTagihan)}</p>
           </div>
-          <div className="rounded-lg border border-slate-200/60 p-3.5">
-            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Sudah Dibayar</p>
-            <p className="text-base font-semibold text-slate-800 mt-1">{ringkasan.jumlahLunas} Bulan</p>
+          <div className="border border-slate-100 rounded-sm p-2 bg-slate-50/10 space-y-0.5">
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider leading-none">Kliring Terbayar</p>
+            <p className="text-xs font-bold text-slate-800 leading-none">{ringkasan.jumlahLunas} Bulan</p>
           </div>
-          <div className="rounded-lg border border-slate-200/60 p-3.5">
-            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Belum Dibayar</p>
-            <p className="text-base font-semibold text-slate-800 mt-1">{ringkasan.jumlahBelumLunas} Bulan</p>
+          <div className="border border-slate-100 rounded-sm p-2 bg-slate-50/10 space-y-0.5">
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider leading-none">Tunggakan Administrasi</p>
+            <p className="text-xs font-bold text-slate-800 leading-none">{ringkasan.jumlahBelumLunas} Bulan</p>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Main Logs Table */}
-      <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <h2 className="text-xs uppercase font-bold tracking-wider text-slate-800">Daftar Bulanan Tahun {activeYear}</h2>
+      {/* STRUKTUR TABEL UTAMA */}
+      <section className="space-y-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-0.5">
+          <h2 className="text-[10px] font-bold text-slate-900 uppercase tracking-wider">Rincian Laporan Bulanan ({activeYear})</h2>
           <button
+            type="button"
             onClick={handleUnduhDaftarTahunanPdf}
-            className="px-3 py-1.5 rounded border border-slate-200 text-slate-700 text-xs font-medium bg-white hover:bg-slate-50 transition-colors"
+            className="text-[10px] font-bold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded-sm transition-colors cursor-pointer self-start sm:self-auto leading-none"
           >
-            Unduh Laporan PDF
+            Unduh Laporan Tahunan (.PDF)
           </button>
         </div>
         
-        <div className="overflow-x-auto mt-2">
-          <table className="w-full min-w-[760px] text-xs">
-            <thead>
-              <tr className="text-slate-400 border-b border-slate-100 font-semibold">
-                <th className="text-left px-2 py-3">Bulan</th>
-                <th className="text-left px-2 py-3">Nominal</th>
-                <th className="text-left px-2 py-3">Jatuh Tempo</th>
-                <th className="text-left px-2 py-3">Status</th>
-                <th className="text-left px-2 py-3">Metode Bayar</th>
-                <th className="text-right px-2 py-3 w-[120px]">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-              {bills.map(item => {
-                const isSelected = selectedBillIds.includes(item.id);
-                return (
-                  <tr 
-                    key={item.id} 
-                    className={`transition-colors ${
-                      isSelected 
-                        ? 'bg-slate-900/[0.03] hover:bg-slate-900/[0.05]' 
-                        : 'hover:bg-slate-50/40'
-                    }`}
-                  >
-                    <td className="px-2 py-3 font-semibold text-slate-800">{MONTH_NAMES[item.month - 1]}</td>
-                    <td className="px-2 py-3 font-mono">{formatRupiah(item.amount)}</td>
-                    <td className="px-2 py-3 text-slate-400">{item.dueDate}</td>
-                    <td className="px-2 py-3">
-                      <div className="flex items-center gap-1.5">
-                        <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'lunas' ? 'bg-slate-800' : 'bg-slate-300'}`} />
-                        <span>{item.status === 'lunas' ? 'Lunas' : 'Belum Lunas'}</span>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3 text-slate-500">{getPaymentMethodLabel(item.paymentMethod)}</td>
-                    <td className="px-2 py-3 text-right">
-                      {item.status === 'belum_lunas' ? (
-                        <button
-                          onClick={() => handleToggleSelectBill(item.id)}
-                          className={`w-[100px] py-1.5 rounded text-xs font-semibold tracking-tight transition-all text-center inline-block cursor-pointer ${
-                            isSelected
-                              ? 'bg-amber-600 text-white border border-transparent hover:bg-amber-700'
-                              : 'bg-white text-slate-800 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                          }`}
-                        >
-                          {isSelected ? '✓ Terpilih' : 'Pilih Bulan'}
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleUnduhBuktiPdf(item)}
-                          className="w-[100px] py-1.5 rounded border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors text-center inline-block"
-                        >
-                          Bukti Bulanan
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="border border-slate-100 rounded-sm overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-xs text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-400 font-bold text-[10px] uppercase tracking-wider border-b border-slate-100">
+                  <th className="px-3 py-1.5">Bulan Periode</th>
+                  <th className="px-3 py-1.5 w-32 shrink-0">Nominal</th>
+                  <th className="px-3 py-1.5 w-28 shrink-0">Jatuh Tempo</th>
+                  <th className="px-3 py-1.5 w-28 shrink-0">Status Kelayakan</th>
+                  <th className="px-3 py-1.5 w-36 shrink-0">Kanal Kliring</th>
+                  <th className="px-3 py-1.5 w-24 shrink-0 text-right">Tindakan</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 bg-white text-slate-600">
+                {bills.map(item => {
+                  const isSelected = selectedBillIds.includes(item.id);
+                  return (
+                    <tr 
+                      key={item.id} 
+                      className={`transition-colors leading-tight ${
+                        isSelected ? 'bg-slate-50/70 font-semibold' : 'hover:bg-slate-50/10'
+                      }`}
+                    >
+                      <td className="px-3 py-1.5 font-bold text-slate-900">{MONTH_NAMES[item.month - 1]}</td>
+                      <td className="px-3 py-1.5 font-mono text-slate-900 font-medium">{formatRupiah(item.amount)}</td>
+                      <td className="px-3 py-1.5 text-slate-400 text-[11px] font-mono">{item.dueDate}</td>
+                      <td className="px-3 py-1.5 text-[11px]">
+                        <div className="flex items-center gap-1">
+                          <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'lunas' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                          <span className={item.status === 'lunas' ? 'text-emerald-700 font-bold' : 'text-slate-500'}>
+                            {item.status === 'lunas' ? 'Lunas' : 'Belum Lunas'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-1.5 text-slate-500 text-[11px] font-medium">{getPaymentMethodLabel(item.paymentMethod)}</td>
+                      <td className="px-3 py-1.5 text-right">
+                        {item.status === 'belum_lunas' ? (
+                          <button
+                            type="button"
+                            onClick={() => handleToggleSelectBill(item.id)}
+                            className={`w-[76px] py-0.5 rounded-sm text-[10px] font-bold tracking-tight transition-all text-center inline-block cursor-pointer border ${
+                              isSelected
+                                ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600'
+                                : 'bg-white text-slate-800 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                            }`}
+                          >
+                            {isSelected ? '✓ Terpilih' : 'Pilih Bulan'}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleUnduhBuktiPdf(item)}
+                            className="w-[76px] py-0.5 rounded-sm border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:text-slate-800 transition-colors text-center inline-block cursor-pointer text-[10px] font-bold"
+                          >
+                            Unduh Resi
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Payment Hub Station */}
-      <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-        <div>
-          <h2 className="text-xs uppercase font-bold tracking-wider text-slate-800">Mode Pembayaran</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Pilih salah satu metode yang tersedia untuk melakukan kliring tagihan.</p>
+      {/* METODE PEMBAYARAN HUB */}
+      <section className="border border-slate-100 rounded-sm p-3 space-y-3 shadow-sm">
+        <div className="leading-none">
+          <h2 className="text-[10px] font-bold text-slate-900 uppercase tracking-wider">Kanal Gerbang Pembayaran</h2>
+          <p className="text-[11px] text-slate-400 mt-1 font-medium">Pilih salah satu instrumen keuangan pembayaran sah di bawah ini.</p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5">
           {PAYMENT_METHODS.map(method => {
             const isTarget = selectedMethod === method.value;
             return (
               <button
                 key={method.value}
+                type="button"
                 onClick={() => setSelectedMethod(method.value)}
-                className={`rounded border p-2.5 text-left transition-all ${
+                className={`rounded-sm border p-2 text-left transition-all cursor-pointer ${
                   isTarget
                     ? 'border-slate-900 bg-slate-50/50 ring-1 ring-slate-900'
                     : 'border-slate-200 hover:border-slate-300 bg-white'
                 }`}
               >
-                <div className="flex items-center gap-2 text-slate-700">
-                  {method.value === 'atm' && <Landmark className="w-3.5 h-3.5" />}
-                  {method.value === 'mobile_banking' && <CreditCard className="w-3.5 h-3.5" />}
-                  {method.value === 'internet_banking' && <CreditCard className="w-3.5 h-3.5" />}
-                  {method.value === 'ewallet' && <Wallet className="w-3.5 h-3.5" />}
-                  {method.value === 'tunai' && <CircleDollarSign className="w-3.5 h-3.5" />}
-                  <span className="text-xs font-medium tracking-tight">{method.label}</span>
+                <div className="flex flex-col gap-1 text-slate-700 leading-tight">
+                  <div className="text-slate-900">
+                    {method.value === 'atm' && <Landmark className="w-3.5 h-3.5" />}
+                    {method.value === 'mobile_banking' && <CreditCard className="w-3.5 h-3.5" />}
+                    {method.value === 'internet_banking' && <CreditCard className="w-3.5 h-3.5" />}
+                    {method.value === 'ewallet' && <Wallet className="w-3.5 h-3.5" />}
+                    {method.value === 'tunai' && <CircleDollarSign className="w-3.5 h-3.5" />}
+                  </div>
+                  <span className="text-xs font-bold tracking-tight text-slate-800">{method.label}</span>
                 </div>
               </button>
             );
           })}
         </div>
 
-        {/* Form Controls Checkout Layout */}
-        <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 mt-2 pt-4">
+        {/* CHECKOUT SUBMISSION AREA */}
+        <div className="border-t border-slate-100 pt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3 leading-none">
           <div className="text-xs">
             {billsToPay.length > 0 ? (
               <p className="text-slate-500 font-medium">
-                Mekanisme pembayaran: <span className="text-slate-900 font-bold">{billsToPay.length} Bulan</span> dipilih dengan akumulasi tagihan:{' '}
-                <span className="text-slate-900 font-mono font-bold text-sm bg-slate-100 px-2 py-0.5 rounded border border-slate-200/60 ml-1">
+                Mekanisme pembayaran: <span className="text-slate-900 font-bold">{billsToPay.length} Bulan</span> terpilih dengan akumulasi tagihan:{' '}
+                <span className="text-slate-900 font-mono font-bold text-[11px] bg-slate-50 px-1 py-0.5 rounded-sm border border-slate-200 ml-1 inline-block">
                   {formatRupiah(totalSelectedAmount)}
                 </span>
               </p>
             ) : (
-              <p className="text-slate-400 italic">Klik tombol "Pilih Bulan" pada tabel di atas untuk membayar.</p>
+              <p className="text-slate-400 italic text-[11px] font-medium">Pilih satu atau several bulan pada tabel rincian di atas untuk memuat otorisasi kas.</p>
             )}
           </div>
           
           <button
+            type="button"
             onClick={handleBayarMulti}
             disabled={billsToPay.length === 0}
-            className="px-5 py-2 rounded bg-slate-900 text-white text-xs font-semibold disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed hover:bg-black transition-all shadow-xs"
+            className="px-3 py-1.5 rounded-sm bg-slate-900 text-white text-xs font-bold disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed hover:bg-black transition-all cursor-pointer self-start md:self-auto shadow-xs"
           >
-            Proses Pembayaran ({billsToPay.length})
+            Eksekusi Transaksi ({billsToPay.length})
           </button>
         </div>
 
         {infoMessage && (
-          <div className="text-xs font-medium text-slate-800 p-2 border border-slate-200 bg-slate-50 rounded">
+          <div className="text-xs font-semibold text-slate-700 p-2 border border-slate-200 bg-slate-50/50 rounded-sm leading-normal">
             {infoMessage}
           </div>
         )}
-      </div>
+      </section>
+      
     </div>
   );
 }

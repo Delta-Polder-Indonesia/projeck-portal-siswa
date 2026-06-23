@@ -79,16 +79,16 @@ export default function RapotSiswa() {
       const bobot = getBobotNilai(item.predikat);
       return `
         <tr style="background: #fff;">
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">${idx + 1}</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">${formatTA}</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center; font-family: monospace;">${item.id?.substring(0, 5) || '4210' + (idx + 1)}</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px 12px; text-align: left;">${item.mataPelajaran}</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">${semester === 'ganjil' ? '1' : '2'}</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">3</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">KKNI</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center; font-weight: bold;">${item.predikat}</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">${bobot}</td>
-          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center; font-weight: bold;">${bobot * 3}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center;">${idx + 1}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center;">${formatTA}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center; font-family: monospace;">${item.id?.substring(0, 5) || '4210' + (idx + 1)}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px 8px; text-align: left;">${item.mataPelajaran}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center;">${semester === 'ganjil' ? '1' : '2'}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center;">3</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center;">KKNI</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center; font-weight: bold;">${item.predikat}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center;">${bobot}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 4px; text-align: center; font-weight: bold;">${bobot * 3}</td>
         </tr>
       `;
     }).join('');
@@ -99,13 +99,13 @@ export default function RapotSiswa() {
       <head>
         <title>Portal Mahasiswa UNPAB - KHS</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px; color: #333; font-size: 11px; }
-          .header-blue { background: #2291c3; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px 4px 0 0; }
-          .header-blue h1 { margin: 0; font-size: 15px; font-weight: bold; }
-          table { width: 100%; border-collapse: collapse; margin-top: 0px; font-size: 11px; }
-          th { background: #79c7ec; border: 1px solid #b4dbf0; padding: 8px 4px; color: #1c5877; font-weight: bold; text-transform: uppercase; text-align: center; }
+          body { font-family: Arial, sans-serif; padding: 15px; color: #333; font-size: 11px; }
+          .header-blue { background: #2291c3; color: white; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 2px 2px 0 0; }
+          .header-blue h1 { margin: 0; font-size: 13px; font-weight: bold; }
+          table { width: 100%; border-collapse: collapse; margin-top: 0px; font-size: 10px; }
+          th { background: #79c7ec; border: 1px solid #b4dbf0; padding: 6px 2px; color: #1c5877; font-weight: bold; text-transform: uppercase; text-align: center; }
           .sub-th { background: #99d5f1; }
-          .summary-strip { background: #79c7ec; color: #1c5877; font-weight: bold; padding: 8px 12px; border: 1px solid #b4dbf0; border-top: none; text-transform: uppercase; }
+          .summary-strip { background: #79c7ec; color: #1c5877; font-weight: bold; padding: 6px 10px; border: 1px solid #b4dbf0; border-top: none; text-transform: uppercase; font-size: 10px; }
           @media print { .header-blue { background: #2291c3 !important; -webkit-print-color-adjust: exact; } th { background: #79c7ec !important; -webkit-print-color-adjust: exact; } .sub-th { background: #99d5f1 !important; -webkit-print-color-adjust: exact; } .summary-strip { background: #79c7ec !important; -webkit-print-color-adjust: exact; } }
         </style>
       </head>
@@ -113,9 +113,9 @@ export default function RapotSiswa() {
         <div class="header-blue">
           <div>
             <h1>PORTAL MAHASISWA UNPAB</h1>
-            <div style="font-size: 10px; margin-top: 2px; opacity: 0.9;">Kartu Hasil Studi (KHS) Digital</div>
+            <div style="font-size: 9px; margin-top: 1px; opacity: 0.9;">Kartu Hasil Studi (KHS) Digital</div>
           </div>
-          <div style="text-align: right; font-weight: bold; font-size: 10px; line-height: 1.3;">
+          <div style="text-align: right; font-weight: bold; font-size: 9px; line-height: 1.2;">
             NAMA: ${student?.name?.toUpperCase() || '-'}<br>
             NPM/NIS: ${student?.nis || '-'} &bull; KELAS: ${className}
           </div>
@@ -123,19 +123,19 @@ export default function RapotSiswa() {
         <table>
           <thead>
             <tr>
-              <th rowspan="2" style="width: 35px;">No.</th>
-              <th rowspan="2" style="width: 110px;">TA</th>
-              <th rowspan="2" style="width: 70px;">Kode</th>
+              <th rowspan="2" style="width: 30px;">No.</th>
+              <th rowspan="2" style="width: 100px;">TA</th>
+              <th rowspan="2" style="width: 60px;">Kode</th>
               <th rowspan="2">Mata Kuliah</th>
-              <th rowspan="2" style="width: 45px;">SMT</th>
-              <th rowspan="2" style="width: 45px;">SKS</th>
-              <th rowspan="2" style="width: 85px;">Kurikulum</th>
-              <th colspan="2" class="sub-th" style="border-bottom: 1px solid #b4dbf0; width: 100px;">Nilai</th>
-              <th rowspan="2" style="width: 60px;">(K x N)</th>
+              <th rowspan="2" style="width: 40px;">SMT</th>
+              <th rowspan="2" style="width: 40px;">SKS</th>
+              <th rowspan="2" style="width: 75px;">Kurikulum</th>
+              <th colspan="2" class="sub-th" style="border-bottom: 1px solid #b4dbf0; width: 90px;">Nilai</th>
+              <th rowspan="2" style="width: 50px;">(K x N)</th>
             </tr>
             <tr>
-              <th class="sub-th" style="border-right: 1px solid #b4dbf0; width: 50px;">Huruf</th>
-              <th class="sub-th" style="width: 50px;">Angka</th>
+              <th class="sub-th" style="border-right: 1px solid #b4dbf0; width: 45px;">Huruf</th>
+              <th class="sub-th" style="width: 45px;">Angka</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
@@ -153,29 +153,29 @@ export default function RapotSiswa() {
   };
 
   return (
-    <div className="space-y-4 max-w-[1600px] mx-auto p-2 antialiased text-slate-600">
+    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-100">
       
-      {/* Top Filter Workspace Control */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-wrap gap-4 items-end justify-between">
-        <div className="flex flex-wrap gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pilih Tahun Ajaran</span>
+      {/* PANEL FILTER ATAS (Normal & Compact) */}
+      <div className="mb-4 pb-2 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tahun Ajaran</span>
             <select
               value={tahunAjaran}
               onChange={e => setTahunAjaran(e.target.value)}
-              className="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
+              className="px-2 py-0.5 bg-white border border-slate-200 rounded-sm text-xs font-medium text-slate-700 outline-none focus:border-slate-400"
             >
               {tahunAjaranList.map(ta => (
                 <option key={ta} value={ta}>{ta}</option>
               ))}
             </select>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pilih Semester</span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Semester</span>
             <select
               value={semester}
               onChange={e => setSemester(e.target.value as 'ganjil' | 'genap')}
-              className="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
+              className="px-2 py-0.5 bg-white border border-slate-200 rounded-sm text-xs font-medium text-slate-700 outline-none focus:border-slate-400"
             >
               <option value="ganjil">Ganjil</option>
               <option value="genap">Genap</option>
@@ -187,42 +187,44 @@ export default function RapotSiswa() {
           <button
             type="button"
             onClick={handleCetakRapot}
-            className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded text-xs font-bold hover:bg-blue-700 transition-colors shadow-sm"
+            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-900 text-white rounded-sm text-xs font-medium hover:bg-slate-800 transition-colors self-start sm:self-auto shrink-0"
           >
-            <Download className="w-4 h-4" /> Cetak KHS (Portal Style)
+            <Download className="w-3 h-3" /> 
+            <span>Cetak KHS Digital</span>
           </button>
         )}
       </div>
 
-      {/* TAMPILAN UTAMA: REPLIKA KHS DIGITAL PORTAL UNPAB */}
+      {/* REPLIKA KHS DIGITAL PORTAL UNPAB */}
       {nilaiRapot.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 border border-slate-200 shadow-sm text-center">
-          <BookOpenCheck className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-xs font-bold text-slate-600">Belum ada Kartu Hasil Studi (KHS) yang diterbitkan.</p>
+        <div className="py-12 border border-dashed border-slate-200 rounded-sm text-center bg-slate-50/30">
+          <BookOpenCheck className="w-6 h-6 text-slate-300 mx-auto mb-1" />
+          <p className="text-[11px] text-slate-400 italic">Belum ada nilai Kartu Hasil Studi (KHS) yang diterbitkan untuk semester ini.</p>
         </div>
       ) : (
-        <div className="bg-white shadow-md border border-sky-200 rounded-lg overflow-hidden">
+        <div className="border border-sky-200/80 rounded-sm overflow-hidden shadow-sm">
           
           {/* Header Biru Cerah Khas Portal */}
-          <div className="bg-[#2291c3] p-4 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-sky-300">
+          <div className="bg-[#2291c3] p-2 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-2">
             <div>
-              <h2 className="text-base font-black tracking-wide">PORTAL MAHASISWA UNPAB</h2>
-              <p className="text-[11px] text-sky-100 font-medium mt-0.5">Sistem Informasi Kartu Hasil Studi (KHS) Akademik</p>
+              <h2 className="text-xs font-bold tracking-wide leading-none">PORTAL MAHASISWA UNPAB</h2>
+              <p className="text-[10px] text-sky-100/90 mt-1 leading-none">Sistem Informasi Kartu Hasil Studi (KHS) Akademik</p>
             </div>
             
-            <div className="flex items-center gap-3 bg-sky-900/20 p-2 rounded-md border border-sky-400/30 font-sans text-[11px]">
+            <div className="flex items-center gap-2 bg-sky-950/15 px-2 py-1 rounded-sm border border-sky-400/15 text-[11px] max-w-full">
               {student?.avatar ? (
-                <img src={student.avatar} alt="" className="w-9 h-9 rounded bg-white object-cover" />
+                <img src={student.avatar} alt="" className="w-6 h-6 rounded-sm bg-white object-cover shrink-0" />
               ) : (
-                <div className="w-9 h-9 rounded bg-sky-100 flex items-center justify-center text-sky-800">
-                  <User className="w-4 h-4" />
+                <div className="w-6 h-6 rounded-sm bg-sky-100 flex items-center justify-center text-sky-800 shrink-0">
+                  <User className="w-3 h-3" />
                 </div>
               )}
-              <div className="leading-tight">
-                <div><span className="text-sky-200">MAHASISWA:</span> <strong className="text-white uppercase">{student?.name}</strong></div>
-                <div className="mt-0.5">
-                  <span className="text-sky-200">NPM:</span> <span className="font-mono text-white mr-2">{student?.nis}</span> 
-                  <span className="text-sky-200">KELAS:</span> <span className="text-white">{className}</span>
+              <div className="leading-none truncate">
+                <div className="truncate"><span className="text-sky-200/80 text-[10px]">NAMA:</span> <strong className="text-white uppercase font-bold">{student?.name}</strong></div>
+                <div className="mt-1 text-[10px] flex flex-wrap gap-x-2 text-sky-100/90 font-mono">
+                  <span>NPM: {student?.nis}</span> 
+                  <span className="text-sky-300/40">|</span>
+                  <span className="font-sans">KELAS: {className}</span>
                 </div>
               </div>
             </div>
@@ -230,42 +232,42 @@ export default function RapotSiswa() {
 
           {/* Tabel Grid KHS Utama */}
           <div className="overflow-x-auto">
-            <table className="w-full text-[11px] font-sans">
+            <table className="w-full text-xs font-sans text-left border-collapse">
               <thead>
                 {/* Header Tingkat 1 */}
                 <tr className="bg-[#79c7ec] text-[#1c5877] font-bold text-center border-b border-[#b4dbf0]">
-                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-10" rowSpan={2}>No.</th>
-                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-28" rowSpan={2}>TA</th>
-                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-20" rowSpan={2}>Kode</th>
-                  <th className="px-3 py-2.5 border-r border-[#b4dbf0] font-bold text-left" rowSpan={2}>Mata Kuliah</th>
-                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-14" rowSpan={2}>SMT</th>
-                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-14" rowSpan={2}>SKS</th>
-                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-24" rowSpan={2}>Kurikulum</th>
-                  <th className="px-2 py-1.5 border-b border-[#b4dbf0] font-bold text-center bg-[#99d5f1]" colSpan={2}>Nilai</th>
-                  <th className="px-2 py-2.5 font-bold text-center w-16" rowSpan={2}>(K * N)</th>
+                  <th className="px-1.5 py-1.5 border-r border-[#b4dbf0] w-8 shrink-0" rowSpan={2}>No.</th>
+                  <th className="px-1.5 py-1.5 border-r border-[#b4dbf0] w-20 shrink-0" rowSpan={2}>TA</th>
+                  <th className="px-1.5 py-1.5 border-r border-[#b4dbf0] w-14 shrink-0" rowSpan={2}>Kode</th>
+                  <th className="px-2.5 py-1.5 border-r border-[#b4dbf0] text-left" rowSpan={2}>Mata Kuliah</th>
+                  <th className="px-1.5 py-1.5 border-r border-[#b4dbf0] w-10 shrink-0" rowSpan={2}>SMT</th>
+                  <th className="px-1.5 py-1.5 border-r border-[#b4dbf0] w-10 shrink-0" rowSpan={2}>SKS</th>
+                  <th className="px-1.5 py-1.5 border-r border-[#b4dbf0] w-16 shrink-0" rowSpan={2}>Kurikulum</th>
+                  <th className="px-1.5 py-0.5 border-b border-[#b4dbf0] bg-[#99d5f1] w-20 shrink-0" colSpan={2}>Nilai</th>
+                  <th className="px-1.5 py-1.5 w-12 shrink-0" rowSpan={2}>(K * N)</th>
                 </tr>
                 {/* Sub-Header Tingkat 2 */}
                 <tr className="bg-[#99d5f1] text-[#1c5877] font-bold text-center border-b border-[#b4dbf0]">
-                  <th className="px-2 py-1 border-r border-[#b4dbf0] font-bold text-center w-14">Huruf</th>
-                  <th className="px-2 py-1 border-r border-[#b4dbf0] font-bold text-center w-14">Angka</th>
+                  <th className="px-1.5 py-0.5 border-r border-[#b4dbf0] w-10 shrink-0">Huruf</th>
+                  <th className="px-1.5 py-0.5 border-r border-[#b4dbf0] w-10 shrink-0">Angka</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#b4dbf0] bg-white text-slate-800">
+              <tbody className="divide-y divide-[#b4dbf0] bg-white text-slate-700">
                 {nilaiRapot.map((item, idx) => {
                   const bobotAngka = getBobotNilai(item.predikat);
                   const sksItem = 3; 
                   return (
-                    <tr key={item.id} className="hover:bg-sky-50/40 transition-colors">
-                      <td className="px-2 py-2 text-center text-slate-400 font-mono border-r border-[#b4dbf0]">{idx + 1}</td>
-                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-medium text-slate-600">{formatTA}</td>
-                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-mono text-slate-500">{item.id?.substring(0, 5) || '4210' + (idx + 1)}</td>
-                      <td className="px-3 py-2 text-left border-r border-[#b4dbf0] font-semibold text-slate-800">{item.mataPelajaran}</td>
-                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0]">{semester === 'ganjil' ? '1' : '2'}</td>
-                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-medium">{sksItem}</td>
-                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] text-slate-500">KKNI</td>
-                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-bold text-blue-800">{item.predikat}</td>
-                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-medium">{bobotAngka}</td>
-                      <td className="px-2 py-2 text-center font-bold text-slate-900">{sksItem * bobotAngka}</td>
+                    <tr key={item.id} className="hover:bg-sky-50/10 transition-colors leading-tight">
+                      <td className="px-1.5 py-1 text-center text-slate-400 font-mono border-r border-[#b4dbf0] text-[11px]">{idx + 1}</td>
+                      <td className="px-1.5 py-1 text-center border-r border-[#b4dbf0] text-slate-500 text-[11px]">{formatTA}</td>
+                      <td className="px-1.5 py-1 text-center border-r border-[#b4dbf0] font-mono text-slate-400 text-[10px]">{item.id?.substring(0, 5) || '4210' + (idx + 1)}</td>
+                      <td className="px-2.5 py-1 border-r border-[#b4dbf0] font-medium text-slate-900">{item.mataPelajaran}</td>
+                      <td className="px-1.5 py-1 text-center border-r border-[#b4dbf0] font-mono">{semester === 'ganjil' ? '1' : '2'}</td>
+                      <td className="px-1.5 py-1 text-center border-r border-[#b4dbf0] font-mono">{sksItem}</td>
+                      <td className="px-1.5 py-1 text-center border-r border-[#b4dbf0] text-slate-400 text-[10px]">KKNI</td>
+                      <td className="px-1.5 py-1 text-center border-r border-[#b4dbf0] font-bold text-sky-700">{item.predikat}</td>
+                      <td className="px-1.5 py-1 text-center border-r border-[#b4dbf0] font-mono">{bobotAngka}</td>
+                      <td className="px-1.5 py-1 text-center font-bold text-slate-900 font-mono">{sksItem * bobotAngka}</td>
                     </tr>
                   );
                 })}
@@ -273,15 +275,15 @@ export default function RapotSiswa() {
             </table>
           </div>
 
-          {/* Strip Biru Total Parameter Persis Seperti Foto */}
-          <div className="bg-[#79c7ec] text-[#1c5877] font-bold px-4 py-2.5 text-xs border-t border-[#b4dbf0] uppercase tracking-wide flex flex-wrap gap-x-6 gap-y-2">
-            <span>TOTAL SKS : <span className="text-slate-900 font-black">{stats.totalSKS}</span></span>
+          {/* Strip Biru Total Parameter */}
+          <div className="bg-[#79c7ec] text-[#1c5877] font-bold px-2.5 py-1.5 text-[10px] border-t border-[#b4dbf0] uppercase tracking-wide flex flex-wrap gap-x-3 gap-y-0.5 items-center">
+            <span>TOTAL SKS : <span className="text-slate-900 font-extrabold font-mono">{stats.totalSKS}</span></span>
             <span className="text-sky-400/40">|</span>
-            <span>Jumlah K x N : <span className="text-slate-900 font-black">{stats.totalKN}</span></span>
+            <span>Jumlah K x N : <span className="text-slate-900 font-extrabold font-mono">{stats.totalKN}</span></span>
             <span className="text-sky-400/40">|</span>
-            <span>IP Semester : <span className="text-blue-900 font-black">{stats.ipSemester}</span></span>
+            <span>IP Semester : <span className="text-blue-900 font-extrabold font-mono">{stats.ipSemester}</span></span>
             <span className="text-sky-400/40">|</span>
-            <span>Beban SKS Berikut : <span className="text-slate-900 font-black">24</span></span>
+            <span>Beban SKS Berikut : <span className="text-slate-900 font-extrabold font-mono">24</span></span>
           </div>
 
         </div>

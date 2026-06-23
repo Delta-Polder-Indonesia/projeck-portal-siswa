@@ -9,279 +9,245 @@ export default function ExpectationModal({ open, onClose }: ExpectationModalProp
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col" style={{ backgroundColor: '#f8fafc' }}>
-            {/* Header */}
-            <div className="flex items-center justify-between px-8 py-3 border-b" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-600">
-                        <Shield className="w-4 h-4 text-white" />
+        <div className="fixed inset-0 z-[100] flex flex-col bg-white font-serif text-gray-900">
+            
+            {/* Konten Utama (Gaya Koran Rata Layout Kolom) */}
+            <div className="flex-1 overflow-y-auto px-8 py-8 max-[600px]:px-4">
+                <div className="max-w-6xl mx-auto">
+                    
+                    {/* Banner/Judul Utama Koran - Langsung Menyatu di Paling Atas */}
+                    <div className="text-center pb-6 mb-6 border-b-4 border-double border-gray-900">
+                        <p className="text-xs uppercase tracking-widest font-sans font-bold text-gray-600 mb-1">
+                            Warta Resmi • SMP Negeri 1 Majenang
+                        </p>
+                        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight font-serif leading-none mb-2">
+                            PROFIL & VISI SEKOLAH
+                        </h1>
+                        <p className="text-sm italic text-gray-600 font-serif">
+                            Mengenal Lebih Dekat Lingkungan dan Komitmen Pendidikan Kami
+                        </p>
                     </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-900 leading-tight">Profil & Visi Sekolah</h2>
-                        <p className="text-gray-500 text-xs">Mengenal Lebih Dekat SMP Negeri 1 Majenang</p>
-                    </div>
-                </div>
-                <button
-                    onClick={onClose}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                    <X className="w-5 h-5" />
-                </button>
-            </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-8 py-8 max-[600px]:px-5 max-[600px]:py-5">
-                <div className="max-w-5xl mx-auto space-y-8">
-
-                    {/* Hero Section - Identitas Sekolah */}
-                    <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
-                        <div className="flex flex-col md:flex-row gap-6 items-start">
-                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-emerald-200">
+                    {/* Baris Pertama: Identitas Utama & Informasi Kontak */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 border-b border-gray-400">
+                        {/* Kolom Logo & Slogan */}
+                        <div className="md:col-span-2 flex gap-4 items-start border-b md:border-b-0 md:border-r border-gray-300 pb-6 md:pb-0 md:pr-6">
+                            <div className="w-20 h-20 bg-gray-100 flex items-center justify-center flex-shrink-0 border border-gray-900 overflow-hidden">
                                 <img
                                     src={`${import.meta.env.BASE_URL}images/smp.png`}
                                     alt="Logo SMP N 1 Majenang"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover grayscale"
                                     onError={(e) => {
                                         const target = e.target as HTMLImageElement;
                                         target.style.display = 'none';
-                                        target.parentElement!.innerHTML = '<span class="text-3xl font-bold text-emerald-600">SMP</span>';
+                                        target.parentElement!.innerHTML = '<span class="text-xl font-bold font-sans">SMP</span>';
                                     }}
                                 />
                             </div>
-                            <div className="flex-1">
-                                <h1 className="text-2xl font-bold text-gray-900 mb-2">SMP Negeri 1 Majenang</h1>
-                                <p className="text-emerald-600 font-medium mb-4">Unggul dalam Prestasi, Berkarakter, dan Berwawasan Lingkungan</p>
-                                
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-                                    <div className="flex items-center gap-2">
-                                        <MapPin className="w-4 h-4 text-emerald-500" />
-                                        <span>Jl. Pendidikan No. 1, Majenang, Cilacap</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Phone className="w-4 h-4 text-emerald-500" />
-                                        <span>(0280) 123456</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Mail className="w-4 h-4 text-emerald-500" />
-                                        <span>smpn1majenang@sch.id</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Globe className="w-4 h-4 text-emerald-500" />
-                                        <span>www.smpn1majenang.sch.id</span>
-                                    </div>
-                                </div>
+                            <div>
+                                <h2 className="text-2xl font-bold font-serif leading-tight">SMP Negeri 1 Majenang</h2>
+                                <p className="text-sm italic font-serif text-gray-700 mt-2">
+                                    "Unggul dalam Prestasi, Berkarakter, dan Berwawasan Lingkungan"
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Kolom Kontak Klasik */}
+                        <div className="text-sm space-y-1.5 font-sans text-gray-700 justify-center flex flex-col">
+                            <div className="flex items-center gap-2">
+                                <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                                <span>Jl. Pendidikan No. 1, Majenang, Cilacap</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                                <span>(0280) 123456</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                                <span>smpn1majenang@sch.id</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Globe className="w-3.5 h-3.5 flex-shrink-0" />
+                                <span>www.smpn1majenang.sch.id</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Statistik Sekolah */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* Baris Kedua: Data Statistik Data Tipis */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 border-b border-gray-400 text-center font-sans">
                         {[
-                            { icon: Users, label: 'Jumlah Siswa', value: '850+', color: 'blue' },
-                            { icon: GraduationCap, label: 'Jumlah Guru', value: '45', color: 'emerald' },
-                            { icon: BookOpen, label: 'Rombel', value: '24', color: 'amber' },
-                            { icon: Award, label: 'Akreditasi', value: 'A', color: 'rose' },
+                            { label: 'JUMLAH SISWA', value: '850+' },
+                            { label: 'JUMLAH GURU', value: '45 TPA' },
+                            { label: 'ROMBONGAN BELAJAR', value: '24 Rombel' },
+                            { label: 'AKREDITASI UTAMA', value: 'Grade A' },
                         ].map((stat, idx) => (
-                            <div key={idx} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center">
-                                <div className={`w-10 h-10 rounded-lg bg-${stat.color}-100 flex items-center justify-center mx-auto mb-2`}>
-                                    <stat.icon className={`w-5 h-5 text-${stat.color}-600`} />
-                                </div>
-                                <p className="text-xl font-bold text-gray-900">{stat.value}</p>
-                                <p className="text-xs text-gray-500">{stat.label}</p>
+                            <div key={idx} className={`py-4 ${idx !== 3 ? 'border-r border-gray-300' : ''}`}>
+                                <p className="text-xs tracking-wider text-gray-500 font-bold">{stat.label}</p>
+                                <p className="text-xl font-black text-gray-900 mt-0.5">{stat.value}</p>
                             </div>
                         ))}
                     </div>
 
-                    {/* Visi & Misi */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Award className="w-5 h-5 text-emerald-600" />
-                            Visi & Misi
-                        </h3>
-                        <div className="space-y-4">
-                            <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                                <h4 className="font-semibold text-emerald-800 mb-2">Visi</h4>
-                                <p className="text-emerald-700 text-sm leading-relaxed">
+                    {/* Baris Ketiga: Visi Misi & Sambutan (2 Kolom Koran) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-6 pb-6 border-b border-gray-400">
+                        {/* Kolom Kiri: Visi & Misi */}
+                        <div className="md:col-span-7 md:border-r border-gray-300 md:pr-6 space-y-4">
+                            <h3 className="text-lg font-black uppercase font-serif tracking-tight border-b border-gray-900 pb-1 mb-3">
+                                I. Haluan Sekolah: Visi & Misi
+                            </h3>
+                            <div className="mb-4">
+                                <h4 className="font-bold text-sm uppercase font-sans tracking-wide text-gray-800 mb-1">Visi Utama:</h4>
+                                <p className="text-base italic leading-relaxed text-justify pl-4 border-l-2 border-gray-880">
                                     "Terwujudnya generasi yang beriman, bertaqwa, berilmu, berbudi luhur, serta unggul dalam prestasi dan berwawasan lingkungan."
                                 </p>
                             </div>
                             <div>
-                                <h4 className="font-semibold text-gray-800 mb-2">Misi</h4>
-                                <ul className="space-y-2">
+                                <h4 className="font-bold text-sm uppercase font-sans tracking-wide text-gray-800 mb-2">Misi Operasional:</h4>
+                                <ul className="space-y-2 text-sm text-justify">
                                     {[
-                                        'Menyelenggarakan pendidikan yang berkualitas dan berbasis teknologi informasi',
-                                        'Menumbuhkan semangat keunggulan dan kompetitif bagi seluruh warga sekolah',
-                                        'Membangun karakter siswa yang disiplin, mandiri, dan bertanggung jawab',
-                                        'Mengembangkan potensi siswa di bidang akademik dan non-akademik',
-                                        'Menciptakan lingkungan sekolah yang kondusif, hijau, dan berwawasan lingkungan',
+                                        'Menyelenggarakan pendidikan yang berkualitas dan berbasis teknologi informasi.',
+                                        'Menumbuhkan semangat keunggulan dan kompetitif bagi seluruh warga sekolah.',
+                                        'Membangun karakter siswa yang disiplin, mandiri, dan bertanggung jawab.',
+                                        'Mengembangkan potensi siswa di bidang akademik dan non-akademik.',
+                                        'Menciptakan lingkungan sekolah yang kondusif, hijau, dan berwawasan lingkungan.',
                                     ].map((misi, idx) => (
-                                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                                            <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                        <li key={idx} className="list-decimal list-inside pl-1 leading-relaxed">
                                             <span>{misi}</span>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Profil Kepala Sekolah */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Users className="w-5 h-5 text-emerald-600" />
-                            Sambutan Kepala Sekolah
-                        </h3>
-                        <div className="flex flex-col md:flex-row gap-6">
-                            <div className="flex-shrink-0 mx-auto md:mx-0">
-                                <div className="w-40 h-52 rounded-xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                        {/* Kolom Kanan: Sambutan Kepala Sekolah */}
+                        <div className="md:col-span-5 space-y-4">
+                            <h3 className="text-lg font-black uppercase font-serif tracking-tight border-b border-gray-900 pb-1 mb-3">
+                                II. Catatan Kepala Sekolah
+                            </h3>
+                            <div className="flex flex-col sm:flex-row gap-4 items-start">
+                                <div className="w-24 h-32 bg-gray-100 border border-gray-400 flex-shrink-0 overflow-hidden grayscale">
                                     <img
                                         src={`${import.meta.env.BASE_URL}images/kepala-sekolah.jpg`}
-                                        alt="Kepala Sekolah SMP N 1 Majenang"
+                                        alt="Kepala Sekolah"
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
                                             const target = e.target as HTMLImageElement;
                                             target.style.display = 'none';
-                                            target.parentElement!.classList.add('flex-col', 'gap-2');
-                                            target.parentElement!.innerHTML = `
-                                                <Users class="w-12 h-12 text-gray-400" />
-                                                <span class="text-xs text-gray-400 text-center px-2">Foto Kepala Sekolah<br/>akan ditampilkan di sini</span>
-                                            `;
+                                            target.parentElement!.innerHTML = '<div class="text-[10px] p-2 text-center text-gray-400 pt-8 font-sans">Foto Pimpinan</div>';
                                         }}
                                     />
                                 </div>
-                                <div className="mt-3 text-center">
-                                    <p className="font-semibold text-gray-900">Drs. H. Nama Kepala Sekolah, M.Pd.</p>
-                                    <p className="text-xs text-emerald-600">Kepala SMP Negeri 1 Majenang</p>
+                                <div className="text-xs font-sans">
+                                    <p className="font-bold text-sm text-gray-900 font-serif">Drs. H. Nama Kepala Sekolah, M.Pd.</p>
+                                    <p className="text-gray-600 italic mb-2">Kepala Sekolah Ke-12</p>
+                                    <p className="text-gray-700"><span className="font-bold">Masa Bakti:</span> Menjabat sejak 2020</p>
+                                    <p className="text-gray-700"><span className="font-bold">Alumni:</span> Universitas Negeri Yogyakarta</p>
                                 </div>
                             </div>
-                            <div className="flex-1">
-                                <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                                    <p className="text-emerald-800 text-sm leading-relaxed italic border-l-4 border-emerald-400 pl-4">
-                                        "Puji syukur kita panjatkan kehadirat Allah SWT atas limpahan rahmat dan karunia-Nya. SMP Negeri 1 Majenang hadir dengan Portal Siswa ini sebagai wujud komitmen kami dalam mengikuti perkembangan teknologi dan memudahkan seluruh stakeholders sekolah dalam mengakses informasi pendidikan. Kami berharap portal ini dapat menjadi jembatan komunikasi yang efektif antara sekolah, siswa, dan orang tua. Mari bersama-sama kita wujudkan pendidikan yang berkualitas dan merata untuk generasi penerus bangsa yang gemilang."
-                                    </p>
-                                </div>
-                                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <Calendar className="w-4 h-4 text-emerald-500" />
-                                        <span>Menjabat sejak 2020</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <GraduationCap className="w-4 h-4 text-emerald-500" />
-                                        <span>Lulusan Universitas Negeri Yogyakarta</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Dewan Guru */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <GraduationCap className="w-5 h-5 text-blue-600" />
-                            Dewan Guru & Tenaga Kependidikan
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                            SMP Negeri 1 Majenang didukung oleh tenaga pendidik yang profesional, berkompeten, dan berdedikasi tinggi. Dewan guru kami terdiri dari lulusan perguruan tinggi terkemuka dengan berbagai keahlian bidang studi.
-                        </p>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            {[
-                                { nama: 'Drs. Nama Wakasek Kesiswaan', jabatan: 'Wakasek Kesiswaan', mapel: 'Pendidikan Agama' },
-                                { nama: 'Dra. Nama Wakasek Kurikulum', jabatan: 'Wakasek Kurikulum', mapel: 'Matematika' },
-                                { nama: 'Nama Kepala TU, S.Pd.', jabatan: 'Kepala Tata Usaha', mapel: 'Administrasi' },
-                            ].map((guru, idx) => (
-                                <div key={idx} className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                                    <div className="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center mx-auto mb-2">
-                                        <Users className="w-6 h-6 text-blue-600" />
-                                    </div>
-                                    <p className="font-semibold text-gray-900 text-sm text-center">{guru.nama}</p>
-                                    <p className="text-xs text-blue-600 text-center">{guru.jabatan}</p>
-                                    <p className="text-xs text-gray-500 text-center mt-1">{guru.mapel}</p>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                            <p className="text-blue-700 text-sm leading-relaxed italic border-l-4 border-blue-400 pl-3">
-                                "Kami, dewan guru SMP Negeri 1 Majenang, berkomitmen untuk memberikan pelayanan pendidikan terbaik. Melalui Portal Siswa ini, kami berharap dapat mempererat komunikasi dengan siswa dan orang tua. Gunakanlah fasilitas ini dengan bijak untuk meningkatkan prestasi belajar dan memperluas wawasan. Mari bersama-sama menciptakan ekosistem pendidikan yang kondusif dan inspiratif."
+                            <p className="text-sm leading-relaxed text-justify text-gray-800 italic bg-gray-50 p-3 border-t border-b border-gray-300">
+                                "Puji syukur kita panjatkan kehadirat Allah SWT. SMP Negeri 1 Majenang hadir dengan Portal Siswa ini sebagai wujud komitmen kami dalam mengikuti perkembangan teknologi dan memudahkan seluruh stakeholders dalam accessing informasi pendidikan."
                             </p>
                         </div>
                     </div>
 
-                    {/* Fasilitas Sekolah */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <BookOpen className="w-5 h-5 text-amber-600" />
-                            Sarana & Prasarana
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {[
-                                { icon: BookOpen, text: 'Perpustakaan modern dengan koleksi 5.000+ buku' },
-                                { icon: Globe, text: 'Laboratorium Komputer dengan 30 unit PC' },
-                                { icon: Users, text: 'Ruang kelas ber-AC dilengkapi proyektor' },
-                                { icon: Award, text: 'Laboratorium Sains (Fisika, Kimia, Biologi)' },
-                                { icon: Clock, text: 'Lapangan olahraga multifungsi' },
-                                { icon: Shield, text: 'Ruang UKS dan konseling siswa' },
-                            ].map((fasilitas, idx) => (
-                                <div key={idx} className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                                    <fasilitas.icon className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                                    <span className="text-sm text-gray-700">{fasilitas.text}</span>
-                                </div>
-                            ))}
+                    {/* Baris Keempat: Struktur Pengajar & Fasilitas */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 pb-6 border-b border-gray-400">
+                        {/* Kiri: Dewan Guru */}
+                        <div className="md:border-r border-gray-300 md:pr-6">
+                            <h3 className="text-lg font-black uppercase font-serif tracking-tight border-b border-gray-900 pb-1 mb-3">
+                                III. Staf Pimpinan & Tata Usaha
+                            </h3>
+                            <p className="text-sm text-gray-700 mb-4 text-justify">
+                                Didukung oleh tenaga pendidik profesional lulusan perguruan tinggi terkemuka yang siap berdedikasi tinggi demi memajukan mutu studi siswa.
+                            </p>
+                            <div className="space-y-2 font-sans text-sm">
+                                {[
+                                    { nama: 'Drs. Nama Wakasek Kesiswaan', jabatan: 'Wakasek Kesiswaan', mapel: 'Pendidikan Agama' },
+                                    { nama: 'Dra. Nama Wakasek Kurikulum', jabatan: 'Wakasek Kurikulum', mapel: 'Matematika' },
+                                    { nama: 'Nama Kepala TU, S.Pd.', jabatan: 'Kepala Tata Usaha', mapel: 'Sistem Administrasi' },
+                                ].map((guru, idx) => (
+                                    <div key={idx} className="flex justify-between items-center py-1.5 border-b border-dashed border-gray-300">
+                                        <div>
+                                            <p className="font-bold text-gray-900">{guru.nama}</p>
+                                            <p className="text-xs text-gray-500">{guru.mapel}</p>
+                                        </div>
+                                        <span className="text-xs font-mono uppercase bg-gray-100 px-2 py-0.5 border border-gray-300 text-gray-700">
+                                            {guru.jabatan}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Kanan: Sarana Prasarana */}
+                        <div>
+                            <h3 className="text-lg font-black uppercase font-serif tracking-tight border-b border-gray-900 pb-1 mb-3">
+                                IV. Inventaris Prasarana Sekolah
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm font-sans">
+                                {[
+                                    'Perpustakaan modern (5.000+ koleksi buku)',
+                                    'Laboratorium Komputer (30 unit PC)',
+                                    'Ruang kelas ber-AC & Proyektor multimedia',
+                                    'Laboratorium Sains Terintegrasi',
+                                    'Lapangan olahraga multifungsi',
+                                    'Ruang medis UKS & Konseling',
+                                ].map((fasilitas, idx) => (
+                                    <div key={idx} className="flex items-start gap-2 py-1 border-b border-gray-100">
+                                        <span className="text-gray-900 font-bold">•</span>
+                                        <span className="text-gray-700 leading-tight">{fasilitas}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Ekspektasi Portal */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-emerald-600" />
-                            Apa yang Diharapkan dari Portal Ini?
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {[
-                                {
-                                    title: 'Akses Informasi Cepat',
-                                    desc: 'Dapatkan update terbaru tentang kegiatan sekolah, pengumuman, dan materi akademik secara real-time.',
-                                    color: 'emerald'
-                                },
-                                {
-                                    title: 'Transparansi Akademik',
-                                    desc: 'Siswa dan orang tua dapat memantau perkembangan belajar, kehadiran, dan nilai secara transparan.',
-                                    color: 'blue'
-                                },
-                                {
-                                    title: 'Layanan Mandiri',
-                                    desc: 'Memudahkan akses ke berbagai layanan administratif sekolah tanpa harus datang langsung ke tata usaha.',
-                                    color: 'amber'
-                                },
-                            ].map((item, idx) => (
-                                <div key={idx} className={`p-4 bg-${item.color}-50 rounded-xl border border-${item.color}-100`}>
-                                    <h4 className={`font-semibold text-${item.color}-800 mb-2 text-sm`}>{item.title}</h4>
-                                    <p className={`text-${item.color}-700 text-xs leading-relaxed`}>{item.desc}</p>
+                    {/* Baris Kelima: Maklumat & Jam Kerja Portal */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 pb-8 border-b-2 border-gray-900">
+                        <div className="md:col-span-2">
+                            <h3 className="text-base font-black uppercase font-serif border-b border-gray-900 pb-1 mb-3">
+                                V. Maklumat Fungsi Portal Informasi
+                            </h3>
+                            <div className="space-y-3 text-sm text-justify">
+                                <p><span className="font-bold font-serif">Akses Informasi Cepat:</span> Dapatkan update terbaru mengenai agenda kegiatan berkala sekolah, pengumuman darurat, serta rangkuman materi akademik secara waktu nyata.</p>
+                                <p><span className="font-bold font-serif">Transparansi Nilai:</span> Siswa maupun wali murid dapat memantau grafik perkembangan belajar, absensi presensi, beserta rekap nilai harian secara terbuka.</p>
+                                <p><span className="font-bold font-serif">Layanan Mandiri:</span> Pengajuan berkas administrasi dasar dapat dilakukan daring tanpa harus mengantre di loket Tata Usaha.</p>
+                            </div>
+                        </div>
+
+                        <div className="border border-gray-900 p-4 bg-gray-50 h-fit font-sans">
+                            <h4 className="text-xs font-black uppercase tracking-wider text-center border-b border-gray-900 pb-1 mb-2">
+                                JAM OPERASIONAL SISTEM
+                            </h4>
+                            <div className="text-xs space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Senin - Jumat:</span>
+                                    <span className="font-bold">06.00 - 22.00 WIB</span>
                                 </div>
-                            ))}
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Sabtu - Minggu:</span>
+                                    <span className="font-bold">08.00 - 17.00 WIB</span>
+                                </div>
+                                <p className="text-[11px] text-gray-500 pt-2 border-t border-dashed border-gray-300 text-center italic leading-tight">
+                                    Layanan verifikasi berkas dan admin hanya diproses selama jam kerja aktif di atas.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Jam Operasional */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Clock className="w-5 h-5 text-rose-600" />
-                            Jam Operasional Portal
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <span className="text-sm text-gray-600">Senin - Jumat</span>
-                                <span className="text-sm font-semibold text-gray-900">06.00 - 22.00 WIB</span>
-                            </div>
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <span className="text-sm text-gray-600">Sabtu - Minggu</span>
-                                <span className="text-sm font-semibold text-gray-900">08.00 - 17.00 WIB</span>
-                            </div>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-3 text-center">
-                            Portal dapat diakses kapan saja, namun layanan admin dan verifikasi data hanya pada jam operasional di atas.
-                        </p>
+                    {/* Catatan Kaki Kecil */}
+                    <p className="text-center text-[11px] text-gray-500 font-sans italic pt-6 mb-6">
+                        Arsip Dokumentasi Pendidikan • Kesekretariatan SMP Negeri 1 Majenang
+                    </p>
+
+                    {/* Tombol Aksi Penutup Koran di Paling Bawah */}
+                    <div className="flex justify-center pb-4">
+                        <button
+                            onClick={onClose}
+                            className="px-8 py-3 border-2 border-gray-950 font-sans text-sm font-black uppercase tracking-wider text-gray-900 hover:bg-gray-950 hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                        >
+                            KEMBALI KE PORTAL UTAMA [SELESAI MEMBACA]
+                        </button>
                     </div>
 
                 </div>
