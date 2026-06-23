@@ -7,34 +7,17 @@ import {
   getTahunAjaranRapotSiswa,
 } from '../../data/store';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
-import { BookOpenCheck, Award, TrendingUp, Download, User, BarChart2 } from 'lucide-react';
+import { BookOpenCheck, Download, User } from 'lucide-react';
 
-function predikatColor(p: string) {
-  switch (p) {
-    case 'A': return 'bg-slate-100 text-slate-800 border border-slate-300';
-    case 'B': return 'bg-slate-100 text-slate-700 border border-slate-250';
-    case 'C': return 'bg-slate-50 text-slate-600 border border-slate-200';
-    case 'D': return 'bg-amber-50 text-amber-800 border border-amber-200';
-    default: return 'bg-rose-50 text-rose-800 border border-rose-200';
+// Fungsi konversi nilai huruf ke angka SKS sesuai standar akademik
+function getBobotNilai(predikat: string): number {
+  switch (predikat) {
+    case 'A': return 4;
+    case 'B': return 3;
+    case 'C': return 2;
+    case 'D': return 1;
+    default: return 0;
   }
-}
-
-function predikatLabel(p: string) {
-  switch (p) {
-    case 'A': return 'Sangat Baik';
-    case 'B': return 'Baik';
-    case 'C': return 'Cukup';
-    case 'D': return 'Kurang';
-    default: return 'Sangat Kurang';
-  }
-}
-
-function hitungPredikat(nilai: number): string {
-  if (nilai >= 90) return 'A';
-  if (nilai >= 80) return 'B';
-  if (nilai >= 70) return 'C';
-  if (nilai >= 60) return 'D';
-  return 'E';
 }
 
 export default function RapotSiswa() {
@@ -66,93 +49,99 @@ export default function RapotSiswa() {
     return getNilaiRapotBySiswa(user.id, tahunAjaran, semester);
   }, [user, tahunAjaran, semester, storeVersion]);
 
+  // Kalkulasi data summary ala KHS UNPAB
   const stats = useMemo(() => {
-    if (nilaiRapot.length === 0) return { rataRata: 0, tertinggi: 0, terendah: 0, predikatRata: 'E', totalMapel: 0 };
-    const values = nilaiRapot.map(item => item.nilaiAkhir);
-    const rataRata = Math.round(values.reduce((sum, v) => sum + v, 0) / values.length);
+    const totalSKS = nilaiRapot.length * 3; // Mengasumsikan rata-rata 3 SKS per MK
+    const totalKN = nilaiRapot.reduce((sum, item) => sum + (getBobotNilai(item.predikat) * 3), 0);
+    const ipSemester = totalSKS > 0 ? (totalKN / totalSKS).toFixed(2) : '0.00';
+
     return {
-      rataRata,
-      tertinggi: Math.max(...values),
-      terendah: Math.min(...values),
-      predikatRata: hitungPredikat(rataRata),
-      totalMapel: nilaiRapot.length,
+      totalSKS,
+      totalKN,
+      ipSemester,
+      totalMapel: nilaiRapot.length
     };
   }, [nilaiRapot]);
 
+  // Format string untuk Tahun Akademik
+  const formatTA = useMemo(() => {
+    return `${semester === 'ganjil' ? 'GANJIL' : 'GENAP'} ${tahunAjaran.split('/')[0]}`;
+  }, [tahunAjaran, semester]);
+
+  // Handle Cetak Dokumen (Desain yang disinkronkan persis dengan UI baru)
   const handleCetakRapot = () => {
     if (nilaiRapot.length === 0) return;
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
-    const rows = nilaiRapot.map((item, idx) => `
-      <tr>
-        <td style="border:1px solid #e2e8f0; padding:6px 10px; text-align:center">${idx + 1}</td>
-        <td style="border:1px solid #e2e8f0; padding:6px 10px; font-weight:500">${item.mataPelajaran}</td>
-        <td style="border:1px solid #e2e8f0; padding:6px 10px; text-align:center">${item.nilaiTugas}</td>
-        <td style="border:1px solid #e2e8f0; padding:6px 10px; text-align:center">${item.nilaiUTS}</td>
-        <td style="border:1px solid #e2e8f0; padding:6px 10px; text-align:center">${item.nilaiUAS}</td>
-        <td style="border:1px solid #e2e8f0; padding:6px 10px; text-align:center; font-weight:700">${item.nilaiAkhir}</td>
-        <td style="border:1px solid #e2e8f0; padding:6px 10px; text-align:center; font-weight:700">${item.predikat}</td>
-        <td style="border:1px solid #e2e8f0; padding:6px 10px; font-size:11px; color:#475569">${item.catatanGuru || '-'}</td>
-      </tr>
-    `).join('');
+    const rowsHtml = nilaiRapot.map((item, idx) => {
+      const bobot = getBobotNilai(item.predikat);
+      return `
+        <tr style="background: #fff;">
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">${idx + 1}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">${formatTA}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center; font-family: monospace;">${item.id?.substring(0, 5) || '4210' + (idx + 1)}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px 12px; text-align: left;">${item.mataPelajaran}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">${semester === 'ganjil' ? '1' : '2'}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">3</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">KKNI</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center; font-weight: bold;">${item.predikat}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center;">${bobot}</td>
+          <td style="border: 1px solid #b4dbf0; padding: 6px; text-align: center; font-weight: bold;">${bobot * 3}</td>
+        </tr>
+      `;
+    }).join('');
 
     const html = `
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Arsip_Rapot_${student?.name}_${tahunAjaran}</title>
+        <title>Portal Mahasiswa UNPAB - KHS</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 30px; color: #1e293b; line-height: 1.4; }
-          h1 { font-size: 16px; font-weight: 700; margin-bottom: 2px; letter-tight: -0.02em; }
-          h2 { font-size: 12px; color: #64748b; margin-bottom: 24px; font-weight: 500; }
-          table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 12px; }
-          th { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px 10px; font-weight: 600; text-align: center; color: #334155; }
-          .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; font-size: 11px; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; }
-          .info-item span { color: #64748b; font-weight: 500; }
-          .footer { margin-top: 30px; font-size: 11px; color: #94a3b8; border-top: 1px dashed #e2e8f0; padding-top: 12px; }
-          .stats-row { display: flex; gap: 12px; margin-top: 16px; }
-          .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 16px; min-width: 100px; text-align: center; }
-          .stat-card .val { font-size: 18px; font-weight: 700; color: #0f172a; }
-          .stat-card .lbl { font-size: 10px; color: #64748b; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
-          @media print { body { padding: 10px; } .info-grid { background: none; } }
+          body { font-family: Arial, sans-serif; padding: 20px; color: #333; font-size: 11px; }
+          .header-blue { background: #2291c3; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px 4px 0 0; }
+          .header-blue h1 { margin: 0; font-size: 15px; font-weight: bold; }
+          table { width: 100%; border-collapse: collapse; margin-top: 0px; font-size: 11px; }
+          th { background: #79c7ec; border: 1px solid #b4dbf0; padding: 8px 4px; color: #1c5877; font-weight: bold; text-transform: uppercase; text-align: center; }
+          .sub-th { background: #99d5f1; }
+          .summary-strip { background: #79c7ec; color: #1c5877; font-weight: bold; padding: 8px 12px; border: 1px solid #b4dbf0; border-top: none; text-transform: uppercase; }
+          @media print { .header-blue { background: #2291c3 !important; -webkit-print-color-adjust: exact; } th { background: #79c7ec !important; -webkit-print-color-adjust: exact; } .sub-th { background: #99d5f1 !important; -webkit-print-color-adjust: exact; } .summary-strip { background: #79c7ec !important; -webkit-print-color-adjust: exact; } }
         </style>
       </head>
       <body>
-        <h1>LAPORAN HASIL BELAJAR AKADEMIK (RAPOT)</h1>
-        <h2>Sistem Informasi Akademik Sekolah</h2>
-        <div class="info-grid">
-          <div class="info-item"><span>Nama Lengkap:</span> <br><strong>${student?.name || '-'}</strong></div>
-          <div class="info-item"><span>Nomor Induk Siswa:</span> <br><strong>${student?.nis || '-'}</strong></div>
-          <div class="info-item"><span>Kelas Penempatan:</span> <br><strong>${className}</strong></div>
-          <div class="info-item"><span>Tahun Ajaran:</span> <br><strong>${tahunAjaran}</strong></div>
-          <div class="info-item"><span>Periode Semester:</span> <br><strong>${semester === 'ganjil' ? 'Ganjil' : 'Genap'}</strong></div>
+        <div class="header-blue">
+          <div>
+            <h1>PORTAL MAHASISWA UNPAB</h1>
+            <div style="font-size: 10px; margin-top: 2px; opacity: 0.9;">Kartu Hasil Studi (KHS) Digital</div>
+          </div>
+          <div style="text-align: right; font-weight: bold; font-size: 10px; line-height: 1.3;">
+            NAMA: ${student?.name?.toUpperCase() || '-'}<br>
+            NPM/NIS: ${student?.nis || '-'} &bull; KELAS: ${className}
+          </div>
         </div>
         <table>
           <thead>
             <tr>
-              <th style="width:35px">No</th>
-              <th>Mata Pelajaran</th>
-              <th style="width:60px">Tugas</th>
-              <th style="width:60px">UTS</th>
-              <th style="width:60px">UAS</th>
-              <th style="width:70px">Nilai Akhir</th>
-              <th style="width:65px">Predikat</th>
-              <th>Catatan Evaluasi Guru</th>
+              <th rowspan="2" style="width: 35px;">No.</th>
+              <th rowspan="2" style="width: 110px;">TA</th>
+              <th rowspan="2" style="width: 70px;">Kode</th>
+              <th rowspan="2">Mata Kuliah</th>
+              <th rowspan="2" style="width: 45px;">SMT</th>
+              <th rowspan="2" style="width: 45px;">SKS</th>
+              <th rowspan="2" style="width: 85px;">Kurikulum</th>
+              <th colspan="2" class="sub-th" style="border-bottom: 1px solid #b4dbf0; width: 100px;">Nilai</th>
+              <th rowspan="2" style="width: 60px;">(K x N)</th>
+            </tr>
+            <tr>
+              <th class="sub-th" style="border-right: 1px solid #b4dbf0; width: 50px;">Huruf</th>
+              <th class="sub-th" style="width: 50px;">Angka</th>
             </tr>
           </thead>
-          <tbody>${rows}</tbody>
+          <tbody>${rowsHtml}</tbody>
         </table>
-        <div class="stats-row">
-          <div class="stat-card"><div class="val">${stats.rataRata}</div><div class="lbl">Rata-rata</div></div>
-          <div class="stat-card"><div class="val">${stats.tertinggi}</div><div class="lbl">Tertinggi</div></div>
-          <div class="stat-card"><div class="val">${stats.terendah}</div><div class="lbl">Terendah</div></div>
-          <div class="stat-card"><div class="val">${stats.predikatRata}</div><div class="lbl">Predikat</div></div>
-        </div>
-        <div class="footer">
-          <p>Arsip digital dicetak otomatis pada tanggal: ${new Date().toLocaleString('id-ID')}</p>
-          <p>Seluruh rekaman kalkulasi nilai akhir di atas bersifat sah dan tersinkronisasi dalam server pangkalan data lembaga.</p>
+        <div class="summary-strip">
+          TOTAL SKS : ${stats.totalSKS} | Jumlah K x N : ${stats.totalKN} | IP Semester : ${stats.ipSemester} | Beban SKS Berikut : 24
         </div>
         <script>window.print();</script>
       </body>
@@ -164,37 +153,29 @@ export default function RapotSiswa() {
   };
 
   return (
-    <div className="space-y-4 max-w-[1600px] mx-auto p-1 antialiased text-slate-600">
+    <div className="space-y-4 max-w-[1600px] mx-auto p-2 antialiased text-slate-600">
       
-      {/* Top Bar Header */}
-      <div className="flex items-center justify-between gap-4 bg-white rounded-xl p-4 border border-slate-200/60 shadow-xs">
-        <div>
-          <h1 className="text-base font-semibold text-slate-800 tracking-tight">Laporan Hasil Belajar Akademik</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Transkrip parameter pencapaian kurikulum individual siswa per periode ajaran berjalan.</p>
-        </div>
-      </div>
-
-      {/* Workspace Control Filters */}
-      <div className="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/60 flex flex-wrap gap-4 items-end justify-between">
-        <div className="flex flex-wrap gap-3">
-          <div className="space-y-1">
-            <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Tahun Ajaran</label>
+      {/* Top Filter Workspace Control */}
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-wrap gap-4 items-end justify-between">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pilih Tahun Ajaran</span>
             <select
               value={tahunAjaran}
               onChange={e => setTahunAjaran(e.target.value)}
-              className="px-2.5 py-1.5 bg-white border border-slate-200 rounded text-xs font-medium outline-none focus:border-slate-400 transition-colors"
+              className="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
             >
               {tahunAjaranList.map(ta => (
                 <option key={ta} value={ta}>{ta}</option>
               ))}
             </select>
           </div>
-          <div className="space-y-1">
-            <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider">Semester</label>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pilih Semester</span>
             <select
               value={semester}
               onChange={e => setSemester(e.target.value as 'ganjil' | 'genap')}
-              className="px-2.5 py-1.5 bg-white border border-slate-200 rounded text-xs font-medium outline-none focus:border-slate-400 transition-colors"
+              className="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
             >
               <option value="ganjil">Ganjil</option>
               <option value="genap">Genap</option>
@@ -206,161 +187,104 @@ export default function RapotSiswa() {
           <button
             type="button"
             onClick={handleCetakRapot}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded text-xs font-medium hover:bg-slate-800 transition-colors shadow-xs"
+            className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded text-xs font-bold hover:bg-blue-700 transition-colors shadow-sm"
           >
-            <Download className="w-3.5 h-3.5" /> Eksport Dokumen Rapot
+            <Download className="w-4 h-4" /> Cetak KHS (Portal Style)
           </button>
         )}
       </div>
 
-      {/* Corporate Meta Profile Strip */}
-      <div className="bg-white border border-slate-200/60 rounded-xl p-4 shadow-xs">
-        <div className="flex items-center gap-3">
-          {student?.avatar ? (
-            <img src={student.avatar} alt="" className="w-11 h-11 rounded-lg object-cover border border-slate-200 bg-slate-50" />
-          ) : (
-            <div className="w-11 h-11 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center text-sm font-semibold border border-slate-700">
-              <User className="w-5 h-5 text-slate-400" />
-            </div>
-          )}
-          <div>
-            <h2 className="text-sm font-semibold text-slate-800 leading-none">{student?.name}</h2>
-            <p className="text-xs text-slate-400 mt-1.5 font-medium">
-              NIS: <span className="font-mono text-slate-600">{student?.nis}</span> &bull; Kelas: <span className="text-slate-600">{className}</span> &bull; Periode: <span className="text-slate-600">{tahunAjaran} ({semester === 'ganjil' ? 'Ganjil' : 'Genap'})</span>
-            </p>
-          </div>
-        </div>
-      </div>
-
+      {/* TAMPILAN UTAMA: REPLIKA KHS DIGITAL PORTAL UNPAB */}
       {nilaiRapot.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 border border-slate-200/60 shadow-xs text-center">
-          <BookOpenCheck className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-          <p className="text-xs font-semibold text-slate-700">Record entri nilai rapor kosong.</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Sistem belum mendeteksi publikasi transkrip mata pelajaran dari instruktur penguji.</p>
+        <div className="bg-white rounded-xl p-12 border border-slate-200 shadow-sm text-center">
+          <BookOpenCheck className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+          <p className="text-xs font-bold text-slate-600">Belum ada Kartu Hasil Studi (KHS) yang diterbitkan.</p>
         </div>
       ) : (
-        <>
-          {/* Performance Summary Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3.5">
-            <div className="bg-white rounded-xl p-3 border border-slate-200/60 shadow-xs">
-              <div className="flex items-center gap-1.5 text-slate-400 mb-1">
-                <TrendingUp className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-[10px] uppercase font-semibold tracking-wider">Rata-Rata</span>
-              </div>
-              <p className="text-xl font-bold text-slate-800">{stats.rataRata}</p>
+        <div className="bg-white shadow-md border border-sky-200 rounded-lg overflow-hidden">
+          
+          {/* Header Biru Cerah Khas Portal */}
+          <div className="bg-[#2291c3] p-4 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-sky-300">
+            <div>
+              <h2 className="text-base font-black tracking-wide">PORTAL MAHASISWA UNPAB</h2>
+              <p className="text-[11px] text-sky-100 font-medium mt-0.5">Sistem Informasi Kartu Hasil Studi (KHS) Akademik</p>
             </div>
             
-            <div className="bg-white rounded-xl p-3 border border-slate-200/60 shadow-xs">
-              <div className="flex items-center gap-1.5 text-slate-400 mb-1">
-                <Award className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-[10px] uppercase font-semibold tracking-wider">Tertinggi</span>
+            <div className="flex items-center gap-3 bg-sky-900/20 p-2 rounded-md border border-sky-400/30 font-sans text-[11px]">
+              {student?.avatar ? (
+                <img src={student.avatar} alt="" className="w-9 h-9 rounded bg-white object-cover" />
+              ) : (
+                <div className="w-9 h-9 rounded bg-sky-100 flex items-center justify-center text-sky-800">
+                  <User className="w-4 h-4" />
+                </div>
+              )}
+              <div className="leading-tight">
+                <div><span className="text-sky-200">MAHASISWA:</span> <strong className="text-white uppercase">{student?.name}</strong></div>
+                <div className="mt-0.5">
+                  <span className="text-sky-200">NPM:</span> <span className="font-mono text-white mr-2">{student?.nis}</span> 
+                  <span className="text-sky-200">KELAS:</span> <span className="text-white">{className}</span>
+                </div>
               </div>
-              <p className="text-xl font-bold text-slate-800">{stats.tertinggi}</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-3 border border-slate-200/60 shadow-xs">
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 block mb-1">Terendah</span>
-              <p className="text-xl font-bold text-slate-500">{stats.terendah}</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-3 border border-slate-200/60 shadow-xs">
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 block mb-1">Predikat Evaluasi</span>
-              <div className="flex items-baseline gap-1.5 mt-0.5">
-                <p className="text-xl font-bold text-slate-800">{stats.predikatRata}</p>
-                <p className="text-[10px] text-slate-400 font-medium">({predikatLabel(stats.predikatRata)})</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-3 border border-slate-200/60 shadow-xs col-span-2 sm:col-span-1">
-              <div className="flex items-center gap-1.5 text-slate-400 mb-1">
-                <BookOpenCheck className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-[10px] uppercase font-semibold tracking-wider">Kuantitas Mapel</span>
-              </div>
-              <p className="text-xl font-bold text-slate-800">{stats.totalMapel}</p>
             </div>
           </div>
 
-          {/* Ledger Table Section */}
-          <div className="bg-white rounded-xl shadow-xs border border-slate-200/60 overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50/60 flex items-center gap-2">
-              <BookOpenCheck className="w-3.5 h-3.5 text-slate-500" />
-              <h3 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">Spesifikasi Komponen Akademik</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="bg-slate-50/40 border-b border-slate-200/60 text-slate-400 font-medium text-left">
-                    <th className="px-4 py-2.5 font-medium w-12 text-center">No</th>
-                    <th className="px-4 py-2.5 font-medium">Mata Pelajaran</th>
-                    <th className="px-4 py-2.5 font-medium w-20 text-center">Tugas</th>
-                    <th className="px-4 py-2.5 font-medium w-20 text-center">UTS</th>
-                    <th className="px-4 py-2.5 font-medium w-20 text-center">UAS</th>
-                    <th className="px-4 py-2.5 font-medium w-24 text-center">Nilai Akhir</th>
-                    <th className="px-4 py-2.5 font-medium w-20 text-center">Predikat</th>
-                    <th className="px-4 py-2.5 font-medium">Catatan Reviewer Instruktur</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {nilaiRapot.map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-slate-50/40 transition-colors">
-                      <td className="px-4 py-2.5 text-center text-slate-400 font-mono">{idx + 1}</td>
-                      <td className="px-4 py-2.5 font-semibold text-slate-800">{item.mataPelajaran}</td>
-                      <td className="px-4 py-2.5 text-center text-slate-600 font-medium">{item.nilaiTugas}</td>
-                      <td className="px-4 py-2.5 text-center text-slate-600 font-medium">{item.nilaiUTS}</td>
-                      <td className="px-4 py-2.5 text-center text-slate-600 font-medium">{item.nilaiUAS}</td>
-                      <td className="px-4 py-2.5 text-center">
-                        <span className="font-bold text-slate-900">{item.nilaiAkhir}</span>
-                      </td>
-                      <td className="px-4 py-2.5 text-center">
-                        <span className={`inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded ${predikatColor(item.predikat)}`}>
-                          {item.predikat}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5 text-slate-400 leading-normal text-[11px]">{item.catatanGuru || '-'}</td>
+          {/* Tabel Grid KHS Utama */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-[11px] font-sans">
+              <thead>
+                {/* Header Tingkat 1 */}
+                <tr className="bg-[#79c7ec] text-[#1c5877] font-bold text-center border-b border-[#b4dbf0]">
+                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-10" rowSpan={2}>No.</th>
+                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-28" rowSpan={2}>TA</th>
+                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-20" rowSpan={2}>Kode</th>
+                  <th className="px-3 py-2.5 border-r border-[#b4dbf0] font-bold text-left" rowSpan={2}>Mata Kuliah</th>
+                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-14" rowSpan={2}>SMT</th>
+                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-14" rowSpan={2}>SKS</th>
+                  <th className="px-2 py-2.5 border-r border-[#b4dbf0] font-bold text-center w-24" rowSpan={2}>Kurikulum</th>
+                  <th className="px-2 py-1.5 border-b border-[#b4dbf0] font-bold text-center bg-[#99d5f1]" colSpan={2}>Nilai</th>
+                  <th className="px-2 py-2.5 font-bold text-center w-16" rowSpan={2}>(K * N)</th>
+                </tr>
+                {/* Sub-Header Tingkat 2 */}
+                <tr className="bg-[#99d5f1] text-[#1c5877] font-bold text-center border-b border-[#b4dbf0]">
+                  <th className="px-2 py-1 border-r border-[#b4dbf0] font-bold text-center w-14">Huruf</th>
+                  <th className="px-2 py-1 border-r border-[#b4dbf0] font-bold text-center w-14">Angka</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#b4dbf0] bg-white text-slate-800">
+                {nilaiRapot.map((item, idx) => {
+                  const bobotAngka = getBobotNilai(item.predikat);
+                  const sksItem = 3; 
+                  return (
+                    <tr key={item.id} className="hover:bg-sky-50/40 transition-colors">
+                      <td className="px-2 py-2 text-center text-slate-400 font-mono border-r border-[#b4dbf0]">{idx + 1}</td>
+                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-medium text-slate-600">{formatTA}</td>
+                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-mono text-slate-500">{item.id?.substring(0, 5) || '4210' + (idx + 1)}</td>
+                      <td className="px-3 py-2 text-left border-r border-[#b4dbf0] font-semibold text-slate-800">{item.mataPelajaran}</td>
+                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0]">{semester === 'ganjil' ? '1' : '2'}</td>
+                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-medium">{sksItem}</td>
+                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] text-slate-500">KKNI</td>
+                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-bold text-blue-800">{item.predikat}</td>
+                      <td className="px-2 py-2 text-center border-r border-[#b4dbf0] font-medium">{bobotAngka}</td>
+                      <td className="px-2 py-2 text-center font-bold text-slate-900">{sksItem * bobotAngka}</td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-              <p>Total Cakupan Mata Pelajaran: <strong className="text-slate-700 font-semibold">{stats.totalMapel} Record</strong></p>
-              <p className="flex items-center gap-2">
-                Akumulasi Rata-Rata: <strong className="text-slate-800 font-bold">{stats.rataRata}</strong>
-                <span className="text-slate-200">|</span>
-                Kualifikasi: <strong className="text-slate-700 font-semibold">{stats.predikatRata} ({predikatLabel(stats.predikatRata)})</strong>
-              </p>
-            </div>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
 
-          {/* Minimalist Grid Distribution Bars */}
-          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-xs">
-            <div className="flex items-center gap-1.5 border-b border-slate-100 pb-2 mb-3">
-              <BarChart2 className="w-4 h-4 text-slate-400" />
-              <h3 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">Distribusi Deviasi Nilai Akhir</h3>
-            </div>
-            <div className="space-y-2.5">
-              {nilaiRapot.map(item => {
-                const pct = Math.max(item.nilaiAkhir, 5);
-                return (
-                  <div key={item.id} className="flex items-center gap-3">
-                    <div className="w-32 text-xs font-medium text-slate-500 truncate">{item.mataPelajaran}</div>
-                    <div className="flex-1 bg-slate-50 border border-slate-100 rounded h-5 relative overflow-hidden">
-                      <div
-                        className="h-full bg-slate-800 rounded-xs transition-all flex items-center justify-end pr-2"
-                        style={{ width: `${pct}%` }}
-                      >
-                        {pct > 20 && <span className="text-[10px] text-white font-mono font-bold">{item.nilaiAkhir}</span>}
-                      </div>
-                    </div>
-                    <div className="w-8 text-right">
-                      <span className="text-xs font-mono font-bold text-slate-700">{item.predikat}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          {/* Strip Biru Total Parameter Persis Seperti Foto */}
+          <div className="bg-[#79c7ec] text-[#1c5877] font-bold px-4 py-2.5 text-xs border-t border-[#b4dbf0] uppercase tracking-wide flex flex-wrap gap-x-6 gap-y-2">
+            <span>TOTAL SKS : <span className="text-slate-900 font-black">{stats.totalSKS}</span></span>
+            <span className="text-sky-400/40">|</span>
+            <span>Jumlah K x N : <span className="text-slate-900 font-black">{stats.totalKN}</span></span>
+            <span className="text-sky-400/40">|</span>
+            <span>IP Semester : <span className="text-blue-900 font-black">{stats.ipSemester}</span></span>
+            <span className="text-sky-400/40">|</span>
+            <span>Beban SKS Berikut : <span className="text-slate-900 font-black">24</span></span>
           </div>
-        </>
+
+        </div>
       )}
     </div>
   );

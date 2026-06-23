@@ -27,8 +27,8 @@ import { useState } from 'react';
 interface SidebarProps {
   activePage: string;
   onNavigate: (page: string) => void;
-  collapsed: boolean;          // Disesuaikan dengan props terbaru App.tsx Anda
-  onToggleCollapse: () => void; // Disesuaikan dengan props terbaru App.tsx Anda
+  collapsed: boolean;          
+  onToggleCollapse: () => void; 
 }
 
 export default function Sidebar({ activePage, onNavigate, collapsed: sidebarCollapsed, onToggleCollapse: setSidebarCollapsed }: SidebarProps) {
@@ -39,31 +39,50 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
 
   const isTeacher = user?.role === 'teacher';
 
-  const teacherMenus = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'attendance', label: 'Input Absensi', icon: ClipboardCheck },
-    { id: 'roster-settings', label: 'Atur Roster', icon: BookOpen },
-    { id: 'announcement-settings', label: 'Atur Pengumuman', icon: Megaphone },
-    { id: 'assignment-settings', label: 'Atur Tugas Online', icon: Briefcase },
-    { id: 'letters-teacher', label: 'Kotak Surat', icon: Mail },
-    { id: 'rapot-input', label: 'Input Rapot', icon: BookOpenCheck },
-    { id: 'report', label: 'Laporan', icon: BarChart3 },
+  const menuSections = [
+    {
+      title: "MENU UTAMA",
+      items: isTeacher 
+        ? [
+            { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }, 
+            { id: 'attendance', label: 'Input Absensi', icon: ClipboardCheck }
+          ]
+        : [
+            { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }, 
+            { id: 'roster', label: 'Roster Kelas', icon: ClipboardCheck }, 
+            { id: 'history', label: 'Riwayat Absensi', icon: Calendar }
+          ]
+    },
+    {
+      title: "AKADEMIK & TUGAS",
+      items: isTeacher
+        ? [
+            { id: 'roster-settings', label: 'Atur Roster', icon: BookOpen }, 
+            { id: 'assignment-settings', label: 'Atur Tugas Online', icon: Briefcase }, 
+            { id: 'rapot-input', label: 'Input Rapot', icon: BookOpenCheck },
+            { id: 'report', label: 'Laporan', icon: BarChart3 }
+          ]
+        : [
+            { id: 'tasks', label: 'Kantong Tugas', icon: Briefcase }, 
+            { id: 'rapot', label: 'Rapot Saya', icon: BookOpenCheck }, 
+            { id: 'billing', label: 'Tagihan Sekolah', icon: WalletCards }
+          ]
+    },
+    {
+      title: "KOMUNIKASI",
+      items: isTeacher 
+        ? [
+            { id: 'letters-teacher', label: 'Kotak Surat', icon: Mail }, 
+            { id: 'announcement-settings', label: 'Atur Pengumuman', icon: Megaphone }
+          ]
+        : [
+            { id: 'letters-student', label: 'Kirim Surat', icon: Mail }
+          ]
+    }
   ];
 
-  const studentMenus = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'roster', label: 'Roster Kelas', icon: ClipboardCheck },
-    { id: 'history', label: 'Riwayat Absensi', icon: Calendar },
-    { id: 'tasks', label: 'Kantong Tugas', icon: Briefcase },
-    { id: 'letters-student', label: 'Kirim Surat', icon: Mail },
-    { id: 'rapot', label: 'Rapot Saya', icon: BookOpenCheck },
-    { id: 'billing', label: 'Tagihan Sekolah', icon: WalletCards },
-  ];
-
-  const menus = isTeacher ? teacherMenus : studentMenus;
-
-  // Modifikasi warna aktif & kontras teks agar serasi dengan bg-sky-500
-  const activeColor = 'bg-white text-sky-600 font-bold';
+  // --- PENYESUAIAN WARNA: Karena bg sekarang putih, warna aktif & hover disesuaikan ---
+  const activeColor = 'bg-sky-50 text-sky-600 font-bold shadow-sm';
   const avatarBg = isTeacher ? 'bg-blue-600' : 'bg-emerald-600';
 
   const topNavItems = [
@@ -91,41 +110,50 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
   ];
 
   const sidebarContent = (
-    <>
-      <nav className="flex-1 p-3 space-y-1">
-        {menus.map(menu => {
-          const Icon = menu.icon;
-          const isActive = activePage === menu.id;
-          return (
-            <button
-              key={menu.id}
-              onClick={() => { onNavigate(menu.id); setMobileOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                  ? activeColor + ' shadow-md'
-                  : 'text-sky-100 hover:text-white hover:bg-white/10' // Hover teks putih transparan
+    <nav className="flex-1 p-3 space-y-6 overflow-y-auto">
+      {menuSections.map((section) => (
+        <div key={section.title} className="space-y-1">
+          {/* Judul Kategori diubah jadi abu-abu/biru redup agar kontras dengan latar putih */}
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-2">
+            {section.title}
+          </p>
+          
+          {section.items.map((item) => {
+            const Icon = item.icon;
+            const isActive = activePage === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => { onNavigate(item.id); setMobileOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? activeColor
+                    : 'text-gray-600 hover:text-sky-600 hover:bg-gray-50'
                 }`}
-            >
-              <Icon className="w-5 h-5" />
-              {menu.label}
-            </button>
-          );
-        })}
-      </nav>
-    </>
+              >
+                <Icon className="w-5 h-5" />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </nav>
   );
 
   return (
     <>
+      {/* Header atas tetap utuh dengan bg-sky-500 */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-sky-500 shadow-md">
         <div className="flex items-center h-14 px-4">
           <div className="flex items-center gap-1">
             <div className="flex items-center gap-2 mr-4 pr-4 border-r border-white/30">
               <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center overflow-hidden">
                 <img
-  src={`${import.meta.env.BASE_URL}images/logo-smpn1-small.png`}
-  alt="Logo SMP 1 Majenang"
-  className="w-full h-full object-cover"
-/>
+                  src={`${import.meta.env.BASE_URL}images/logo-smpn1-small.png`}
+                  alt="Logo SMP 1 Majenang"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-white font-bold text-sm leading-tight">PORTAL SISWA</h1>
@@ -260,6 +288,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
 
       <div className="h-14" />
 
+      {/* Tombol menu mobile */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
         className="md:hidden fixed top-16 left-4 z-50 p-2 bg-sky-600 text-white rounded-xl shadow-lg"
@@ -271,16 +300,17 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
         <div className="md:hidden fixed inset-0 bg-black/50 z-40 top-14" onClick={() => setMobileOpen(false)} />
       )}
 
-      {/* DESKTOP SIDEBAR: Diubah dari bg-gray-900 ke bg-sky-500 */}
+      {/* DESKTOP SIDEBAR - MODIFIKASI: bg berubah dari bg-sky-500 ke bg-white & border-gray-200 */}
       <aside
-        className={`hidden md:flex md:flex-col bg-sky-500 border-r border-white/10 min-h-[calc(100vh-3.5rem)] fixed left-0 top-14 bottom-0 z-30 transition-all duration-300 ${sidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-64 opacity-100'
-          }`}
+        className={`hidden md:flex md:flex-col bg-white border-r border-gray-200 min-h-[calc(100vh-3.5rem)] fixed left-0 top-14 bottom-0 z-30 transition-all duration-300 ${
+          sidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-64 opacity-100'
+        }`}
       >
         {sidebarContent}
       </aside>
 
-      {/* MOBILE SIDEBAR: Diubah dari bg-gray-900 ke bg-sky-500 */}
-      <aside className={`md:hidden fixed left-0 top-14 bottom-0 w-64 bg-sky-500 z-40 flex flex-col transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      {/* MOBILE SIDEBAR - MODIFIKASI: bg berubah dari bg-sky-500 ke bg-white & border-gray-200 */}
+      <aside className={`md:hidden fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 z-40 flex flex-col transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {sidebarContent}
       </aside>
     </>
