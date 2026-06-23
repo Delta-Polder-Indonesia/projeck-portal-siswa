@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getClasses, getStudents, updateStudent } from '../../data/store';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
-import { Camera, Save, Loader2, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Camera, Save, Loader2, X, CheckCircle, AlertCircle, User, AtSign, Phone, MapPin } from 'lucide-react';
 import ModalPotongFoto from '../bersama/ModalPotongFoto';
 import { bacaFileSebagaiDataUrl } from '../../utils/gambar';
 
@@ -38,7 +38,7 @@ export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
   const storeVersion = useStoreVersion();
   
-  // Data
+  // Data Fetching
   const student = useMemo(() => 
     getStudents().find(item => item.id === user?.id), 
     [user, storeVersion]
@@ -122,7 +122,7 @@ export default function ProfilePage() {
     if (formData.phone) {
       const cleanPhone = formData.phone.replace(/\D/g, '');
       if (cleanPhone.length < 10 || cleanPhone.length > 13) {
-        newErrors.phone = 'Nomor whatsapp harus 10-13 digit';
+        newErrors.phone = 'Nomor WhatsApp harus 10-13 digit';
       }
     }
     
@@ -138,7 +138,6 @@ export default function ProfilePage() {
   const handleInputChange = useCallback((field: keyof ProfileFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setIsDirty(true);
-    // Clear error when user types
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -148,7 +147,6 @@ export default function ProfilePage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validation
     if (!file.type.startsWith('image/')) {
       setMessage({ text: 'File harus berupa gambar (JPG, PNG, atau GIF)', type: 'error' });
       event.target.value = '';
@@ -163,12 +161,9 @@ export default function ProfilePage() {
 
     try {
       setIsUploadingAvatar(true);
-      setMessage({ text: 'Menyiapkan foto untuk dipotong...', type: 'success' });
-      
       const dataUrl = await bacaFileSebagaiDataUrl(file);
       setSumberFotoPotong(dataUrl);
       setBukaPotongFoto(true);
-      setMessage(null);
     } catch (error) {
       setMessage({ text: 'Upload foto gagal. Silakan coba file lain.', type: 'error' });
     } finally {
@@ -205,9 +200,7 @@ export default function ProfilePage() {
     }
 
     setIsSaving(true);
-    
     try {
-      // Simulate API delay untuk UX
       await new Promise(resolve => setTimeout(resolve, 500));
       
       updateStudent({
@@ -233,312 +226,233 @@ export default function ProfilePage() {
   const handleBatalPotong = useCallback(() => {
     setBukaPotongFoto(false);
     setSumberFotoPotong('');
-    setMessage({ text: 'Pemotongan foto dibatalkan', type: 'error' });
-  }, []);
-
-  const dismissMessage = useCallback(() => {
-    setMessage(null);
   }, []);
 
   if (!student) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-500">Profil siswa tidak ditemukan</p>
+      <div className="flex items-center justify-center h-96 bg-gray-50 rounded-2xl border border-dashed border-gray-200 m-4">
+        <div className="text-center p-6 max-w-sm">
+          <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <p className="text-gray-700 font-medium mb-1">Profil Tidak Ditemukan</p>
+          <p className="text-sm text-gray-500">Data siswa gagal dimuat atau sesi Anda telah berakhir.</p>
         </div>
       </div>
     );
   }
 
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Profil Saya</h1>
-          <p className="text-gray-500">Kelola identitas siswa dan foto profil dari satu halaman</p>
-        </div>
-        {isDirty && (
-          <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
-            Ada perubahan belum disimpan
-          </span>
-        )}
-      </div>
-
-      {/* Message Alert */}
+    <div className="space-y-6 max-w-6xl mx-auto px-4 py-6 text-slate-800">
+ 
+      {/* Floating Alert Notification */}
       {message && (
-        <div className={`rounded-xl p-4 flex items-center justify-between ${
-          message.type === 'success' ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'
+        <div className={`rounded-2xl p-4 flex items-center justify-between shadow-sm border transition-all duration-300 ${
+          message.type === 'success' ? 'bg-emerald-50/80 border-emerald-200 text-emerald-800' : 'bg-rose-50/80 border-rose-200 text-rose-800'
         }`}>
           <div className="flex items-center gap-3">
             {message.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 text-emerald-600" />
+              <div className="p-1 bg-emerald-500 text-white rounded-full"><CheckCircle className="w-4 h-4" /></div>
             ) : (
-              <AlertCircle className="w-5 h-5 text-red-600" />
+              <div className="p-1 bg-rose-500 text-white rounded-full"><AlertCircle className="w-4 h-4" /></div>
             )}
-            <p className={`text-sm font-medium ${
-              message.type === 'success' ? 'text-emerald-800' : 'text-red-800'
-            }`}>
-              {message.text}
-            </p>
+            <p className="text-sm font-medium">{message.text}</p>
           </div>
-          <button 
-            onClick={dismissMessage}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={() => setMessage(null)} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Profile Header Card */}
-      <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="h-32 md:h-40 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 relative">
-          <div className="absolute inset-0 bg-black/10" />
+      {/* Hero Profile Banner Card */}
+      <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="h-32 md:h-44 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 relative opacity-95">
+          <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]" />
         </div>
         
-        <div className="px-5 md:px-8 pb-6 -mt-14 md:-mt-16 relative">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div className="flex items-end gap-4">
-              <div className="relative group">
-                {avatarPreview ? (
-                  <img
-                    src={avatarPreview}
-                    alt="Foto profil"
-                    onError={(e) => {
-                      e.currentTarget.src = DEFAULT_AVATAR;
-                    }}
-                    className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-lg"
-                  />
-                ) : (
-                  <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-emerald-700 text-white flex items-center justify-center text-2xl font-bold border-4 border-white shadow-lg">
-                    {getInitials(student.name)}
-                  </div>
-                )}
-                
-                {/* Hover overlay untuk ganti foto */}
-                <label className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-                  <Camera className="w-8 h-8 text-white" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleUploadAvatar}
-                    className="hidden"
-                    disabled={isUploadingAvatar}
-                  />
-                </label>
-              </div>
-              
-              <div className="pb-1">
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900">{student.name}</h2>
-                <p className="text-sm text-gray-500">{className} • NIS {student.nis}</p>
-              </div>
-            </div>
-
-            <label className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              isUploadingAvatar 
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 cursor-pointer shadow-sm'
-            }`}>
-              {isUploadingAvatar ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Memproses...
-                </>
+        <div className="px-6 md:px-8 pb-6 -mt-12 md:-mt-14 relative flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+            <div className="relative group shadow-xl rounded-full border-4 border-white bg-white overflow-hidden w-28 h-28 md:w-32 md:h-32">
+              {avatarPreview ? (
+                <img
+                  src={avatarPreview}
+                  alt="Avatar"
+                  onError={(e) => { e.currentTarget.src = DEFAULT_AVATAR; }}
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <>
-                  <Camera className="w-4 h-4" />
-                  Ganti Foto
-                </>
+                <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-3xl font-bold">
+                  {getInitials(student.name)}
+                </div>
               )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleUploadAvatar}
-                className="hidden"
-                disabled={isUploadingAvatar}
-              />
-            </label>
+              <label className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity duration-200">
+                <Camera className="w-7 h-7 text-white" />
+                <input type="file" accept="image/*" onChange={handleUploadAvatar} className="hidden" disabled={isUploadingAvatar} />
+              </label>
+            </div>
+            
+            <div className="sm:mb-2">
+              <h2 className="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">{student.name}</h2>
+              <p className="text-sm text-slate-400 font-medium mt-0.5">Kelas {className} &bull; NIS {student.nis}</p>
+            </div>
           </div>
+
+          <label className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold shadow-sm border transition-all duration-200 cursor-pointer ${
+            isUploadingAvatar 
+              ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed' 
+              : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300'
+          }`}>
+            {isUploadingAvatar ? (
+              <><Loader2 className="w-4 h-4 animate-spin" />Memproses...</>
+            ) : (
+              <><Camera className="w-4 h-4 text-slate-500" />Ganti Foto Profil</>
+            )}
+            <input type="file" accept="image/*" onChange={handleUploadAvatar} className="hidden" disabled={isUploadingAvatar} />
+          </label>
         </div>
       </section>
 
-      {/* Content Grid */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Current Data Table */}
-        <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <div className="w-1 h-5 bg-emerald-500 rounded-full" />
-            Data Profil Saat Ini
-          </h2>
+      {/* Main Grid Content */}
+      <div className="grid lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Left Side: Detail Overview */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm lg:col-span-5 space-y-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+            <div className="w-1.5 h-5 bg-emerald-500 rounded-full" />
+            <h3 className="font-bold text-slate-800">Detail Data Saat Ini</h3>
+          </div>
           
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <tbody className="divide-y divide-gray-100">
-                {[
-                  { label: 'Nama Lengkap', value: student.name },
-                  { label: 'NIS', value: student.nis },
-                  { label: 'Kelas', value: className },
-                  { label: 'Jenis Kelamin', value: student.gender === 'L' ? 'Laki-laki' : 'Perempuan' },
-                  { label: 'Email', value: student.email || <span className="text-gray-400 italic">Belum diisi</span> },
-                  { label: 'Nomor whatsapp', value: student.phone || <span className="text-gray-400 italic">Belum diisi</span> },
-                  { label: 'Nama Orang Tua/Wali', value: student.parentName || <span className="text-gray-400 italic">Belum diisi</span> },
-                  { label: 'Alamat', value: student.address || <span className="text-gray-400 italic">Belum diisi</span> },
-                ].map((item, idx) => (
-                  <tr key={idx}>
-                    <td className="py-3 text-gray-500 w-44">{item.label}</td>
-                    <td className="py-3 text-gray-800 font-medium">{item.value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-3.5 text-sm">
+            {[
+              { label: 'Nama Lengkap', value: student.name, icon: <User className="w-4 h-4 text-slate-400" /> },
+              { label: 'Nomor Induk Siswa (NIS)', value: student.nis, icon: <span className="text-xs font-bold text-slate-400">ID</span> },
+              { label: 'Kelas Aktif', value: className, icon: <span className="text-xs font-bold text-slate-400">RM</span> },
+              { label: 'Jenis Kelamin', value: student.gender === 'L' ? 'Laki-laki' : 'Perempuan', icon: <span className="text-xs font-bold text-slate-400">JK</span> },
+              { label: 'Alamat Surel (Email)', value: student.email || 'Belum diisi', isItalic: !student.email, icon: <AtSign className="w-4 h-4 text-slate-400" /> },
+              { label: 'No. WhatsApp', value: student.phone || 'Belum diisi', isItalic: !student.phone, icon: <Phone className="w-4 h-4 text-slate-400" /> },
+              { label: 'Orang Tua / Wali', value: student.parentName || 'Belum diisi', isItalic: !student.parentName, icon: <User className="w-4 h-4 text-slate-400" /> },
+              { label: 'Alamat Rumah', value: student.address || 'Belum diisi', isItalic: !student.address, icon: <MapPin className="w-4 h-4 text-slate-400" /> },
+            ].map((item, idx) => (
+              <div key={idx} className="flex gap-3 p-2.5 rounded-xl hover:bg-slate-50/60 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
+                  {item.icon}
+                </div>
+                <div>
+                  <span className="block text-xs font-medium text-slate-400">{item.label}</span>
+                  <span className={`text-slate-700 font-semibold mt-0.5 block ${item.isItalic ? 'text-slate-300 italic font-normal' : ''}`}>
+                    {item.value}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Edit Form */}
-        <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <div className="w-1 h-5 bg-blue-500 rounded-full" />
-            Pengaturan Profil
-          </h2>
+        {/* Right Side: Interactive Form */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm lg:col-span-7 space-y-5">
+          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+            <div className="w-1.5 h-5 bg-teal-500 rounded-full" />
+            <h3 className="font-bold text-slate-800">Modifikasi Pengaturan Profil</h3>
+          </div>
           
           <div className="space-y-4">
-            {/* Name */}
+            {/* Input Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Nama Lengkap <span className="text-red-500">*</span>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                Nama Lengkap <span className="text-rose-500">*</span>
               </label>
               <input
+                type="text"
                 value={formData.name}
                 onChange={e => handleInputChange('name', e.target.value)}
-                className={`w-full px-3.5 py-2.5 border rounded-lg text-sm outline-none transition-all ${
+                className={`w-full px-4 py-2.5 border rounded-xl text-sm outline-none transition-all ${
                   errors.name 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
-                    : 'border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200'
+                    ? 'border-rose-300 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 bg-rose-50/10' 
+                    : 'border-slate-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white bg-slate-50/50'
                 }`}
-                placeholder="Masukkan nama lengkap"
+                placeholder="Masukkan nama lengkap Anda"
               />
               {errors.name && (
-                <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.name}
+                <p className="mt-1.5 text-xs text-rose-600 flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3.5 h-3.5" /> {errors.name}
                 </p>
               )}
             </div>
 
-            {/* Email & Phone Grid */}
+            {/* Twin Row Grid (Email & WhatsApp) */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Email</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={e => handleInputChange('email', e.target.value)}
-                  placeholder="contoh@email.com"
-                  className={`w-full px-3.5 py-2.5 border rounded-lg text-sm outline-none transition-all ${
+                  placeholder="nama@domain.com"
+                  className={`w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none transition-all ${
                     errors.email 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
-                      : 'border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200'
+                      ? 'border-rose-300 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
+                      : 'focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 bg-slate-50/50 focus:bg-white'
                   }`}
                 />
-                {errors.email && (
-                  <p className="mt-1 text-xs text-red-600">{errors.email}</p>
-                )}
+                {errors.email && <p className="mt-1.5 text-xs text-rose-600 font-medium">{errors.email}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Nomor Whatsapp</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nomor WhatsApp</label>
                 <input
+                  type="text"
                   value={formData.phone}
                   onChange={e => handleInputChange('phone', e.target.value)}
                   placeholder="08xxxxxxxxxx"
-                  className={`w-full px-3.5 py-2.5 border rounded-lg text-sm outline-none transition-all ${
+                  className={`w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none transition-all ${
                     errors.phone 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
-                      : 'border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200'
+                      ? 'border-rose-300 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
+                      : 'focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 bg-slate-50/50 focus:bg-white'
                   }`}
                 />
-                {errors.phone && (
-                  <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
-                )}
+                {errors.phone && <p className="mt-1.5 text-xs text-rose-600 font-medium">{errors.phone}</p>}
               </div>
             </div>
 
-            {/* Parent Name */}
+            {/* Input Parent Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nama Orang Tua/Wali</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nama Orang Tua / Wali</label>
               <input
+                type="text"
                 value={formData.parentName}
                 onChange={e => handleInputChange('parentName', e.target.value)}
-                placeholder="Masukkan nama orang tua atau wali"
-                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
+                placeholder="Nama ayah, ibu, atau wali"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 bg-slate-50/50 focus:bg-white transition-all"
               />
             </div>
 
-            {/* Address */}
+            {/* Input Address */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Alamat</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Alamat Lengkap</label>
               <textarea
-                rows={4}
+                rows={3}
                 value={formData.address}
                 onChange={e => handleInputChange('address', e.target.value)}
-                placeholder="Masukkan alamat lengkap"
+                placeholder="Tuliskan alamat rumah domisili saat ini..."
                 maxLength={500}
-                className={`w-full px-3.5 py-2.5 border rounded-lg text-sm outline-none resize-none transition-all ${
-                  errors.address 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
-                    : 'border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200'
-                }`}
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none resize-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 bg-slate-50/50 focus:bg-white transition-all"
               />
-              <div className="flex justify-between mt-1">
-                {errors.address ? (
-                  <p className="text-xs text-red-600">{errors.address}</p>
-                ) : (
-                  <span />
-                )}
-                <span className="text-xs text-gray-400">
-                  {formData.address.length}/500
-                </span>
+              <div className="flex justify-between items-center mt-1">
+                <span className="text-xs text-rose-600 font-medium">{errors.address || ''}</span>
+                <span className="text-xs font-medium text-slate-400">{formData.address.length}/500</span>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="mt-6 flex items-center gap-3">
-            <button
-              onClick={handleSaveProfile}
-              disabled={isSaving || !isDirty}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                isSaving || !isDirty
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md hover:shadow-lg'
-              }`}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Menyimpan...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  Simpan Perubahan
-                </>
-              )}
-            </button>
-            
+          {/* Action Footer Buttons */}
+          <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
             {isDirty && (
               <button
+                type="button"
                 onClick={() => {
                   if (student) {
                     setFormData({
@@ -553,20 +467,38 @@ export default function ProfilePage() {
                     setIsDirty(false);
                   }
                 }}
-                className="px-4 py-2.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                className="px-4 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-xl transition-colors"
               >
                 Batalkan
               </button>
             )}
+            
+            <button
+              type="button"
+              onClick={handleSaveProfile}
+              disabled={isSaving || !isDirty}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
+                isSaving || !isDirty
+                  ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600 hover:shadow-md'
+              }`}
+            >
+              {isSaving ? (
+                <><Loader2 className="w-4 h-4 animate-spin" />Menyimpan...</>
+              ) : (
+                <><Save className="w-4 h-4" />Simpan Perubahan</>
+              )}
+            </button>
           </div>
         </div>
+
       </div>
 
-      {/* Crop Modal */}
+      {/* Crop Avatar Modal Component */}
       <ModalPotongFoto
         open={bukaPotongFoto}
         sumberGambar={sumberFotoPotong}
-        judul="Potong Foto Profil Siswa"
+        judul="Sesuaikan Foto Profil Anda"
         warnaAksen="hijau"
         onBatal={handleBatalPotong}
         onSimpan={handleSimpanFotoPotong}

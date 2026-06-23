@@ -35,8 +35,8 @@ export default function TabTagihanSekolah({ setNotice, scope }: TabTagihanSekola
         const day = Math.max(1, Math.min(28, tanggalJatuhTempo));
         const confirmed = window.confirm(
             `Terapkan tagihan ${tahunTagihan} untuk semua siswa dengan nominal ${new Intl.NumberFormat(
-                'id-ID'
-            ).format(nominalTagihan)} dan jatuh tempo tanggal ${day}?`
+                'id-ID',
+            ).format(nominalTagihan)} dan jatuh tempo tanggal ${day}?`,
         );
         if (!confirmed) return;
 
@@ -45,52 +45,92 @@ export default function TabTagihanSekolah({ setNotice, scope }: TabTagihanSekola
     };
 
     return (
-        <div className="min-h-[540px] space-y-4 rounded-xl border border-gray-200 p-4">
-            <div>
-                <h3 className="font-semibold text-gray-800">Pengaturan Tagihan Uang Sekolah</h3>
-                <p className="text-xs text-gray-500 mt-1">
+        <div className="mx-auto max-w-5xl space-y-3 rounded-sm border border-gray-200 p-3">
+
+            {/* STRIP HEADER */}
+            <div className="border-b border-gray-200 pb-1.5">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-gray-800">
+                    Pengaturan Tagihan Uang Sekolah
+                </h3>
+                <p className="mt-0.5 text-[10px] text-gray-500">
                     Atur nominal bulanan dan tanggal jatuh tempo, lalu terapkan ke seluruh siswa per tahun.
                 </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-3">
-                <label className="text-sm text-gray-700">
-                    Tahun
+
+            {/* FIELD GRID */}
+            <div className="grid gap-2 md:grid-cols-3">
+
+                {/* Tahun */}
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        Tahun
+                    </label>
                     <input
                         type="number"
                         value={tahunTagihan}
                         onChange={(e) => setTahunTagihan(Number(e.target.value))}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
                     />
-                </label>
-                <label className="text-sm text-gray-700">
-                    Nominal Bulanan (Rp)
+                </div>
+
+                {/* Nominal */}
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        Nominal Bulanan (Rp)
+                    </label>
                     <input
                         type="number"
                         min={1000}
                         step={1000}
                         value={nominalTagihan}
                         onChange={(e) => setNominalTagihan(Number(e.target.value))}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
                     />
-                </label>
-                <label className="text-sm text-gray-700">
-                    Tanggal Jatuh Tempo
+                </div>
+
+                {/* Jatuh Tempo */}
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        Tanggal Jatuh Tempo
+                    </label>
                     <input
                         type="number"
                         min={1}
                         max={28}
                         value={tanggalJatuhTempo}
                         onChange={(e) => setTanggalJatuhTempo(Number(e.target.value))}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
                     />
-                </label>
+                </div>
             </div>
-            <button
-                onClick={handleTerapkanTagihanTahunan}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
-            >
-                <Save className="w-4 h-4" /> Terapkan Tagihan Tahunan
-            </button>
+
+            {/* INFO RINGKAS */}
+            <div className="rounded-sm border border-gray-100 bg-gray-50/60 px-3 py-2">
+                <p className="text-[10px] text-gray-500 leading-4">
+                    Sistem akan membuat{' '}
+                    <span className="font-bold text-gray-700">12 tagihan</span> per siswa untuk tahun{' '}
+                    <span className="font-bold text-gray-700">{tahunTagihan}</span> dengan nominal{' '}
+                    <span className="font-bold text-gray-700">
+                        Rp {new Intl.NumberFormat('id-ID').format(nominalTagihan)}
+                    </span>{' '}
+                    jatuh tempo setiap tanggal{' '}
+                    <span className="font-bold text-gray-700">
+                        {Math.max(1, Math.min(28, tanggalJatuhTempo))}
+                    </span>
+                    . Tagihan yang sudah ada tidak akan ditimpa.
+                </p>
+            </div>
+
+            {/* TOMBOL AKSI */}
+            <div className="flex justify-end border-t border-gray-200 pt-2">
+                <button
+                    onClick={handleTerapkanTagihanTahunan}
+                    className="inline-flex items-center gap-1.5 rounded-sm bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-blue-700"
+                >
+                    <Save className="h-3.5 w-3.5" />
+                    Terapkan Tagihan Tahunan
+                </button>
+            </div>
         </div>
     );
 }

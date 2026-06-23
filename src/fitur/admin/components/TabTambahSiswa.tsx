@@ -51,54 +51,73 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
     };
 
     return (
-        <div className="space-y-4 rounded-xl border border-gray-200 p-6 bg-white">
-            <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50/60 p-6">
-                <h3 className="text-base font-semibold text-gray-800">Form Penerimaan Siswa Baru (PPDB)</h3>
-                <div className="grid gap-4 sm:grid-cols-2">
+        <div className="mx-auto max-w-5xl rounded-sm border border-gray-200 bg-white p-3">
+            <div className="space-y-3 rounded-sm border border-gray-200 bg-gray-50/50 p-3">
+                <div className="border-b border-gray-200 pb-1.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wide text-gray-800">
+                        Form Penerimaan Siswa Baru (PPDB)
+                    </h3>
+                </div>
+
+                <div className="grid gap-2 sm:grid-cols-2">
                     <div className="space-y-1">
-                        <label className="text-xs text-gray-600">Nama Lengkap Siswa</label>
+                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                            Nama Lengkap Siswa
+                        </label>
                         <input
                             value={newStudentName}
                             onChange={(e) => setNewStudentName(e.target.value)}
                             placeholder="Contoh: Andi Pratama"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
                         />
                     </div>
+
                     <div className="space-y-1">
-                        <label className="text-xs text-gray-600">Nomor Induk Siswa (NIS)</label>
+                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                            Nomor Induk Siswa (NIS)
+                        </label>
                         <input
                             value={newStudentNis}
                             onChange={(e) => setNewStudentNis(e.target.value)}
                             placeholder="Contoh: 2024001"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
                         />
                     </div>
+
                     <div className="space-y-1">
-                        <label className="text-xs text-gray-600">Jenis Kelamin</label>
+                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                            Jenis Kelamin
+                        </label>
                         <select
                             value={newStudentGender}
                             onChange={(e) => setNewStudentGender(e.target.value as 'L' | 'P')}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                            className="w-full rounded-sm border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
                         >
                             <option value="L">Laki-Laki (L)</option>
                             <option value="P">Perempuan (P)</option>
                         </select>
                     </div>
+
                     <div className="space-y-1">
-                        <label className="text-xs text-gray-600">Kata Sandi Awal</label>
+                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                            Kata Sandi Awal
+                        </label>
                         <input
                             value={newStudentPassword}
                             onChange={(e) => setNewStudentPassword(e.target.value)}
                             placeholder="Minimal 6 karakter"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
                         />
                     </div>
+
                     <div className="space-y-1 sm:col-span-2">
-                        <label className="text-xs text-gray-600">Pilih Kelas</label>
+                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                            Pilih Kelas
+                        </label>
                         <select
                             value={newStudentClassId}
                             onChange={(e) => setNewStudentClassId(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                            className="w-full rounded-sm border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
                         >
                             <option value="">-- Pilih Kelas --</option>
                             {classes.map((c) => (
@@ -110,12 +129,13 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
                     </div>
                 </div>
 
-                <div className="pt-4 flex w-full justify-end">
+                <div className="flex w-full justify-end border-t border-gray-200 pt-2">
                     <button
                         onClick={handleAddStudent}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition"
+                        className="inline-flex items-center gap-1.5 rounded-sm bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700"
                     >
-                        <UserPlus className="w-4 h-4" /> Daftarkan Siswa Baru
+                        <UserPlus className="h-3.5 w-3.5" />
+                        Daftarkan Siswa Baru
                     </button>
                 </div>
             </div>

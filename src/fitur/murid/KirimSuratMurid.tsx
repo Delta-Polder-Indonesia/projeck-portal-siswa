@@ -89,63 +89,63 @@ export default function KirimSuratMurid() {
   } as const;
 
   const statusStyle = {
-    menunggu: 'text-amber-600 bg-amber-50/50 border-amber-200/40',
-    disetujui: 'text-emerald-600 bg-emerald-50/50 border-emerald-200/40',
-    ditolak: 'text-rose-600 bg-rose-50/50 border-rose-200/40',
+    menunggu: 'text-amber-700 bg-amber-50 border-amber-200',
+    disetujui: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    ditolak: 'text-rose-700 bg-rose-50 border-rose-200',
   } as const;
 
   return (
-    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-100">
-      
+    <div className="w-full h-full p-6 md:p-8 lg:p-10 antialiased text-slate-700 bg-white">
+
       {/* HEADER HALAMAN */}
-      <header className="mb-4 pb-2 border-b border-slate-100">
-        <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-none">Perizinan & Absensi</h1>
-        <p className="text-[11px] text-slate-400 mt-1 leading-tight">Ajukan surat izin berhalangan hadir atau pantau status persetujuan dari wali kelas.</p>
+      <header className="mb-8 pb-4 border-b border-slate-200">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Perizinan & Absensi</h1>
+        <p className="text-sm text-slate-500 mt-2">Ajukan surat izin berhalangan hadir atau pantau status persetujuan dari wali kelas.</p>
       </header>
 
-      {/* SEJAJAR WORKSPACE GRID (6 Kolom : 6 Kolom dengan Gap Rapat) */}
-      <div className="grid lg:grid-cols-12 gap-4 items-start">
-        
+      {/* SEJAJAR WORKSPACE GRID */}
+      <div className="grid lg:grid-cols-12 gap-8 items-start">
+
         {/* FORM PENGAJUAN (Kiri) */}
-        <section className="lg:col-span-6 space-y-3 bg-slate-50/30 p-3 border border-slate-100 rounded-sm">
-          <div className="border-b border-slate-100 pb-1">
-            <h2 className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Formulir Pengajuan</h2>
+        <section className="lg:col-span-7 space-y-6">
+          <div className="mb-4">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-widest border-b border-slate-100 pb-2">Formulir Pengajuan</h2>
           </div>
-          
-          {/* Informasi Identitas Ringkas & Padat */}
-          <div className="grid grid-cols-3 gap-2 border-b border-slate-200/60 pb-2 text-[11px]">
+
+          {/* Informasi Identitas */}
+          <div className="grid grid-cols-3 gap-4 border border-slate-200 rounded-lg p-4 bg-slate-50">
             <div>
-              <span className="block text-[10px] text-slate-400 uppercase font-medium">Nama</span>
-              <span className="font-semibold text-slate-800 block truncate leading-tight">{student?.name || '-'}</span>
+              <span className="block text-xs text-slate-500 uppercase font-semibold mb-1">Nama Siswa</span>
+              <span className="font-semibold text-slate-900 block truncate text-sm">{student?.name || '-'}</span>
             </div>
             <div>
-              <span className="block text-[10px] text-slate-400 uppercase font-medium">NIS</span>
-              <span className="font-mono text-slate-700 block leading-tight">{student?.nis || '-'}</span>
+              <span className="block text-xs text-slate-500 uppercase font-semibold mb-1">NIS</span>
+              <span className="font-mono font-medium text-slate-900 block text-sm">{student?.nis || '-'}</span>
             </div>
             <div>
-              <span className="block text-[10px] text-slate-400 uppercase font-medium">Kelas</span>
-              <span className="font-medium text-slate-700 block leading-tight">{className}</span>
+              <span className="block text-xs text-slate-500 uppercase font-semibold mb-1">Kelas</span>
+              <span className="font-semibold text-slate-900 block text-sm">{className}</span>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-2">
-            <div className="space-y-1">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tanggal Izin</label>
+          <div className="grid sm:grid-cols-2 gap-5">
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide">Tanggal Izin</label>
               <input
                 type="date"
                 value={letterDate}
                 onChange={event => setLetterDate(event.target.value)}
-                className="w-full px-2 py-1 border border-slate-200 rounded-sm text-xs outline-none focus:border-slate-400 focus:bg-white bg-white transition-colors text-slate-700 font-mono"
+                className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 bg-white transition-all text-slate-800 font-medium"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kategori Izin</label>
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide">Kategori Izin</label>
               <select
                 value={type}
                 onChange={event => setType(event.target.value as 'izin' | 'sakit' | 'dispensasi' | 'lainnya')}
-                className="w-full px-2 py-1 border border-slate-200 rounded-sm text-xs outline-none focus:border-slate-400 focus:bg-white bg-white transition-colors text-slate-700 appearance-none"
-                style={{ backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2394a3b8\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 bg-white transition-all text-slate-800 font-medium appearance-none"
+                style={{ backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
               >
                 <option value="izin">Izin</option>
                 <option value="sakit">Sakit</option>
@@ -155,56 +155,55 @@ export default function KirimSuratMurid() {
             </div>
           </div>
 
-          <div className="space-y-1">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Perihal / Alasan Utama</label>
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide">Perihal / Alasan Utama</label>
             <input
               type="text"
               value={subject}
               onChange={event => setSubject(event.target.value)}
               placeholder="Contoh: Surat keterangan sakit dari dokter klinik"
-              className="w-full px-2 py-1 border border-slate-200 rounded-sm text-xs outline-none focus:border-slate-400 focus:bg-white bg-white transition-colors text-slate-700 placeholder:text-slate-300"
+              className="w-full px-3 py-2.5 border border-slate-300 rounded-md text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 bg-white transition-all text-slate-800 placeholder:text-slate-400 font-medium"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Isi Surat / Penjelasan Detail</label>
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide">Isi Surat / Penjelasan Detail</label>
             <textarea
-              rows={4}
+              rows={5}
               value={message}
               onChange={event => setMessage(event.target.value)}
               placeholder="Tuliskan alasan ketidakhadiran Anda secara ringkas dan jelas di sini..."
-              className="w-full px-2 py-1.5 border border-slate-200 rounded-sm text-xs outline-none focus:border-slate-400 focus:bg-white bg-white transition-colors text-slate-700 resize-none leading-tight placeholder:text-slate-300 shadow-inner"
+              className="w-full px-3 py-2.5 border border-slate-300 rounded-md text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 bg-white transition-all text-slate-800 resize-y placeholder:text-slate-400 font-medium leading-relaxed"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unggah Bukti Pendukung (PDF/Foto max 2MB)</label>
-            <div className="flex items-center gap-2 bg-white border border-slate-200 p-1.5 rounded-sm">
-              <label className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-50 border border-slate-200 rounded-sm text-[11px] font-medium text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors shrink-0">
-                <Upload className="w-3 h-3 text-slate-400" />
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide">Unggah Bukti Pendukung (PDF/Foto max 2MB)</label>
+            <div className="flex items-center gap-3 bg-white border border-slate-200 p-2 rounded-md">
+              <label className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-300 rounded text-sm font-medium text-slate-700 cursor-pointer hover:bg-slate-200 transition-colors shrink-0">
+                <Upload className="w-4 h-4 text-slate-500" />
                 <span>Pilih Dokumen</span>
                 <input type="file" className="hidden" onChange={event => setAttachment(event.target.files?.[0] || null)} />
               </label>
-              <span className="text-[11px] text-slate-400 truncate max-w-[200px] font-mono">
+              <span className="text-sm text-slate-500 truncate max-w-[250px] font-mono">
                 {attachment?.name || 'Belum ada file terpilih'}
               </span>
             </div>
           </div>
 
-          {/* Tombol Aksi Bawah */}
-          <div className="pt-2 flex items-center justify-between gap-2 border-t border-slate-100">
+          <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
             <button
               type="button"
               onClick={handleSubmit}
               disabled={isSaving}
-              className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-900 text-white rounded-sm text-[11px] font-medium hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-md text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-              <span>{isSaving ? 'Mengirim...' : 'Kirim Surat'}</span>
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              <span>{isSaving ? 'Mengirim Surat...' : 'Kirim Surat'}</span>
             </button>
 
             {feedback && (
-              <p className={`text-[11px] font-medium leading-none text-right ${feedback.startsWith('Berhasil') ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <p className={`text-sm font-semibold ${feedback.startsWith('Berhasil') ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {feedback}
               </p>
             )}
@@ -212,54 +211,57 @@ export default function KirimSuratMurid() {
         </section>
 
         {/* LOG RIWAYAT SURAT (Kanan) */}
-        <section className="lg:col-span-6 flex flex-col space-y-3">
-          <div className="border-b border-slate-100 pb-1">
-            <h2 className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Riwayat Pengajuan</h2>
+        <section className="lg:col-span-5 flex flex-col space-y-4">
+          <div className="mb-2 border-b border-slate-100 pb-2">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Riwayat Pengajuan</h2>
           </div>
 
-          <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
+          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
             {riwayatSurat.map((item) => (
-              <div key={item.id} className="p-2 border border-slate-100 bg-slate-50/20 rounded-sm relative group">
-                
-                <div className="flex justify-between items-start gap-2 border-b border-slate-100 pb-1">
+              <div key={item.id} className="p-4 border border-slate-200 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow relative group">
+
+                <div className="flex justify-between items-start gap-4 mb-2">
                   <div>
-                    <h3 className="text-xs font-bold text-slate-900 leading-tight">{item.subject}</h3>
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mt-0.5 leading-none">
-                      <span className="font-bold text-slate-500 bg-slate-100 px-1 py-0.2 rounded-sm text-[9px] uppercase tracking-wide">{typeLabel[item.type]}</span>
-                      <span>·</span>
-                      <span className="flex items-center gap-0.5 font-mono">
-                        <Calendar className="w-2.5 h-2.5 text-slate-300" />
-                        <span>Izin: {new Date(`${item.letterDate}T00:00:00`).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>
+                    <h3 className="text-base font-bold text-slate-900 leading-tight">{item.subject}</h3>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
+                      <span className="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[11px] uppercase tracking-wide border border-slate-200">
+                        {typeLabel[item.type]}
+                      </span>
+                      <span>&bull;</span>
+                      <span className="flex items-center gap-1 font-mono">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Izin: {new Date(`${item.letterDate}T00:00:00`).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </span>
                     </div>
                   </div>
-                  
-                  {/* Status Minimalis Padat */}
-                  <span className={`px-1.5 py-0.5 rounded-sm border text-[10px] font-bold shrink-0 leading-none ${statusStyle[item.status]}`}>
+
+                  <span className={`px-2 py-1 rounded border text-xs font-bold leading-none ${statusStyle[item.status]}`}>
                     {statusLabel[item.status]}
                   </span>
                 </div>
 
-                <p className="text-[11px] text-slate-500 mt-1.5 leading-tight whitespace-pre-line font-normal">
+                <p className="text-sm text-slate-600 mt-3 leading-relaxed whitespace-pre-line">
                   {item.message}
                 </p>
-                
-                <div className="mt-2 pt-1 border-t border-slate-100/60 flex items-center justify-between text-[10px] text-slate-400 font-mono leading-none">
-                  <span className="flex items-center gap-0.5 max-w-[60%]">
-                    <FileText className="w-2.5 h-2.5 text-slate-300 shrink-0" />
+
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-mono">
+                  <span className="flex items-center gap-1.5 max-w-[60%]">
+                    <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="truncate">{item.attachmentName || 'Tanpa lampiran'}</span>
                   </span>
                   <span className="shrink-0">Dibuat: {new Date(item.createdAt).toLocaleDateString('id-ID')}</span>
                 </div>
               </div>
             ))}
-            
+
             {riwayatSurat.length === 0 && (
-              <p className="text-[11px] text-slate-400 italic py-2">Belum ada riwayat pengajuan surat izin.</p>
+              <div className="text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+                <p className="text-sm text-slate-500 font-medium">Belum ada riwayat pengajuan surat izin.</p>
+              </div>
             )}
           </div>
         </section>
-        
+
       </div>
     </div>
   );

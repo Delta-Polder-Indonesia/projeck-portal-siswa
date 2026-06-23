@@ -26,7 +26,9 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
         const edit = studentEdits[studentId];
         if (!edit) return;
 
-        const nisUsed = students.find((item) => item.nis === edit.nis.trim() && item.id !== studentId);
+        const nisUsed = students.find(
+            (item) => item.nis === edit.nis.trim() && item.id !== studentId,
+        );
         if (nisUsed) {
             setNotice('NIS sudah digunakan siswa lain.');
             return;
@@ -34,11 +36,7 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
 
         const nextStudents = students.map((item) => {
             if (item.id !== studentId) return item;
-            return {
-                ...item,
-                nis: edit.nis.trim(),
-                password: edit.password,
-            };
+            return { ...item, nis: edit.nis.trim(), password: edit.password };
         });
 
         saveStudents(nextStudents);
@@ -57,62 +55,103 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
     });
 
     return (
-        <div className="space-y-3">
-            <h3 className="font-semibold text-gray-800">Pengaturan Akun Siswa (NIS dan Kata Sandi)</h3>
-            <input
-                value={searchStudent}
-                onChange={(e) => setSearchStudent(e.target.value)}
-                placeholder="Cari nama siswa, NIS, atau kelas"
-                className="w-full md:w-80 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            />
-            <div className="border border-gray-200 rounded-xl overflow-x-auto">
-                <table className="w-full min-w-[720px]">
+        <div className="mx-auto max-w-5xl space-y-2">
+
+            {/* STRIP HEADER + SEARCH */}
+            <div className="flex flex-col gap-2 border-b border-gray-200 pb-2 sm:flex-row sm:items-center sm:justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-gray-800">
+                    Pengaturan Akun Siswa — NIS & Kata Sandi
+                </h3>
+                <input
+                    value={searchStudent}
+                    onChange={(e) => setSearchStudent(e.target.value)}
+                    placeholder="Cari nama, NIS, atau kelas..."
+                    className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500 sm:w-64"
+                />
+            </div>
+
+            {/* TABLE GRID */}
+            <div className="overflow-x-auto rounded-sm border border-gray-200">
+                <table className="w-full min-w-[620px] border-collapse">
                     <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200 text-left text-xs text-gray-600">
-                            <th className="px-3 py-2">Nama</th>
-                            <th className="px-3 py-2">Kelas</th>
-                            <th className="px-3 py-2">NIS</th>
-                            <th className="px-3 py-2">Kata Sandi</th>
-                            <th className="px-3 py-2">Aksi</th>
+                        <tr className="border-b border-gray-200 bg-gray-50 text-left">
+                            <th className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                Nama Siswa
+                            </th>
+                            <th className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                Kelas
+                            </th>
+                            <th className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                NIS
+                            </th>
+                            <th className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                Kata Sandi
+                            </th>
+                            <th className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                Aksi
+                            </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-100">
                         {filteredStudents.map((student) => {
                             const edit = studentEdits[student.id];
                             if (!edit) return null;
-                            const className = classes.find((item) => item.id === student.classId)?.name || '-';
+                            const className =
+                                classes.find((item) => item.id === student.classId)?.name || '-';
                             return (
-                                <tr key={student.id} className="border-b border-gray-100 last:border-0">
-                                    <td className="px-3 py-2 text-sm text-gray-700">{student.name}</td>
-                                    <td className="px-3 py-2 text-sm text-gray-500">{className}</td>
-                                    <td className="px-3 py-2">
+                                <tr
+                                    key={student.id}
+                                    className="transition-colors hover:bg-gray-50/70"
+                                >
+                                    {/* Nama */}
+                                    <td className="px-2.5 py-1.5 text-xs font-medium text-gray-800">
+                                        {student.name}
+                                    </td>
+
+                                    {/* Kelas */}
+                                    <td className="px-2.5 py-1.5 text-xs text-gray-500">
+                                        {className}
+                                    </td>
+
+                                    {/* NIS Input */}
+                                    <td className="px-2.5 py-1.5">
                                         <input
                                             value={edit.nis}
                                             onChange={(e) =>
                                                 setStudentEdits((prev) => ({
                                                     ...prev,
-                                                    [student.id]: { ...prev[student.id], nis: e.target.value },
+                                                    [student.id]: {
+                                                        ...prev[student.id],
+                                                        nis: e.target.value,
+                                                    },
                                                 }))
                                             }
-                                            className="px-2 py-1.5 border border-gray-300 rounded-md text-sm w-36"
+                                            className="w-32 rounded-sm border border-gray-300 px-2 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
                                         />
                                     </td>
-                                    <td className="px-3 py-2">
+
+                                    {/* Password Input */}
+                                    <td className="px-2.5 py-1.5">
                                         <input
                                             value={edit.password}
                                             onChange={(e) =>
                                                 setStudentEdits((prev) => ({
                                                     ...prev,
-                                                    [student.id]: { ...prev[student.id], password: e.target.value },
+                                                    [student.id]: {
+                                                        ...prev[student.id],
+                                                        password: e.target.value,
+                                                    },
                                                 }))
                                             }
-                                            className="px-2 py-1.5 border border-gray-300 rounded-md text-sm w-36"
+                                            className="w-32 rounded-sm border border-gray-300 px-2 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
                                         />
                                     </td>
-                                    <td className="px-3 py-2">
+
+                                    {/* Aksi */}
+                                    <td className="px-2.5 py-1.5">
                                         <button
                                             onClick={() => handleSaveStudent(student.id)}
-                                            className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-xs"
+                                            className="rounded-sm bg-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white transition-colors hover:bg-blue-700"
                                         >
                                             Simpan
                                         </button>
@@ -120,10 +159,15 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
                                 </tr>
                             );
                         })}
+
+                        {/* EMPTY STATE */}
                         {filteredStudents.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="px-3 py-4 text-center text-sm text-gray-500">
-                                    Siswa tidak ditemukan.
+                                <td
+                                    colSpan={5}
+                                    className="px-3 py-8 text-center text-[10px] uppercase tracking-widest text-gray-400"
+                                >
+                                    — Siswa tidak ditemukan —
                                 </td>
                             </tr>
                         )}

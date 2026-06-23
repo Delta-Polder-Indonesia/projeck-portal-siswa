@@ -183,21 +183,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
               );
             })}
           </div>
-
-          <div className="hidden md:flex items-center gap-2 mx-auto">
-            <div className="flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
-              <span className="text-sky-100 text-xs">SMT. Aktif</span>
-              <span className="bg-white text-sky-600 text-xs font-bold px-2 py-0.5 rounded-full">Genap 2025</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
-              <span className="text-sky-100 text-xs">Kelas</span>
-              <span className="bg-white text-sky-600 text-xs font-bold px-2 py-0.5 rounded-full">XII-IPA-1</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
-              <span className="text-sky-100 text-xs">Agenda</span>
-              <span className="bg-white text-sky-600 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
-            </div>
-          </div>
+        
 
           <div className="flex items-center gap-1 ml-auto">
             <button

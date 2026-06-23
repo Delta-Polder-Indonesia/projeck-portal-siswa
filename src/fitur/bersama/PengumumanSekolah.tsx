@@ -40,47 +40,47 @@ export default function PengumumanSekolah() {
     }, [previewImage]);
 
     return (
-        <div className="max-w-5xl mx-auto p-4 antialiased text-slate-700 bg-white">
+        <div className="w-full h-full p-6 md:p-8 lg:p-10 antialiased text-slate-700 bg-white">
             {/* Header Judul - Polos & Menyatu dengan Halaman */}
-            <div className="border-b border-slate-200 pb-3 mb-4">
-                <div className="flex items-center gap-2">
-                    <Megaphone className="w-4 h-4 text-slate-800" />
-                    <h1 className="text-sm font-bold text-slate-900 tracking-tight">Pengumuman Sekolah</h1>
+            <div className="border-b border-slate-200 pb-4 mb-6">
+                <div className="flex items-center gap-3">
+                    <Megaphone className="w-6 h-6 text-slate-800" />
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Pengumuman Sekolah</h1>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                    Informasi resmi dan pemberitahuan penting dari sekolah.
+                <p className="text-sm text-slate-500 mt-2">
+                    Informasi resmi dan pemberitahuan penting dari manajemen sekolah.
                 </p>
             </div>
 
-            {/* List Pengumuman - Aliran List Normal & High Density */}
+            {/* List Pengumuman - Aliran List Normal & Akademik */}
             <div className="divide-y divide-slate-100">
                 {pengumumanAdmin.map((item) => (
                     <div
                         key={item.id}
-                        className="py-3 flex flex-col md:flex-row md:items-start justify-between gap-4 first:pt-0"
+                        className="py-6 flex flex-col md:flex-row md:items-start justify-between gap-6 first:pt-2 transition-all hover:bg-slate-50/50 p-2 -mx-2 rounded-lg"
                     >
                         {/* Area Teks Informasi */}
                         <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="text-[10px] font-mono text-slate-400 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded-sm shrink-0">
-                                    {new Date(item.createdAt).toLocaleDateString('id-ID')}
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className="text-xs font-mono font-medium text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded shrink-0 leading-none">
+                                    {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </span>
-                                <h2 className="text-xs font-bold text-slate-900 truncate">{item.title}</h2>
+                                <h2 className="text-lg font-bold text-slate-900 truncate">{item.title}</h2>
                             </div>
-                            <p className="text-[11px] text-slate-600 leading-relaxed whitespace-pre-line pl-1">
+                            <p className="text-base text-slate-600 leading-relaxed whitespace-pre-line">
                                 {item.message}
                             </p>
                         </div>
 
                         {/* Lampiran Gambar jika Ada */}
                         {item.imageDataUrl && (
-                            <div className="shrink-0 md:w-28 w-full">
+                            <div className="shrink-0 md:w-48 w-full mt-4 md:mt-0">
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setPreviewImage({ src: item.imageDataUrl || '', title: item.title })
                                     }
-                                    className="block w-full aspect-video md:aspect-square overflow-hidden rounded-sm border border-slate-200 cursor-zoom-in"
+                                    className="block w-full aspect-video overflow-hidden rounded-md border border-slate-200 cursor-zoom-in hover:shadow-md transition-shadow"
                                 >
                                     <img
                                         src={item.imageDataUrl}
@@ -93,9 +93,9 @@ export default function PengumumanSekolah() {
                         )}
                     </div>
                 ))}
-                
+
                 {pengumumanAdmin.length === 0 && (
-                    <div className="py-6 text-center text-xs text-slate-400 font-medium">
+                    <div className="py-12 text-center text-sm text-slate-500 font-medium">
                         Belum ada pengumuman sekolah saat ini.
                     </div>
                 )}
@@ -104,32 +104,32 @@ export default function PengumumanSekolah() {
             {/* Image Preview Overlay Modal */}
             {previewImage && (
                 <div
-                    className="fixed inset-0 z-[120] bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4"
+                    className="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4"
                     role="dialog"
                     aria-modal="true"
                     onClick={() => setPreviewImage(null)}
                 >
-                    <div 
-                        className="relative max-w-xl w-full flex flex-col bg-white rounded-sm overflow-hidden border border-slate-300 shadow-lg"
+                    <div
+                        className="relative max-w-3xl w-full flex flex-col bg-white rounded-lg overflow-hidden border border-slate-200 shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex justify-between items-center px-3 py-1.5 border-b border-slate-200 bg-white">
-                            <span className="text-xs font-bold text-slate-900 truncate pr-3">
+                        <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 bg-white">
+                            <span className="text-sm font-bold text-slate-900 truncate pr-4">
                                 {previewImage.title}
                             </span>
                             <button
                                 type="button"
                                 onClick={() => setPreviewImage(null)}
-                                className="text-slate-400 hover:text-slate-700 p-0.5 transition-colors"
+                                className="text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded p-1 transition-colors"
                             >
-                                <X className="w-4 h-4" />
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <div className="p-1 bg-slate-50 flex items-center justify-center">
+                        <div className="p-2 bg-slate-100 flex items-center justify-center">
                             <img
                                 src={previewImage.src}
                                 alt={previewImage.title}
-                                className="max-h-[65vh] w-auto h-auto object-contain"
+                                className="max-h-[75vh] w-auto h-auto object-contain rounded"
                             />
                         </div>
                     </div>

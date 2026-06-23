@@ -97,7 +97,7 @@ function AppContent() {
         onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
       />
       {/* Mempertahankan layout fixed baru Anda */}
-      <main className={`fixed top-14 bottom-0 right-0 overflow-y-auto p-4 md:p-6 bg-gray-50 transition-all duration-300 ${sidebarCollapsed ? 'left-0' : 'left-0 md:left-64'}`}>
+      <main className={`fixed top-14 bottom-0 right-0 overflow-y-auto bg-white transition-all duration-300 ${sidebarCollapsed ? 'left-0' : 'left-0 md:left-64'}`}>
         {Object.entries(pages).map(([pageId, PageComponent]) => {
           if (!visitedPages[pageId]) return null;
           return (
