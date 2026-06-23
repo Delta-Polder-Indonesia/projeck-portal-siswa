@@ -23,17 +23,19 @@ import TagihanSekolah from './fitur/murid/TagihanSekolah';
 import RapotSiswa from './fitur/murid/RapotSiswa';
 import PengaturanAkun from './fitur/pengaturan/PengaturanAkun';
 import ErrorBoundary from './fitur/bersama/ErrorBoundary';
+// KELOMPOK IMPORT YANG TADI HILANG DIKEMBALIKAN:
 import PengumumanSekolah from './fitur/bersama/PengumumanSekolah';
 import DaftarNamaGuru from './fitur/bersama/DaftarNamaGuru';
 import PesanMasuk from './fitur/bersama/PesanMasuk';
 
 function AppContent() {
   const { user } = useAuth();
+  // Mengembalikan default page ke 'school-announcements' seperti semula
   const [activePage, setActivePage] = useState('school-announcements');
   const [visitedPages, setVisitedPages] = useState<Record<string, boolean>>({ 'school-announcements': true });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Reset to default page when user changes
+  // Reset ke halaman default ketika user berubah
   useEffect(() => {
     setActivePage('school-announcements');
     setVisitedPages({ 'school-announcements': true });
@@ -54,6 +56,7 @@ function AppContent() {
     'rapot-input': InputRapotGuru,
     profile: ProfilGuru,
     settings: PengaturanAkun,
+    // Fitur bersama dikembalikan:
     'school-announcements': PengumumanSekolah,
     'personal-messages': PesanMasuk,
     'teacher-announcements': DaftarNamaGuru,
@@ -69,6 +72,7 @@ function AppContent() {
     billing: TagihanSekolah,
     profile: ProfilMurid,
     settings: PengaturanAkun,
+    // Fitur bersama dikembalikan:
     'school-announcements': PengumumanSekolah,
     'personal-messages': PesanMasuk,
     'teacher-announcements': DaftarNamaGuru,
@@ -85,14 +89,15 @@ function AppContent() {
   if (!user) return <LoginPage />;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen overflow-hidden bg-gray-50">
       <Sidebar
         activePage={activePage}
         onNavigate={setActivePage}
-        sidebarCollapsed={sidebarCollapsed}
-        setSidebarCollapsed={setSidebarCollapsed}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
       />
-      <main className={`flex-1 transition-all duration-300 p-4 md:p-8 pt-16 md:pt-8 ${sidebarCollapsed ? 'md:ml-0' : 'md:ml-64'}`}>
+      {/* Mempertahankan layout fixed baru Anda */}
+      <main className={`fixed top-14 bottom-0 right-0 overflow-y-auto p-4 md:p-6 bg-gray-50 transition-all duration-300 ${sidebarCollapsed ? 'left-0' : 'left-0 md:left-64'}`}>
         {Object.entries(pages).map(([pageId, PageComponent]) => {
           if (!visitedPages[pageId]) return null;
           return (

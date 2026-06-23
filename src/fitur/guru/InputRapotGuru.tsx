@@ -9,7 +9,7 @@ import {
   deleteNilaiRapot,
 } from '../../data/store';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
-import { Save, Trash2, Plus, BookOpenCheck, Search } from 'lucide-react';
+import { Save, Trash2, Plus, BookOpenCheck, Search, Edit2 } from 'lucide-react';
 import type { NilaiRapot } from '../../types';
 
 function hitungPredikat(nilai: number): NilaiRapot['predikat'] {
@@ -135,7 +135,7 @@ export default function InputRapotGuru() {
     };
 
     upsertNilaiRapot(item);
-    setNotice(`Nilai ${formMapel} untuk ${selectedStudent?.name} berhasil disimpan.`);
+    setNotice(`LOG_SUCCESS: Nilai ${formMapel} untuk ${selectedStudent?.name} berhasil disimpan.`);
     resetForm();
   };
 
@@ -149,18 +149,19 @@ export default function InputRapotGuru() {
   };
 
   const handleHapusNilai = (id: string) => {
-    if (!window.confirm('Hapus nilai mata pelajaran ini?')) return;
+    if (!window.confirm('Hapus log nilai mata pelajaran ini?')) return;
     deleteNilaiRapot(id);
-    setNotice('Nilai berhasil dihapus.');
+    setNotice('LOG_DELETED: Nilai berhasil dihapus.');
   };
 
-  const predikatColor = (p: string) => {
+  // Transformasi indikator predikat berbasis garis kontras arsitektural mono
+  const predikatClassName = (p: string) => {
     switch (p) {
-      case 'A': return 'bg-emerald-100 text-emerald-700';
-      case 'B': return 'bg-blue-100 text-blue-700';
-      case 'C': return 'bg-yellow-100 text-yellow-700';
-      case 'D': return 'bg-orange-100 text-orange-700';
-      default: return 'bg-red-100 text-red-700';
+      case 'A': return 'border-slate-900 bg-slate-900 text-white font-bold';
+      case 'B': return 'border-slate-900 bg-white text-slate-900 font-bold';
+      case 'C': return 'border-slate-400 bg-white text-slate-600 font-bold';
+      case 'D': return 'border-slate-200 bg-white text-slate-400';
+      default: return 'border-slate-200 bg-white text-slate-300 line-through';
     }
   };
 
@@ -169,280 +170,274 @@ export default function InputRapotGuru() {
     : 0;
 
   return (
-    <div className="space-y-5">
-      <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800">Input Rapot Siswa</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Input nilai rapot per mata pelajaran untuk setiap siswa di kelas Anda.
-        </p>
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
+      
+      {/* HEADER BAR */}
+      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs">
+        <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase">Input Log Nilai Rapot Siswa</h1>
+        <p className="text-xs text-slate-400 mt-0.5">Pencatatan evaluasi akademis harian, ujian tengah semester, dan ujian akhir berkala per kompartemen kelas.</p>
       </div>
 
       {notice && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2 text-sm text-emerald-700">
-          {notice}
+        <div className="bg-white border border-slate-900 rounded px-3 py-2 text-xs font-mono font-bold text-slate-900 shadow-xs">
+          {notice.toUpperCase()}
         </div>
       )}
 
-      {/* Filter Bar */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-wrap gap-4 items-end">
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Kelas</label>
+      {/* FILTER CONTROL MATRIX */}
+      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs flex flex-wrap gap-4 items-end">
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Kompartemen Kelas</label>
           <select
             value={selectedClassId}
             onChange={e => { setSelectedClassId(e.target.value); setSelectedStudentId(''); }}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none cursor-pointer transition-colors"
           >
             {teacherClasses.map(cls => (
-              <option key={cls.id} value={cls.id}>{cls.name}</option>
+              <option key={cls.id} value={cls.id}>{cls.name.toUpperCase()}</option>
             ))}
           </select>
         </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Tahun Ajaran</label>
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Tahun Ajaran</label>
           <select
             value={tahunAjaran}
             onChange={e => setTahunAjaran(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none cursor-pointer transition-colors"
           >
             {generateTahunAjaran().map(ta => (
               <option key={ta} value={ta}>{ta}</option>
             ))}
           </select>
         </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">Semester</label>
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Periode Semester</label>
           <select
             value={semester}
             onChange={e => setSemester(e.target.value as 'ganjil' | 'genap')}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none cursor-pointer transition-colors"
           >
-            <option value="ganjil">Ganjil</option>
-            <option value="genap">Genap</option>
+            <option value="ganjil">GANJIL</option>
+            <option value="genap">GENAP</option>
           </select>
         </div>
       </div>
 
-      <div className="grid xl:grid-cols-[300px_1fr] gap-6">
-        {/* Daftar Siswa */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-          <h2 className="font-semibold text-gray-800 mb-3">Pilih Siswa</h2>
+      <div className="grid xl:grid-cols-[300px_1fr] gap-4 items-start">
+        
+        {/* SIDEBAR: DAFTAR SISWA */}
+        <div className="bg-white rounded-lg border border-slate-200/80 shadow-xs p-4">
+          <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2 mb-3">Registrasi Target Siswa</h2>
           <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
             <input
               value={searchStudent}
               onChange={e => setSearchStudent(e.target.value)}
-              placeholder="Cari nama/NIS..."
-              className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Cari nama atau NIS..."
+              className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs outline-none transition-colors"
             />
           </div>
           <div className="space-y-1 max-h-[560px] overflow-y-auto pr-1">
             {filteredStudents.map(s => {
               const nilaiCount = nilaiKelas.filter(item => item.studentId === s.id).length;
+              const isSelected = selectedStudentId === s.id;
               return (
                 <button
                   key={s.id}
                   onClick={() => { setSelectedStudentId(s.id); resetForm(); setNotice(''); }}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-all ${
-                    selectedStudentId === s.id
-                      ? 'bg-blue-50 border border-blue-500'
-                      : 'border border-transparent hover:bg-gray-50'
+                  className={`w-full text-left px-3 py-2 rounded border transition-all flex items-center justify-between group cursor-pointer ${
+                    isSelected
+                      ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
+                      : 'border-transparent hover:bg-slate-50 text-slate-700'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    {s.avatar ? (
-                      <img src={s.avatar} alt="" className="w-8 h-8 rounded-full object-cover border border-gray-200" />
-                    ) : (
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${s.gender === 'L' ? 'bg-blue-500' : 'bg-pink-500'}`}>
-                        {s.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{s.name}</p>
-                      <p className="text-xs text-gray-500">{s.nis}</p>
-                    </div>
-                    {nilaiCount > 0 && (
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-semibold">
-                        {nilaiCount} mapel
-                      </span>
-                    )}
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-xs font-bold uppercase truncate ${isSelected ? 'text-white' : 'text-slate-800'}`}>{s.name}</p>
+                    <p className={`text-[10px] font-mono mt-0.5 ${isSelected ? 'text-slate-300' : 'text-slate-400'}`}>{s.nis}</p>
                   </div>
+                  {nilaiCount > 0 && (
+                    <span className={`ml-2 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm border ${
+                      isSelected ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-500'
+                    }`}>
+                      {nilaiCount} MAPEL
+                    </span>
+                  )}
                 </button>
               );
             })}
             {filteredStudents.length === 0 && (
-              <p className="text-sm text-gray-400 text-center py-4">Tidak ada siswa ditemukan.</p>
+              <p className="text-xs font-mono text-slate-400 text-center py-4 uppercase tracking-wider">QUERY_EMPTY</p>
             )}
           </div>
         </div>
 
-        {/* Panel Input Nilai */}
-        <div className="space-y-5">
+        {/* MAIN INTERFACE PANEL */}
+        <div className="space-y-4">
           {!selectedStudent ? (
-            <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
-              <BookOpenCheck className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">Pilih siswa di sebelah kiri untuk mulai input nilai rapot.</p>
+            <div className="bg-white rounded-lg py-24 text-center border border-dashed border-slate-200">
+              <BookOpenCheck className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-xs font-mono text-slate-400 uppercase tracking-wider">AWAITING_STUDENT_SELECTION</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Pilih entitas siswa pada panel manifes kiri untuk memulai konfigurasi pengisian log nilai rapot.</p>
             </div>
           ) : (
             <>
-              {/* Info Siswa */}
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
-                <div className="flex items-center gap-4">
-                  {selectedStudent.avatar ? (
-                    <img src={selectedStudent.avatar} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-white/30" />
-                  ) : (
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold border-2 border-white/30 ${selectedStudent.gender === 'L' ? 'bg-blue-700' : 'bg-pink-500'}`}>
-                      {selectedStudent.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <h2 className="text-lg font-bold">{selectedStudent.name}</h2>
-                    <p className="text-blue-100 text-sm">NIS: {selectedStudent.nis} • {tahunAjaran} • Semester {semester === 'ganjil' ? 'Ganjil' : 'Genap'}</p>
-                  </div>
-                  <div className="ml-auto text-right hidden sm:block">
-                    <p className="text-3xl font-bold">{rataRata}</p>
-                    <p className="text-blue-200 text-xs">Rata-rata</p>
-                  </div>
+              {/* CURRENT ACTIVE STUDENT INFO */}
+              <div className="bg-white rounded-lg p-4 border border-slate-950 shadow-xs text-slate-900 flex flex-wrap items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <div className="text-[9px] font-mono font-bold tracking-wider text-slate-400 uppercase">ENTITAS_SISWA_AKTIF</div>
+                  <h2 className="text-sm font-black uppercase tracking-tight">{selectedStudent.name}</h2>
+                  <p className="text-[10px] font-mono text-slate-500">
+                    CODE_NIS: {selectedStudent.nis} • {tahunAjaran} • SEMESTER_{semester.toUpperCase()}
+                  </p>
+                </div>
+                <div className="text-right border-l border-slate-200 pl-4 font-mono">
+                  <p className="text-2xl font-black tracking-tighter">{rataRata}</p>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">CUMULATIVE_AVG</p>
                 </div>
               </div>
 
-              {/* Form Input */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-blue-600" />
-                  {formMapel ? `Edit Nilai: ${formMapel}` : 'Tambah Nilai Mata Pelajaran'}
+              {/* FORM INPUT MATRIX */}
+              <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-xs">
+                <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2 mb-4 flex items-center gap-1.5">
+                  <Plus className="w-3.5 h-3.5 text-slate-900" />
+                  {formMapel ? `EDIT_LOG_ENTRY: ${formMapel.toUpperCase()}` : 'RECORD_NEW_MAPEL_LOG'}
                 </h3>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Mata Pelajaran</label>
+                
+                <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Mata Pelajaran</label>
                     <select
                       value={formMapel}
                       onChange={e => setFormMapel(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-bold text-slate-800 outline-none cursor-pointer transition-colors"
                     >
-                      <option value="">Pilih Mapel</option>
+                      <option value="">SELECT_MAPEL...</option>
                       {DAFTAR_MAPEL.map(mapel => (
-                        <option key={mapel} value={mapel}>{mapel}</option>
+                        <option key={mapel} value={mapel}>{mapel.toUpperCase()}</option>
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Nilai Tugas</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Nilai Tugas (30%)</label>
                     <input
                       type="number" min={0} max={100}
                       value={formTugas}
                       onChange={e => setFormTugas(Math.min(100, Math.max(0, Number(e.target.value))))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Nilai UTS</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Nilai UTS (30%)</label>
                     <input
                       type="number" min={0} max={100}
                       value={formUTS}
                       onChange={e => setFormUTS(Math.min(100, Math.max(0, Number(e.target.value))))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Nilai UAS</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Nilai UAS (40%)</label>
                     <input
                       type="number" min={0} max={100}
                       value={formUAS}
                       onChange={e => setFormUAS(Math.min(100, Math.max(0, Number(e.target.value))))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors"
                     />
                   </div>
-                  <div className="flex items-end">
-                    <div className="text-center w-full">
-                      <p className="text-xs text-gray-500 mb-1">Nilai Akhir</p>
-                      <p className="text-2xl font-bold text-blue-600">{hitungNilaiAkhir(formTugas, formUTS, formUAS)}</p>
-                      <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold ${predikatColor(hitungPredikat(hitungNilaiAkhir(formTugas, formUTS, formUAS)))}`}>
+                  <div className="flex items-center justify-center bg-slate-50/50 border border-slate-100 rounded p-2 text-center">
+                    <div className="font-mono">
+                      <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">RESULT_FINAL</span>
+                      <p className="text-xl font-black text-slate-900 tracking-tighter">{hitungNilaiAkhir(formTugas, formUTS, formUAS)}</p>
+                      <span className={`inline-block mt-0.5 text-[9px] font-mono border px-1 rounded-sm ${predikatClassName(hitungPredikat(hitungNilaiAkhir(formTugas, formUTS, formUAS)))}`}>
                         {hitungPredikat(hitungNilaiAkhir(formTugas, formUTS, formUAS))}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="mt-3">
-                  <label className="block text-xs text-gray-500 mb-1">Catatan Guru (opsional)</label>
+
+                <div className="mt-4 space-y-1.5">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Catatan Korespondensi Akademik (Opsional)</label>
                   <input
                     value={formCatatan}
                     onChange={e => setFormCatatan(e.target.value)}
-                    placeholder="Contoh: Perlu peningkatan di bab persamaan linear"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Input catatan guru mengenai perkembangan akademis siswa..."
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs outline-none transition-colors"
                   />
                 </div>
-                <div className="mt-4 flex gap-2">
+
+                <div className="mt-4 flex gap-2 border-t border-slate-100 pt-3">
                   <button
                     onClick={handleSimpanNilai}
                     disabled={!formMapel}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-950 text-white rounded text-xs font-mono font-bold tracking-wide transition-colors disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    <Save className="w-4 h-4" /> Simpan Nilai
+                    <Save className="w-3.5 h-3.5" /> COMMIT_RECORD
                   </button>
                   {formMapel && (
                     <button
                       onClick={resetForm}
-                      className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50"
+                      className="px-3 py-1.5 border border-slate-200 text-slate-500 hover:bg-slate-50 rounded text-xs font-mono font-bold transition-colors cursor-pointer"
                     >
-                      Batal
+                      ABORT
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Tabel Nilai */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-5 py-3 border-b bg-gray-50 flex items-center gap-2">
-                  <BookOpenCheck className="w-4 h-4 text-blue-600" />
-                  <h3 className="font-semibold text-gray-700 text-sm">Daftar Nilai Rapot - {selectedStudent.name}</h3>
+              {/* LOG ENTRIES TABLE */}
+              <div className="bg-white rounded-lg border border-slate-200/80 shadow-xs overflow-hidden">
+                <div className="px-4 py-2.5 border-b border-slate-200 bg-slate-50/70 flex items-center gap-1.5">
+                  <BookOpenCheck className="w-3.5 h-3.5 text-slate-500" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-700">Arsip Transkrip Akademis Terpilih</h3>
                 </div>
+                
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full text-left border-collapse table-fixed min-w-[750px]">
                     <thead>
-                      <tr className="bg-gray-50 border-b">
-                        <th className="text-left px-4 py-2 text-xs font-semibold text-gray-600 w-10">No</th>
-                        <th className="text-left px-4 py-2 text-xs font-semibold text-gray-600">Mata Pelajaran</th>
-                        <th className="text-center px-4 py-2 text-xs font-semibold text-gray-600 w-20">Tugas</th>
-                        <th className="text-center px-4 py-2 text-xs font-semibold text-gray-600 w-20">UTS</th>
-                        <th className="text-center px-4 py-2 text-xs font-semibold text-gray-600 w-20">UAS</th>
-                        <th className="text-center px-4 py-2 text-xs font-semibold text-gray-600 w-20">Akhir</th>
-                        <th className="text-center px-4 py-2 text-xs font-semibold text-gray-600 w-16">Predikat</th>
-                        <th className="text-left px-4 py-2 text-xs font-semibold text-gray-600">Catatan</th>
-                        <th className="text-center px-4 py-2 text-xs font-semibold text-gray-600 w-24">Aksi</th>
+                      <tr className="bg-slate-50/30 border-b border-slate-200 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <th className="px-3 py-2 w-12 text-center">NO</th>
+                        <th className="px-3 py-2 w-48">MATA_PELAJARAN</th>
+                        <th className="px-3 py-2 w-20 text-center">TUGAS</th>
+                        <th className="px-3 py-2 w-20 text-center">UTS</th>
+                        <th className="px-3 py-2 w-20 text-center">UAS</th>
+                        <th className="px-3 py-2 w-20 text-center text-slate-900 bg-slate-50/40">AKHIR</th>
+                        <th className="px-3 py-2 w-24 text-center">PREDIKAT</th>
+                        <th className="px-3 py-2">EVALUASI_CATATAN</th>
+                        <th className="px-3 py-2 w-20 text-center">AKSI</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-slate-100 text-xs text-slate-600">
                       {nilaiSiswa.map((item, idx) => (
-                        <tr key={item.id} className="border-b last:border-0 hover:bg-gray-50">
-                          <td className="px-4 py-2 text-sm text-gray-500">{idx + 1}</td>
-                          <td className="px-4 py-2 text-sm font-medium text-gray-800">{item.mataPelajaran}</td>
-                          <td className="px-4 py-2 text-sm text-center text-gray-700">{item.nilaiTugas}</td>
-                          <td className="px-4 py-2 text-sm text-center text-gray-700">{item.nilaiUTS}</td>
-                          <td className="px-4 py-2 text-sm text-center text-gray-700">{item.nilaiUAS}</td>
-                          <td className="px-4 py-2 text-center">
-                            <span className="text-sm font-bold text-gray-800">{item.nilaiAkhir}</span>
-                          </td>
-                          <td className="px-4 py-2 text-center">
-                            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold ${predikatColor(item.predikat)}`}>
+                        <tr key={item.id} className="hover:bg-slate-50/40 transition-colors">
+                          <td className="px-3 py-2 font-mono text-slate-400 text-center">{idx + 1}</td>
+                          <td className="px-3 py-2 font-bold text-slate-900 uppercase tracking-tight">{item.mataPelajaran}</td>
+                          <td className="px-3 py-2 font-mono text-center text-slate-700">{item.nilaiTugas}</td>
+                          <td className="px-3 py-2 font-mono text-center text-slate-700">{item.nilaiUTS}</td>
+                          <td className="px-3 py-2 font-mono text-center text-slate-700">{item.nilaiUAS}</td>
+                          <td className="px-3 py-2 font-mono font-black text-center text-slate-900 bg-slate-50/20">{item.nilaiAkhir}</td>
+                          <td className="px-3 py-2 text-center align-middle">
+                            <span className={`text-[10px] font-mono border w-5 h-5 inline-flex items-center justify-center rounded-sm ${predikatClassName(item.predikat)}`}>
                               {item.predikat}
                             </span>
                           </td>
-                          <td className="px-4 py-2 text-xs text-gray-500 max-w-[200px] truncate">{item.catatanGuru || '-'}</td>
-                          <td className="px-4 py-2 text-center">
+                          <td className="px-3 py-2 text-slate-400 font-mono text-[11px] truncate" title={item.catatanGuru}>
+                            {item.catatanGuru || '-'}
+                          </td>
+                          <td className="px-3 py-2 text-center">
                             <div className="flex items-center justify-center gap-1">
                               <button
                                 onClick={() => handleEditNilai(item)}
-                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"
-                                title="Edit nilai"
+                                className="p-1 text-slate-500 hover:text-slate-900 border border-transparent hover:border-slate-200 rounded transition-colors cursor-pointer"
+                                title="Edit record"
                               >
-                                <Save className="w-3.5 h-3.5" />
+                                <Edit2 className="w-3 h-3" />
                               </button>
                               <button
                                 onClick={() => handleHapusNilai(item.id)}
-                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
-                                title="Hapus nilai"
+                                className="p-1 text-slate-400 hover:text-slate-900 border border-transparent hover:border-slate-200 rounded transition-colors cursor-pointer"
+                                title="Delete record"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Trash2 className="w-3 h-3" />
                               </button>
                             </div>
                           </td>
@@ -450,21 +445,26 @@ export default function InputRapotGuru() {
                       ))}
                       {nilaiSiswa.length === 0 && (
                         <tr>
-                          <td colSpan={9} className="px-4 py-8 text-center text-gray-400 text-sm">
-                            Belum ada nilai rapot untuk siswa ini di semester ini.
+                          <td colSpan={9} className="px-4 py-12 text-center font-mono text-slate-400 uppercase tracking-wider">
+                            NO_ACADEMIC_RECORDS_REGISTERED
                           </td>
                         </tr>
                       )}
                     </tbody>
                   </table>
                 </div>
+                
                 {nilaiSiswa.length > 0 && (
-                  <div className="px-5 py-3 border-t bg-gray-50 flex items-center justify-between">
-                    <p className="text-sm text-gray-600">Total: <strong>{nilaiSiswa.length}</strong> mata pelajaran</p>
-                    <p className="text-sm text-gray-600">
-                      Rata-rata Nilai Akhir: <strong className="text-blue-600">{rataRata}</strong> •
-                      Predikat: <strong className={predikatColor(hitungPredikat(rataRata)) + ' px-2 py-0.5 rounded-full text-xs ml-1'}>{hitungPredikat(rataRata)}</strong>
-                    </p>
+                  <div className="px-4 py-2.5 border-t border-slate-200 bg-slate-50/60 flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-500">
+                    <div>TOTAL_METRICS: <strong className="text-slate-800">{nilaiSiswa.length}</strong> SUBJECT_ENTRIES</div>
+                    <div className="flex items-center gap-2">
+                      CUMULATIVE_FINAL_INDEX: <strong className="text-slate-900 text-xs">{rataRata}</strong>
+                      <span className="text-slate-300">|</span>
+                      GRADE_INDEX: 
+                      <span className={`text-[9px] font-mono border px-1 rounded-sm ${predikatClassName(hitungPredikat(rataRata))}`}>
+                        {hitungPredikat(rataRata)}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>

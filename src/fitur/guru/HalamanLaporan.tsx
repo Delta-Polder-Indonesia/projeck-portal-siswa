@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getTeachers, getClasses, getStudentsByClass, getAttendanceByDateRange } from '../../data/store';
-import { FileText, Download, Filter } from 'lucide-react';
+import { FileText, Download, Filter, Layers } from 'lucide-react';
 
 export default function ReportPage() {
   const { user } = useAuth();
@@ -61,13 +61,14 @@ export default function ReportPage() {
     return { total, hadir, izin, sakit, alpha, percentage: total > 0 ? Math.round((hadir / total) * 100) : 0 };
   }, [reportData]);
 
-  const statusColor = (status: string) => {
+  // Transformasi gaya indikator status berbasis garis kontras arsitektural mono
+  const statusClassName = (status: string) => {
     switch (status) {
-      case 'hadir': return 'bg-green-100 text-green-700';
-      case 'izin': return 'bg-yellow-100 text-yellow-700';
-      case 'sakit': return 'bg-orange-100 text-orange-700';
-      case 'alpha': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-50 text-gray-400';
+      case 'hadir': return 'border-slate-900 bg-slate-900 text-white font-bold';
+      case 'izin': return 'border-slate-900 bg-white text-slate-900 font-bold';
+      case 'sakit': return 'border-slate-400 bg-white text-slate-600 font-bold';
+      case 'alpha': return 'border-slate-200 bg-white text-slate-300 line-through';
+      default: return 'border-slate-100 bg-slate-50/50 text-slate-300';
     }
   };
 
@@ -99,133 +100,132 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800">Laporan Absensi</h1>
-    <p className="text-sm text-gray-500 mt-1">
-        Rekap kehadiran siswa per kelas</p>
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
+      
+      {/* HEADER BAR */}
+      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs">
+        <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase">Laporan & Kearsipan Absensi Siswa</h1>
+        <p className="text-xs text-slate-400 mt-0.5">Kompilasi matriks kehadiran komprehensif, pelacakan histori data berkala, dan penarikan berkas log eksternal.</p>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-        <div className="flex items-center gap-2 mb-3">
-          <Filter className="w-4 h-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-600">Filter Laporan</span>
+      {/* FILTERS CONTROL MATRIX */}
+      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs">
+        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2 mb-3.5">
+          <Filter className="w-3 h-3 text-slate-500" />
+          <span>Konfigurasi Parameter Penayangan Laporan</span>
         </div>
-        <div className="flex flex-wrap gap-4 items-end">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Kelas</label>
-            <select
-              value={selectedClass}
-              onChange={e => setSelectedClass(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none min-w-[150px]"
-            >
-              <option value="">Pilih Kelas</option>
-              {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+        <div className="flex flex-wrap gap-4 items-end justify-between">
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Kompartemen Kelas</label>
+              <select
+                value={selectedClass}
+                onChange={e => setSelectedClass(e.target.value)}
+                className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none cursor-pointer transition-colors min-w-[160px]"
+              >
+                <option value="">SELECT_CLASS...</option>
+                {classes.map(c => <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Batas Awal Log</label>
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+                className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Batas Akhir Log</label>
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors" />
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
-            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
-            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
-          </div>
+          
           {reportData.length > 0 && (
             <button onClick={handleExportCSV}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 text-sm font-medium ml-auto">
-              <Download className="w-4 h-4" /> Export CSV
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-950 border border-slate-900 text-white rounded text-xs font-mono font-bold tracking-wide transition-colors flex items-center gap-1.5 cursor-pointer">
+              <Download className="w-3.5 h-3.5" /> EXPORT_TO_CSV
             </button>
           )}
         </div>
       </div>
 
       {!selectedClass ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
-          <p className="text-gray-500 text-lg">Pilih kelas untuk melihat laporan</p>
+        <div className="py-24 text-center border border-dashed border-slate-200 rounded-lg bg-slate-50/40">
+          <p className="text-xs font-mono text-slate-400 uppercase tracking-wider">AWAITING_QUERY_PARAMETERS</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Tentukan parameter target kelas binaan di atas untuk memetakan visualisasi histori rekapitulasi data.</p>
         </div>
       ) : (
         <>
-          {/* Overall Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-            <div className="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
-              <p className="text-2xl font-bold text-blue-700">{overallStats.total}</p>
-              <p className="text-xs text-blue-500">Total Record</p>
-            </div>
-            <div className="bg-green-50 rounded-xl p-4 text-center border border-green-100">
-              <p className="text-2xl font-bold text-green-700">{overallStats.hadir}</p>
-              <p className="text-xs text-green-500">Hadir</p>
-            </div>
-            <div className="bg-yellow-50 rounded-xl p-4 text-center border border-yellow-100">
-              <p className="text-2xl font-bold text-yellow-700">{overallStats.izin}</p>
-              <p className="text-xs text-yellow-500">Izin</p>
-            </div>
-            <div className="bg-orange-50 rounded-xl p-4 text-center border border-orange-100">
-              <p className="text-2xl font-bold text-orange-700">{overallStats.sakit}</p>
-              <p className="text-xs text-orange-500">Sakit</p>
-            </div>
-            <div className="bg-red-50 rounded-xl p-4 text-center border border-red-100">
-              <p className="text-2xl font-bold text-red-700">{overallStats.alpha}</p>
-              <p className="text-xs text-red-500">Alpha</p>
-            </div>
-            <div className="bg-indigo-50 rounded-xl p-4 text-center border border-indigo-100">
-              <p className="text-2xl font-bold text-indigo-700">{overallStats.percentage}%</p>
-              <p className="text-xs text-indigo-500">Kehadiran</p>
-            </div>
+          {/* MONOCHROME OVERALL METRIC LOGS */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { label: 'TOTAL_RECORDS', value: overallStats.total },
+              { label: 'INDEXED_HADIR', value: overallStats.hadir },
+              { label: 'INDEXED_IZIN', value: overallStats.izin },
+              { label: 'INDEXED_SAKIT', value: overallStats.sakit },
+              { label: 'INDEXED_ALPHA', value: overallStats.alpha },
+              { label: 'AVG_ATTENDANCE', value: `${overallStats.percentage}%` }
+            ].map((stat, idx) => (
+              <div key={idx} className="bg-white rounded-lg p-3 border border-slate-200 shadow-xs flex flex-col justify-between min-h-[75px]">
+                <span className="text-[9px] font-mono font-bold tracking-wider text-slate-400 border-b border-slate-50 pb-1">{stat.label}</span>
+                <p className="text-lg font-bold font-mono text-slate-900 mt-1 tracking-tight">{stat.value}</p>
+              </div>
+            ))}
           </div>
 
-          {/* Summary Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-4 py-3 border-b bg-gray-50 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-semibold text-gray-700">Rekap Kehadiran</span>
+          {/* MASTER SUMMARY REKAP TABLE */}
+          <div className="bg-white rounded-lg border border-slate-200/80 shadow-xs overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-slate-200 bg-slate-50/70 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-slate-500" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700">Matriks Komparasi Absensi & Lembar Log Harian</span>
             </div>
+            
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
                 <thead>
-                  <tr className="bg-gray-50 border-b">
-                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600 w-10">No</th>
-                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Nama</th>
-                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600 w-20">NIS</th>
-                    <th className="text-center px-3 py-2 text-xs font-semibold text-green-600 w-10">H</th>
-                    <th className="text-center px-3 py-2 text-xs font-semibold text-yellow-600 w-10">I</th>
-                    <th className="text-center px-3 py-2 text-xs font-semibold text-orange-600 w-10">S</th>
-                    <th className="text-center px-3 py-2 text-xs font-semibold text-red-600 w-10">A</th>
-                    <th className="text-center px-3 py-2 text-xs font-semibold text-gray-600 w-10">Jml</th>
-                    <th className="text-center px-3 py-2 text-xs font-semibold text-gray-600 w-16">%</th>
+                  <tr className="bg-slate-50/30 border-b border-slate-200 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <th className="px-3 py-2.5 w-12 text-center">NO</th>
+                    <th className="px-3 py-2.5 w-52">IDENTITAS_SISWA</th>
+                    <th className="px-3 py-2.5 w-24">NIS_CODE</th>
+                    <th className="px-2 py-2.5 w-10 text-center text-slate-800">H</th>
+                    <th className="px-2 py-2.5 w-10 text-center text-slate-800">I</th>
+                    <th className="px-2 py-2.5 w-10 text-center text-slate-800">S</th>
+                    <th className="px-2 py-2.5 w-10 text-center text-slate-800">A</th>
+                    <th className="px-2 py-2.5 w-12 text-center">TOT</th>
+                    <th className="px-3 py-2.5 w-16 text-center">%_RATE</th>
+                    
+                    {/* Header Tanggal Dinamis */}
                     {dates.map(d => (
-                      <th key={d} className="text-center px-1 py-2 text-[10px] font-medium text-gray-500 w-8">
-                        {new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                      <th key={d} className="px-1 py-2.5 text-center text-[9px] font-bold border-l border-slate-100 w-11 text-slate-500 bg-slate-50/40">
+                        {new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }).toUpperCase()}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-slate-100">
                   {reportData.map((student, idx) => (
-                    <tr key={student.id} className="border-b last:border-0 hover:bg-gray-50">
-                      <td className="px-3 py-2 text-xs text-gray-500">{idx + 1}</td>
-                      <td className="px-3 py-2 text-sm font-medium text-gray-800 whitespace-nowrap">{student.name}</td>
-                      <td className="px-3 py-2 text-xs text-gray-500">{student.nis}</td>
-                      <td className="text-center px-3 py-2 text-sm font-semibold text-green-600">{student.hadir}</td>
-                      <td className="text-center px-3 py-2 text-sm font-semibold text-yellow-600">{student.izin}</td>
-                      <td className="text-center px-3 py-2 text-sm font-semibold text-orange-600">{student.sakit}</td>
-                      <td className="text-center px-3 py-2 text-sm font-semibold text-red-600">{student.alpha}</td>
-                      <td className="text-center px-3 py-2 text-sm text-gray-600">{student.total}</td>
+                    <tr key={student.id} className="hover:bg-slate-50/40 transition-colors text-xs">
+                      <td className="px-3 py-2 font-mono text-slate-400 text-center">{idx + 1}</td>
+                      <td className="px-3 py-2 font-bold text-slate-900 uppercase truncate tracking-tight">{student.name}</td>
+                      <td className="px-3 py-2 font-mono text-slate-400 font-bold">{student.nis}</td>
+                      <td className="text-center px-2 py-2 font-mono font-bold text-slate-900 bg-slate-50/20">{student.hadir}</td>
+                      <td className="text-center px-2 py-2 font-mono font-bold text-slate-700">{student.izin}</td>
+                      <td className="text-center px-2 py-2 font-mono text-slate-500">{student.sakit}</td>
+                      <td className="text-center px-2 py-2 font-mono text-slate-300 line-through">{student.alpha}</td>
+                      <td className="text-center px-2 py-2 font-mono text-slate-400 font-bold border-r border-slate-100">{student.total}</td>
                       <td className="text-center px-3 py-2">
-                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                          student.percentage >= 80 ? 'bg-green-100 text-green-700' :
-                          student.percentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
+                        <span className={`text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded-sm border ${
+                          student.percentage >= 80 ? 'bg-slate-900 border-slate-900 text-white' :
+                          student.percentage >= 60 ? 'bg-white border-slate-900 text-slate-900' :
+                          'bg-white border-slate-200 text-slate-400 line-through'
                         }`}>
                           {student.percentage}%
                         </span>
                       </td>
+
+                      {/* Render Grid Log Harian Monokrom */}
                       {dates.map(d => (
-                        <td key={d} className="text-center px-1 py-2">
-                          <span className={`text-[10px] font-bold w-6 h-6 inline-flex items-center justify-center rounded ${statusColor(student.dailyStatus[d] || '')}`}>
+                        <td key={d} className="text-center px-0.5 py-1.5 border-l border-slate-100/70 align-middle">
+                          <span className={`text-[9px] font-mono border w-5 h-5 inline-flex items-center justify-center rounded-sm ${statusClassName(student.dailyStatus[d] || '')}`}>
                             {statusLabel(student.dailyStatus[d] || '')}
                           </span>
                         </td>
@@ -235,6 +235,10 @@ export default function ReportPage() {
                 </tbody>
               </table>
             </div>
+            
+            {reportData.length === 0 && (
+              <div className="py-8 text-center font-mono text-[11px] text-slate-400 uppercase">NO_LOG_DATA_FOUND_WITHIN_RANGE</div>
+            )}
           </div>
         </>
       )}

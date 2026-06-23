@@ -11,18 +11,8 @@ import type { TagihanSekolah } from '../../types';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
 const MONTH_NAMES = [
-  'Januari',
-  'Februari',
-  'Maret',
-  'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
-  'September',
-  'Oktober',
-  'November',
-  'Desember',
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
 ];
 
 const PAYMENT_METHODS: Array<{
@@ -61,7 +51,9 @@ export default function TagihanSekolahPage() {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedBillId, setSelectedBillId] = useState<string>('');
+  
+  // Menampung daftar ID tagihan yang dipilih oleh siswa
+  const [selectedBillIds, setSelectedBillIds] = useState<string[]>([]);
   const [selectedMethod, setSelectedMethod] = useState<NonNullable<TagihanSekolah['paymentMethod']>>('atm');
   const [infoMessage, setInfoMessage] = useState<string>('');
 
@@ -89,13 +81,35 @@ export default function TagihanSekolahPage() {
     };
   }, [bills]);
 
-  const billToPay = bills.find(item => item.id === selectedBillId && item.status === 'belum_lunas') || null;
+  // Mengambil data tagihan yang statusnya belum lunas DAN dipilih oleh siswa
+  const billsToPay = useMemo(() => {
+    return bills.filter(item => selectedBillIds.includes(item.id) && item.status === 'belum_lunas');
+  }, [bills, selectedBillIds]);
 
-  const handleBayar = () => {
-    if (!billToPay) return;
-    bayarTagihanSekolah(billToPay.id, selectedMethod);
-    setInfoMessage(`Pembayaran ${MONTH_NAMES[billToPay.month - 1]} ${billToPay.year} berhasil diproses.`);
-    setSelectedBillId('');
+  // Total biaya akumulasi dari bulan-bulan yang dipilih
+  const totalSelectedAmount = useMemo(() => {
+    return billsToPay.reduce((sum, item) => sum + item.amount, 0);
+  }, [billsToPay]);
+
+  // Fungsi saat tombol "Pilih" atau "Batal" di dalam tabel diklik
+  const handleToggleSelectBill = (id: string) => {
+    setInfoMessage('');
+    setSelectedBillIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  // Eksekusi pembayaran berantai untuk semua ID bulan yang dipilih
+  const handleBayarMulti = () => {
+    if (billsToPay.length === 0) return;
+    
+    billsToPay.forEach(bill => {
+      bayarTagihanSekolah(bill.id, selectedMethod);
+    });
+
+    const listBulan = billsToPay.map(b => MONTH_NAMES[b.month - 1]).join(', ');
+    setInfoMessage(`Pembayaran untuk bulan [ ${listBulan} ] tahun ${activeYear} berhasil diproses.`);
+    setSelectedBillIds([]);
   };
 
   const handleUnduhBuktiPdf = (bill: TagihanSekolah) => {
@@ -254,7 +268,11 @@ export default function TagihanSekolahPage() {
             <span className="text-xs text-slate-400 font-medium">Tahun</span>
             <select
               value={activeYear}
-              onChange={(event) => setSelectedYear(Number(event.target.value))}
+              onChange={(event) => {
+                setSelectedYear(Number(event.target.value));
+                setSelectedBillIds([]); // Reset pilihan jika ganti tahun
+                setInfoMessage('');
+              }}
               className="border border-slate-200 rounded px-2.5 py-1.5 text-xs font-medium bg-white text-slate-700 focus:outline-hidden"
             >
               {availableYears.map(year => (
@@ -264,7 +282,6 @@ export default function TagihanSekolahPage() {
           </div>
         </div>
 
-        {/* Clean Flat Metric Cards (No AI Gradients/Pills) */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
           <div className="rounded-lg border border-slate-100 p-3.5 bg-slate-50/50">
             <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Tagihan</p>
@@ -302,45 +319,55 @@ export default function TagihanSekolahPage() {
                 <th className="text-left px-2 py-3">Jatuh Tempo</th>
                 <th className="text-left px-2 py-3">Status</th>
                 <th className="text-left px-2 py-3">Metode Bayar</th>
-                <th className="text-right px-2 py-3">Aksi</th>
+                <th className="text-right px-2 py-3 w-[120px]">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-              {bills.map(item => (
-                <tr key={item.id} className="hover:bg-slate-50/40 transition-colors">
-                  <td className="px-2 py-3 font-semibold text-slate-800">{MONTH_NAMES[item.month - 1]}</td>
-                  <td className="px-2 py-3 font-mono">{formatRupiah(item.amount)}</td>
-                  <td className="px-2 py-3 text-slate-400">{item.dueDate}</td>
-                  <td className="px-2 py-3">
-                    {/* Raw Clean Text Status Indicator */}
-                    <div className="flex items-center gap-1.5">
-                      <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'lunas' ? 'bg-slate-800' : 'bg-slate-300'}`} />
-                      <span>{item.status === 'lunas' ? 'Lunas' : 'Belum Lunas'}</span>
-                    </div>
-                  </td>
-                  <td className="px-2 py-3 text-slate-500">{getPaymentMethodLabel(item.paymentMethod)}</td>
-                  <td className="px-2 py-3 text-right">
-                    {item.status === 'belum_lunas' ? (
-                      <button
-                        onClick={() => {
-                          setSelectedBillId(item.id);
-                          setInfoMessage('');
-                        }}
-                        className="px-3 py-1 rounded bg-slate-900 text-white font-medium hover:bg-black transition-colors"
-                      >
-                        Bayar
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleUnduhBuktiPdf(item)}
-                        className="px-3 py-1 rounded border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors"
-                      >
-                        Bukti Bulanan
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {bills.map(item => {
+                const isSelected = selectedBillIds.includes(item.id);
+                return (
+                  <tr 
+                    key={item.id} 
+                    className={`transition-colors ${
+                      isSelected 
+                        ? 'bg-slate-900/[0.03] hover:bg-slate-900/[0.05]' 
+                        : 'hover:bg-slate-50/40'
+                    }`}
+                  >
+                    <td className="px-2 py-3 font-semibold text-slate-800">{MONTH_NAMES[item.month - 1]}</td>
+                    <td className="px-2 py-3 font-mono">{formatRupiah(item.amount)}</td>
+                    <td className="px-2 py-3 text-slate-400">{item.dueDate}</td>
+                    <td className="px-2 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'lunas' ? 'bg-slate-800' : 'bg-slate-300'}`} />
+                        <span>{item.status === 'lunas' ? 'Lunas' : 'Belum Lunas'}</span>
+                      </div>
+                    </td>
+                    <td className="px-2 py-3 text-slate-500">{getPaymentMethodLabel(item.paymentMethod)}</td>
+                    <td className="px-2 py-3 text-right">
+                      {item.status === 'belum_lunas' ? (
+                        <button
+                          onClick={() => handleToggleSelectBill(item.id)}
+                          className={`w-[100px] py-1.5 rounded text-xs font-semibold tracking-tight transition-all text-center inline-block cursor-pointer ${
+                            isSelected
+                              ? 'bg-amber-600 text-white border border-transparent hover:bg-amber-700'
+                              : 'bg-white text-slate-800 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                          }`}
+                        >
+                          {isSelected ? '✓ Terpilih' : 'Pilih Bulan'}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleUnduhBuktiPdf(item)}
+                          className="w-[100px] py-1.5 rounded border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors text-center inline-block"
+                        >
+                          Bukti Bulanan
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -353,7 +380,6 @@ export default function TagihanSekolahPage() {
           <p className="text-xs text-slate-400 mt-0.5">Pilih salah satu metode yang tersedia untuk melakukan kliring tagihan.</p>
         </div>
 
-        {/* Flat Border Buttons without Artificial Highlights */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           {PAYMENT_METHODS.map(method => {
             const isTarget = selectedMethod === method.value;
@@ -380,37 +406,30 @@ export default function TagihanSekolahPage() {
           })}
         </div>
 
-        {/* Form Controls */}
-        <div className="pt-2 flex flex-wrap items-center gap-3">
-          <select
-            value={selectedBillId}
-            onChange={(event) => setSelectedBillId(event.target.value)}
-            className="min-w-[280px] border border-slate-200 rounded px-3 py-1.5 text-xs bg-white text-slate-700 focus:outline-hidden"
-          >
-            <option value="">Pilih bulan yang ingin dibayar</option>
-            {bills
-              .filter(item => item.status === 'belum_lunas')
-              .map(item => (
-                <option key={item.id} value={item.id}>
-                  {MONTH_NAMES[item.month - 1]} {item.year} - {formatRupiah(item.amount)}
-                </option>
-              ))}
-          </select>
+        {/* Form Controls Checkout Layout */}
+        <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 mt-2 pt-4">
+          <div className="text-xs">
+            {billsToPay.length > 0 ? (
+              <p className="text-slate-500 font-medium">
+                Mekanisme pembayaran: <span className="text-slate-900 font-bold">{billsToPay.length} Bulan</span> dipilih dengan akumulasi tagihan:{' '}
+                <span className="text-slate-900 font-mono font-bold text-sm bg-slate-100 px-2 py-0.5 rounded border border-slate-200/60 ml-1">
+                  {formatRupiah(totalSelectedAmount)}
+                </span>
+              </p>
+            ) : (
+              <p className="text-slate-400 italic">Klik tombol "Pilih Bulan" pada tabel di atas untuk membayar.</p>
+            )}
+          </div>
+          
           <button
-            onClick={handleBayar}
-            disabled={!billToPay}
-            className="px-4 py-1.5 rounded bg-slate-900 text-white text-xs font-semibold disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed hover:bg-black transition-all"
+            onClick={handleBayarMulti}
+            disabled={billsToPay.length === 0}
+            className="px-5 py-2 rounded bg-slate-900 text-white text-xs font-semibold disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed hover:bg-black transition-all shadow-xs"
           >
-            Proses Pembayaran
+            Proses Pembayaran ({billsToPay.length})
           </button>
         </div>
 
-        {billToPay && (
-          <p className="text-xs text-slate-400 font-medium">
-            Mekanisme mutasi: {MONTH_NAMES[billToPay.month - 1]} {billToPay.year} sebesar <span className="text-slate-700 font-mono font-semibold">{formatRupiah(billToPay.amount)}</span>.
-          </p>
-        )}
-        
         {infoMessage && (
           <div className="text-xs font-medium text-slate-800 p-2 border border-slate-200 bg-slate-50 rounded">
             {infoMessage}

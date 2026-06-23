@@ -27,11 +27,11 @@ import { useState } from 'react';
 interface SidebarProps {
   activePage: string;
   onNavigate: (page: string) => void;
-  sidebarCollapsed: boolean;
-  setSidebarCollapsed: (collapsed: boolean) => void;
+  collapsed: boolean;          // Disesuaikan dengan props terbaru App.tsx Anda
+  onToggleCollapse: () => void; // Disesuaikan dengan props terbaru App.tsx Anda
 }
 
-export default function Sidebar({ activePage, onNavigate, sidebarCollapsed, setSidebarCollapsed }: SidebarProps) {
+export default function Sidebar({ activePage, onNavigate, collapsed: sidebarCollapsed, onToggleCollapse: setSidebarCollapsed }: SidebarProps) {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -62,7 +62,8 @@ export default function Sidebar({ activePage, onNavigate, sidebarCollapsed, setS
 
   const menus = isTeacher ? teacherMenus : studentMenus;
 
-  const activeColor = isTeacher ? 'bg-blue-600' : 'bg-emerald-600';
+  // Modifikasi warna aktif & kontras teks agar serasi dengan bg-sky-500
+  const activeColor = 'bg-white text-sky-600 font-bold';
   const avatarBg = isTeacher ? 'bg-blue-600' : 'bg-emerald-600';
 
   const topNavItems = [
@@ -75,7 +76,7 @@ export default function Sidebar({ activePage, onNavigate, sidebarCollapsed, setS
       id: 'toggle-sidebar',
       icon: AlignJustify,
       label: 'Menu',
-      onClick: () => setSidebarCollapsed(!sidebarCollapsed)
+      onClick: () => setSidebarCollapsed()
     },
     {
       id: 'personal-messages',
@@ -100,8 +101,8 @@ export default function Sidebar({ activePage, onNavigate, sidebarCollapsed, setS
               key={menu.id}
               onClick={() => { onNavigate(menu.id); setMobileOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                  ? activeColor + ' text-white shadow-lg ' + (isTeacher ? 'shadow-blue-600/30' : 'shadow-emerald-600/30')
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? activeColor + ' shadow-md'
+                  : 'text-sky-100 hover:text-white hover:bg-white/10' // Hover teks putih transparan
                 }`}
             >
               <Icon className="w-5 h-5" />
@@ -110,7 +111,6 @@ export default function Sidebar({ activePage, onNavigate, sidebarCollapsed, setS
           );
         })}
       </nav>
-
     </>
   );
 
@@ -122,10 +122,10 @@ export default function Sidebar({ activePage, onNavigate, sidebarCollapsed, setS
             <div className="flex items-center gap-2 mr-4 pr-4 border-r border-white/30">
               <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center overflow-hidden">
                 <img
-                  src="/images/Logo SMP 1 majenang.png"
-                  alt="Logo SMP 1 Majenang"
-                  className="w-full h-full object-cover"
-                />
+  src={`${import.meta.env.BASE_URL}images/logo-smpn1-small.png`}
+  alt="Logo SMP 1 Majenang"
+  className="w-full h-full object-cover"
+/>
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-white font-bold text-sm leading-tight">PORTAL SISWA</h1>
@@ -262,7 +262,7 @@ export default function Sidebar({ activePage, onNavigate, sidebarCollapsed, setS
 
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="md:hidden fixed top-16 left-4 z-50 p-2 bg-gray-800 text-white rounded-xl shadow-lg"
+        className="md:hidden fixed top-16 left-4 z-50 p-2 bg-sky-600 text-white rounded-xl shadow-lg"
       >
         {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -271,14 +271,16 @@ export default function Sidebar({ activePage, onNavigate, sidebarCollapsed, setS
         <div className="md:hidden fixed inset-0 bg-black/50 z-40 top-14" onClick={() => setMobileOpen(false)} />
       )}
 
+      {/* DESKTOP SIDEBAR: Diubah dari bg-gray-900 ke bg-sky-500 */}
       <aside
-        className={`hidden md:flex md:flex-col bg-gray-900 min-h-[calc(100vh-3.5rem)] fixed left-0 top-14 bottom-0 z-30 transition-all duration-300 ${sidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-64 opacity-100'
+        className={`hidden md:flex md:flex-col bg-sky-500 border-r border-white/10 min-h-[calc(100vh-3.5rem)] fixed left-0 top-14 bottom-0 z-30 transition-all duration-300 ${sidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-64 opacity-100'
           }`}
       >
         {sidebarContent}
       </aside>
 
-      <aside className={`md:hidden fixed left-0 top-14 bottom-0 w-64 bg-gray-900 z-40 flex flex-col transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      {/* MOBILE SIDEBAR: Diubah dari bg-gray-900 ke bg-sky-500 */}
+      <aside className={`md:hidden fixed left-0 top-14 bottom-0 w-64 bg-sky-500 z-40 flex flex-col transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {sidebarContent}
       </aside>
     </>

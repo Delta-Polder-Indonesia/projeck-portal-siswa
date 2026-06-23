@@ -2,15 +2,16 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getTeachers, getClasses, getStudentsByClass, getAttendanceByDate, addAttendanceRecords } from '../../data/store';
 import { AttendanceRecord } from '../../types';
-import { CheckCircle, XCircle, AlertCircle, Clock, Save, RotateCcw } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Clock, Save, RotateCcw, ClipboardCheck, Layers } from 'lucide-react';
 
 type Status = AttendanceRecord['status'];
 
-const statusConfig: Record<Status, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-  hadir: { label: 'Hadir', color: 'text-green-700', bg: 'bg-green-100 border-green-300', icon: <CheckCircle className="w-4 h-4" /> },
-  izin: { label: 'Izin', color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-300', icon: <AlertCircle className="w-4 h-4" /> },
-  sakit: { label: 'Sakit', color: 'text-orange-700', bg: 'bg-orange-100 border-orange-300', icon: <Clock className="w-4 h-4" /> },
-  alpha: { label: 'Alpha', color: 'text-red-700', bg: 'bg-red-100 border-red-300', icon: <XCircle className="w-4 h-4" /> },
+// Konfigurasi status monokrom dengan variasi ketebalan border & teks slate eksekutif
+const statusConfig: Record<Status, { label: string; bg: string; icon: React.ReactNode }> = {
+  hadir: { label: 'HADIR', bg: 'bg-slate-900 border-slate-900 text-white', icon: <CheckCircle className="w-3.5 h-3.5" /> },
+  izin: { label: 'IZIN', bg: 'bg-white border-slate-900 text-slate-900 font-bold', icon: <AlertCircle className="w-3.5 h-3.5" /> },
+  sakit: { label: 'SAKIT', bg: 'bg-white border-slate-400 text-slate-600 font-bold', icon: <Clock className="w-3.5 h-3.5" /> },
+  alpha: { label: 'ALPHA', bg: 'bg-white border-slate-300 text-slate-400 line-through', icon: <XCircle className="w-3.5 h-3.5" /> },
 };
 
 export default function AttendancePage() {
@@ -31,7 +32,6 @@ export default function AttendancePage() {
     return getStudentsByClass(selectedClass).sort((a, b) => a.name.localeCompare(b.name));
   }, [selectedClass, refresh]);
 
-  // Load existing attendance whenever class/date changes.
   useEffect(() => {
     if (!selectedClass || !selectedDate) return;
     const existing = getAttendanceByDate(selectedDate, selectedClass);
@@ -88,122 +88,140 @@ export default function AttendancePage() {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800">Input Absensi</h1>
-    <p className="text-sm text-gray-500 mt-1">
-        Catat kehadiran siswa per kelas</p>
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
+      
+      {/* HEADER BAR */}
+      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs">
+        <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase">Input Log Absensi & Kehadiran Siswa</h1>
+        <p className="text-xs text-slate-400 mt-0.5">Pencatatan status kehadiran berkala, pemeliharaan data absensi kelas binaan, dan dokumentasi parameter keterangan.</p>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-wrap gap-4 items-end">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          />
+      {/* CONTROL FILTERS BAR */}
+      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs flex flex-wrap gap-4 items-end justify-between">
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="space-y-1.5">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Tanggal Operasional</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={e => setSelectedDate(e.target.value)}
+              className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Target Kompartemen Kelas</label>
+            <select
+              value={selectedClass}
+              onChange={e => setSelectedClass(e.target.value)}
+              className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none cursor-pointer transition-colors min-w-[160px]"
+            >
+              <option value="">SELECT_CLASS...</option>
+              {classes.map(c => (
+                <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
-          <select
-            value={selectedClass}
-            onChange={e => setSelectedClass(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none min-w-[150px]"
-          >
-            <option value="">Pilih Kelas</option>
-            {classes.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        </div>
+
         {selectedClass && (
-          <div className="flex gap-2 ml-auto">
-            <button onClick={() => setAllStatus('hadir')} className="px-3 py-2 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium">
-              Semua Hadir
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setAllStatus('hadir')}
+              className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-900 text-slate-900 text-xs font-mono font-bold rounded transition-colors cursor-pointer"
+            >
+              SET_ALL_HADIR
             </button>
-            <button onClick={() => { setAttendanceMap({}); setNoteMap({}); setSaved(false); }} className="px-3 py-2 bg-gray-100 text-gray-600 text-sm rounded-lg hover:bg-gray-200 transition font-medium flex items-center gap-1">
-              <RotateCcw className="w-3 h-3" /> Reset
+            <button
+              onClick={() => { setAttendanceMap({}); setNoteMap({}); setSaved(false); }}
+              className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-900 text-xs font-mono font-bold rounded transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <RotateCcw className="w-3 h-3" /> RESET_MAP
             </button>
           </div>
         )}
       </div>
 
       {!selectedClass ? (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
-          <p className="text-gray-500 text-lg">Pilih kelas untuk mulai mengisi absensi</p>
+        <div className="py-24 text-center border border-dashed border-slate-200 rounded-lg bg-slate-50/40">
+          <p className="text-xs font-mono text-slate-400 uppercase tracking-wider">AWAITING_CLASS_SELECTION</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Silakan pilih salah satu kelas binaan di atas untuk memuat manifest list data siswa.</p>
         </div>
       ) : (
         <>
-          {/* Summary Bar */}
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-wrap gap-4 items-center">
-            <span className="text-sm text-gray-600">
-              <strong>{totalMarked}</strong> dari <strong>{totalStudents}</strong> siswa tercatat
-            </span>
-            <div className="flex gap-3 ml-auto">
+          {/* LOG COUNTER SUMMARY BAR */}
+          <div className="bg-white rounded-lg p-3 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-1.5 text-xs font-mono text-slate-500">
+              <ClipboardCheck className="w-3.5 h-3.5 text-slate-400" />
+              <span>
+                LOGGED: <span className="font-bold text-slate-900">{totalMarked}</span> / <span className="font-bold text-slate-800">{totalStudents}</span> STUDENTS_INDEXED
+              </span>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
               {(Object.entries(summary) as [Status, number][]).map(([status, count]) => (
-                <span key={status} className={`text-sm font-medium px-3 py-1 rounded-full ${statusConfig[status].bg} ${statusConfig[status].color} border`}>
-                  {statusConfig[status].label}: {count}
+                <span key={status} className="text-[10px] font-mono font-bold px-2 py-0.5 border border-slate-200 rounded-sm bg-slate-50 text-slate-700">
+                  {status.toUpperCase()}: <span className="text-slate-900 font-extrabold">{count}</span>
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Student List */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          {/* TABLE INTERFACE COMPONENT */}
+          <div className="bg-white rounded-lg border border-slate-200/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-gray-50 border-b">
-                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 w-12">No</th>
-                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Nama Siswa</th>
-                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 w-20">NIS</th>
-                    <th className="text-center px-4 py-3 text-sm font-semibold text-gray-600">Status</th>
-                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Keterangan</th>
+                  <tr className="bg-slate-50/70 border-b border-slate-200 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <th className="px-4 py-2.5 w-12 text-center">NO</th>
+                    <th className="px-4 py-2.5">IDENTITAS_SISWA</th>
+                    <th className="px-4 py-2.5 w-24">NIS_CODE</th>
+                    <th className="px-4 py-2.5 text-center w-[340px]">ATTENDANCE_STATUS_SELECTOR</th>
+                    <th className="px-4 py-2.5">PARAM_REMARKS</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-slate-100">
                   {students.map((student, idx) => (
-                    <tr key={student.id} className="border-b last:border-0 hover:bg-gray-50 transition">
-                      <td className="px-4 py-3 text-sm text-gray-500">{idx + 1}</td>
+                    <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-3 text-xs font-mono text-slate-400 text-center">{idx + 1}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {student.avatar ? (
                             <img
                               src={student.avatar}
-                              alt={`Foto ${student.name}`}
-                              className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                              alt={student.name}
+                              className="w-7 h-7 rounded-full object-cover border border-slate-200 p-0.5 filter grayscale"
                             />
                           ) : (
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${student.gender === 'L' ? 'bg-blue-500' : 'bg-pink-500'}`}>
-                              {(student.name || '?').charAt(0).toUpperCase()}
+                            <div className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-900 text-white text-[10px] font-mono font-bold">
+                              {student.gender.toUpperCase()}
                             </div>
                           )}
                           <div>
-                            <p className="text-sm font-medium text-gray-800">{student.name}</p>
-                            <p className="text-xs text-gray-400">{student.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</p>
+                            <p className="text-xs font-bold text-slate-900 tracking-tight">{student.name.toUpperCase()}</p>
+                            <p className="text-[10px] font-mono text-slate-400">{student.gender === 'L' ? 'LAKI-LAKI' : 'PEREMPUAN'}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{student.nis}</td>
+                      <td className="px-4 py-3 text-xs font-mono text-slate-500 font-bold">{student.nis}</td>
                       <td className="px-4 py-3">
-                        <div className="flex justify-center gap-1">
-                          {(Object.entries(statusConfig) as [Status, typeof statusConfig[Status]][]).map(([status, cfg]) => (
-                            <button
-                              key={status}
-                              onClick={() => setStatus(student.id, status)}
-                              className={`px-2 py-1.5 text-xs font-medium rounded-lg border transition-all flex items-center gap-1 ${
-                                attendanceMap[student.id] === status
-                                  ? `${cfg.bg} ${cfg.color} shadow-sm`
-                                  : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'
-                              }`}
-                            >
-                              {cfg.icon}
-                              <span className="hidden sm:inline">{cfg.label}</span>
-                            </button>
-                          ))}
+                        <div className="flex justify-center gap-1.5">
+                          {(Object.entries(statusConfig) as [Status, typeof statusConfig[Status]][]).map(([status, cfg]) => {
+                            const isSelected = attendanceMap[student.id] === status;
+                            return (
+                              <button
+                                key={status}
+                                onClick={() => setStatus(student.id, status)}
+                                className={`px-2.5 py-1 text-[10px] font-mono font-bold rounded-sm border transition-all flex items-center gap-1 cursor-pointer ${
+                                  isSelected
+                                    ? `${cfg.bg} border-slate-900 shadow-xs z-10`
+                                    : 'bg-white border-slate-200 text-slate-400 hover:border-slate-400 hover:text-slate-600'
+                                }`}
+                              >
+                                {cfg.icon}
+                                <span>{cfg.label}</span>
+                              </button>
+                            );
+                          })}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -214,8 +232,8 @@ export default function AttendancePage() {
                             setNoteMap(prev => ({ ...prev, [student.id]: e.target.value }));
                             setSaved(false);
                           }}
-                          placeholder="Keterangan..."
-                          className="w-full px-2 py-1 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-blue-400 outline-none"
+                          placeholder="ENTRY_NOTE..."
+                          className="w-full px-2 py-1 text-xs font-mono bg-white border border-slate-100 hover:border-slate-200 focus:border-slate-900 rounded-sm text-slate-800 outline-none placeholder:text-slate-300 transition-colors"
                         />
                       </td>
                     </tr>
@@ -225,28 +243,26 @@ export default function AttendancePage() {
             </div>
           </div>
 
-          {/* Save Button */}
-          <div className="flex justify-end">
+          {/* FORM ACTION CONTROL BUTTON */}
+          <div className="flex justify-end pt-1">
             <button
               onClick={handleSave}
               disabled={totalMarked === 0}
-              className={`px-6 py-3 rounded-xl text-white font-semibold flex items-center gap-2 shadow-lg transition-all ${
+              className={`px-4 py-2 rounded text-xs font-mono font-bold tracking-wide border transition-all flex items-center gap-1.5 cursor-pointer ${
                 saved
-                  ? 'bg-green-500'
+                  ? 'bg-white border-slate-900 text-slate-900'
                   : totalMarked === 0
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 hover:shadow-xl'
+                    ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed'
+                    : 'bg-slate-900 border-slate-900 hover:bg-slate-950 text-white'
               }`}
             >
               {saved ? (
                 <>
-                  <CheckCircle className="w-5 h-5" />
-                  Tersimpan!
+                  <CheckCircle className="w-3.5 h-3.5" /> COMMIT_SUCCESS
                 </>
               ) : (
                 <>
-                  <Save className="w-5 h-5" />
-                  Simpan Absensi
+                  <Save className="w-3.5 h-3.5" /> EXECUTE_SAVE_RECORDS
                 </>
               )}
             </button>
