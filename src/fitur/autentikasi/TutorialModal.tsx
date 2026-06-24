@@ -10,31 +10,35 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-white font-serif text-gray-900">
+        /* Menggunakan w-full, max-w-none, dan menyamakan padding horizontal (px-4 sm:px-6) agar pas mentok kanan-kiri */
+        <div className="fixed inset-0 z-[100] flex flex-col bg-white font-serif text-gray-900 w-full max-w-none overflow-hidden">
             {/* Content Area (Scrollable) */}
-            <div className="flex-1 overflow-y-auto px-8 py-8 max-[600px]:px-4">
-                <div className="max-w-6xl mx-auto relative"> {/* Menambahkan relative untuk posisi absolute tombol X */}
-                    
-                    {/* TOMBOL TUTUP POJOK KANAN ATAS (MINIMALIS TANPA EFEK) */}
-                    <div className="absolute top-0 right-0 z-10">
-                        <button 
-                            onClick={onClose}
-                            className="p-2.5 rounded-xl border-2 border-gray-300 text-gray-500 bg-white font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1"
-                            title="Tutup Halaman"
-                        >
-                            <X className="w-3.5 h-3.5" /> Tutup
-                        </button>
-                    </div>
+            <div className="flex-1 overflow-y-auto px-4 pt-2 pb-8 sm:px-6">
+                {/* Memastikan pembungkus dalam bertindak sebagai container penuh tanpa batasan lebar tengah */}
+                <div className="relative w-full max-w-none">
                     
                     {/* Banner / Judul Utama Gaya Koran - Menyatu di Paling Atas */}
-                    <div className="text-center pb-5 mb-6 border-b-4 border-double border-gray-900 pt-10 md:pt-4"> {/* Ditambahkan padding top agar tidak tertutup tombol X */}
+                    {/* Ditambahkan kelas 'relative' dan disesuaikan padding agar tombol pas di samping */}
+                    <div className="relative text-center pb-5 mb-6 border-b-4 border-double border-gray-900 pt-14 md:pt-10"> 
+                        
+                        {/* TOMBOL TUTUP (SEJAJAR DENGAN JUDUL UTAMA) */}
+                        <div className="absolute top-14 md:top-10 right-0 z-10">
+                            <button 
+                                onClick={onClose}
+                                className="p-2.5 rounded-xl border-2 border-gray-300 text-gray-500 bg-white font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer hover:bg-gray-50"
+                                title="Tutup Halaman"
+                            >
+                                <X className="w-3.5 h-3.5" /> Tutup
+                            </button>
+                        </div>
+
                         <p className="text-xs uppercase tracking-widest font-sans font-bold text-gray-600 mb-1">
                             Petunjuk Resmi • Jurnal Academic
                         </p>
-                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight leading-none mb-2">
+                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight leading-none mb-2 pr-24 pl-24">
                             PANDUAN AKSES PORTAL
                         </h1>
-                        <p className="text-sm italic text-gray-600">
+                        <p className="text-sm italic text-gray-600 max-w-2xl mx-auto">
                             Tata Cara dan Langkah-Langkah Memasuki Sistem Informasi SMP N 1 Majenang
                         </p>
                     </div>

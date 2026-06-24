@@ -24,7 +24,6 @@ function hitungNilaiAkhir(tugas: number, uts: number, uas: number): number {
   return Math.round(tugas * 0.3 + uts * 0.3 + uas * 0.4);
 }
 
-// Daftar bawaan awal sebagai fallback standardisasi
 const MASTER_MAPEL_DEFAULT = [
   'Matematika',
   'Bahasa Indonesia',
@@ -61,7 +60,6 @@ export default function InputRapotGuru() {
   const [searchStudent, setSearchStudent] = useState('');
   const [notice, setNotice] = useState('');
 
-  // Sinkronisasi manifes mata pelajaran dengan penyimpanan lokal (localStorage)
   const [daftarMapel, setDaftarMapel] = useState<string[]>(() => {
     const saved = localStorage.getItem('app_daftar_mapel');
     if (saved) {
@@ -74,11 +72,14 @@ export default function InputRapotGuru() {
     return MASTER_MAPEL_DEFAULT;
   });
 
-  // Form input per mapel
+  // State Form Mapel Terpilih & Input Manual Tambahan
   const [formMapel, setFormMapel] = useState('');
-  const [formTugas, setFormTugas] = useState(0);
-  const [formUTS, setFormUTS] = useState(0); // FIX: Sudah diperbaiki menggunakan kurung siku ']'
-  const [formUAS, setFormUAS] = useState(0);
+  const [manualMapel, setManualMapel] = useState(''); // Untuk mapel custom yang diketik sendiri
+  const [isManualMode, setIsManualMode] = useState(false); // Flag deteksi mode input manual
+
+  const [formTugas, setFormTugas] = useState<number | ''>('');
+  const [formUTS, setFormUTS] = useState<number | ''>('');
+  const [formUAS, setFormUAS] = useState<number | ''>('');
   const [formCatatan, setFormCatatan] = useState('');
 
   const teacherClasses = useMemo(() => {
@@ -116,43 +117,51 @@ export default function InputRapotGuru() {
 
   const resetForm = () => {
     setFormMapel('');
-    setFormTugas(0);
-    setFormUTS(0);
-    setFormUAS(0);
+    setManualMapel('');
+    setIsManualMode(false);
+    setFormTugas('');
+    setFormUTS('');
+    setFormUAS('');
     setFormCatatan('');
   };
 
+  const nilaiTugasNum = formTugas === '' ? 0 : formTugas;
+  const nilaiUTSNum = formUTS === '' ? 0 : formUTS;
+  const nilaiUASNum = formUAS === '' ? 0 : formUAS;
+
+  // Menentukan nama mapel asli yang akan disimpan ke database rapot
+  const mapelToSubmit = isManualMode ? manualMapel.trim() : formMapel.trim();
+
   const handleSimpanNilai = () => {
-    if (!user || !selectedStudentId || !selectedClassId || !formMapel.trim()) {
-      setNotice('Pilih siswa dan mata pelajaran terlebih dahulu.');
+    if (!user || !selectedStudentId || !selectedClassId || !mapelToSubmit) {
+      setNotice('Pilih siswa dan tentukan mata pelajaran terlebih dahulu.');
       return;
     }
 
-    const namaMapelClean = formMapel.trim();
-    const nilaiAkhir = hitungNilaiAkhir(formTugas, formUTS, formUAS);
+    const nilaiAkhir = hitungNilaiAkhir(nilaiTugasNum, nilaiUTSNum, nilaiUASNum);
     const predikat = hitungPredikat(nilaiAkhir);
 
-    // Evaluasi keunikan entri baru secara Case-Insensitive
+    // Jika guru menginput mapel khusus baru, masukkan mapel tersebut ke dalam daftar master mapel lokal
     const isExist = daftarMapel.some(
-      mapel => mapel.toLowerCase() === namaMapelClean.toLowerCase()
+      mapel => mapel.toLowerCase() === mapelToSubmit.toLowerCase()
     );
 
     if (!isExist) {
-      const updatedList = [...daftarMapel, namaMapelClean];
+      const updatedList = [...daftarMapel, mapelToSubmit];
       setDaftarMapel(updatedList);
       localStorage.setItem('app_daftar_mapel', JSON.stringify(updatedList));
     }
 
     const item: NilaiRapot = {
-      id: `rapot_${selectedStudentId}_${tahunAjaran}_${semester}_${namaMapelClean}`,
+      id: `rapot_${selectedStudentId}_${tahunAjaran}_${semester}_${mapelToSubmit}`,
       studentId: selectedStudentId,
       classId: selectedClassId,
       semester,
       tahunAjaran,
-      mataPelajaran: namaMapelClean,
-      nilaiTugas: formTugas,
-      nilaiUTS: formUTS,
-      nilaiUAS: formUAS,
+      mataPelajaran: mapelToSubmit,
+      nilaiTugas: nilaiTugasNum,
+      nilaiUTS: nilaiUTSNum,
+      nilaiUAS: nilaiUASNum,
       nilaiAkhir,
       predikat,
       catatanGuru: formCatatan.trim() || undefined,
@@ -161,12 +170,21 @@ export default function InputRapotGuru() {
     };
 
     upsertNilaiRapot(item);
-    setNotice(`LOG_SUCCESS: Nilai ${namaMapelClean} untuk ${selectedStudent?.name} berhasil disimpan.`);
+    setNotice(`LOG_SUCCESS: Nilai ${mapelToSubmit} untuk ${selectedStudent?.name} berhasil disimpan.`);
     resetForm();
   };
 
   const handleEditNilai = (item: NilaiRapot) => {
-    setFormMapel(item.mataPelajaran);
+    // Jika mapel rapot ada di list bawaan, pasang ke select standar. Jika tidak ada, alihkan langsung ke mode ketik manual.
+    if (daftarMapel.includes(item.mataPelajaran)) {
+      setFormMapel(item.mataPelajaran);
+      setIsManualMode(false);
+    } else {
+      setFormMapel('__MANUAL_INPUT__');
+      setManualMapel(item.mataPelajaran);
+      setIsManualMode(true);
+    }
+
     setFormTugas(item.nilaiTugas);
     setFormUTS(item.nilaiUTS);
     setFormUAS(item.nilaiUAS);
@@ -313,60 +331,109 @@ export default function InputRapotGuru() {
               <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-xs">
                 <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2 mb-4 flex items-center gap-1.5">
                   <Plus className="w-3.5 h-3.5 text-slate-900" />
-                  {formMapel ? `EDIT_LOG_ENTRY: ${formMapel.toUpperCase()}` : 'RECORD_NEW_MAPEL_LOG'}
+                  {mapelToSubmit ? `EDIT_LOG_ENTRY: ${mapelToSubmit.toUpperCase()}` : 'RECORD_NEW_MAPEL_LOG'}
                 </h3>
                 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {/* MODIFIKASI TERBARU: Select Opsi Mapel Umum + Tambahan Opsi Manual */}
                   <div className="space-y-1.5">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Mata Pelajaran</label>
-                    <input
-                      type="text"
-                      list="daftar-mapel-dinamis"
-                      value={formMapel}
-                      onChange={e => setFormMapel(e.target.value)}
-                      placeholder="Ketik/Pilih Mapel..."
-                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-bold text-slate-800 outline-none transition-colors"
-                    />
-                    <datalist id="daftar-mapel-dinamis">
-                      {daftarMapel.map(mapel => (
-                        <option key={mapel} value={mapel} />
-                      ))}
-                    </datalist>
+                    {!isManualMode ? (
+                      <select
+                        value={formMapel}
+                        onChange={e => {
+                          const val = e.target.value;
+                          if (val === '__MANUAL_INPUT__') {
+                            setIsManualMode(true);
+                            setFormMapel('__MANUAL_INPUT__');
+                          } else {
+                            setFormMapel(val);
+                          }
+                        }}
+                        className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-bold text-slate-800 outline-none transition-colors cursor-pointer"
+                      >
+                        <option value="">-- Pilih Mapel --</option>
+                        {daftarMapel.map(mapel => (
+                          <option key={mapel} value={mapel}>{mapel}</option>
+                        ))}
+                        <option value="__MANUAL_INPUT__" className="text-blue-600 font-bold bg-slate-50">+ Tulis Mapel Manual...</option>
+                      </select>
+                    ) : (
+                      <div className="space-y-1">
+                        <input
+                          type="text"
+                          value={manualMapel}
+                          onChange={e => setManualMapel(e.target.value)}
+                          placeholder="Ketik mapel khusus (mis: Fiqih, Al-Kitab)..."
+                          className="w-full px-2.5 py-1.5 bg-white border border-blue-400 focus:border-slate-900 rounded text-xs font-bold text-slate-800 outline-none"
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsManualMode(false);
+                            setFormMapel('');
+                            setManualMapel('');
+                          }}
+                          className="text-[9px] font-bold text-red-500 hover:underline uppercase block tracking-wide"
+                        >
+                          [ Kembali ke Pilihan ]
+                        </button>
+                      </div>
+                    )}
                   </div>
 
+                  {/* Input Nilai (Tugas) */}
                   <div className="space-y-1.5">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Nilai Tugas (30%)</label>
                     <input
                       type="number" min={0} max={100}
                       value={formTugas}
-                      onChange={e => setFormTugas(Math.min(100, Math.max(0, Number(e.target.value))))}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setFormTugas(val === '' ? '' : Math.min(100, Math.max(0, Number(val))));
+                      }}
                       className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors"
                     />
                   </div>
+
+                  {/* Input Nilai (UTS) */}
                   <div className="space-y-1.5">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Nilai UTS (30%)</label>
                     <input
                       type="number" min={0} max={100}
                       value={formUTS}
-                      onChange={e => setFormUTS(Math.min(100, Math.max(0, Number(e.target.value))))}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setFormUTS(val === '' ? '' : Math.min(100, Math.max(0, Number(val))));
+                      }}
                       className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors"
                     />
                   </div>
+
+                  {/* Input Nilai (UAS) */}
                   <div className="space-y-1.5">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Nilai UAS (40%)</label>
                     <input
                       type="number" min={0} max={100}
                       value={formUAS}
-                      onChange={e => setFormUAS(Math.min(100, Math.max(0, Number(e.target.value))))}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setFormUAS(val === '' ? '' : Math.min(100, Math.max(0, Number(val))));
+                      }}
                       className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors"
                     />
                   </div>
+
+                  {/* Kalkulasi Ringkasan Akhir */}
                   <div className="flex items-center justify-center bg-slate-50/50 border border-slate-100 rounded p-2 text-center">
                     <div className="font-mono">
                       <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">RESULT_FINAL</span>
-                      <p className="text-xl font-black text-slate-900 tracking-tighter">{hitungNilaiAkhir(formTugas, formUTS, formUAS)}</p>
-                      <span className={`inline-block mt-0.5 text-[9px] font-mono border px-1 rounded-sm ${predikatClassName(hitungPredikat(hitungNilaiAkhir(formTugas, formUTS, formUAS)))}`}>
-                        {hitungPredikat(hitungNilaiAkhir(formTugas, formUTS, formUAS))}
+                      <p className="text-xl font-black text-slate-900 tracking-tighter">
+                        {hitungNilaiAkhir(nilaiTugasNum, nilaiUTSNum, nilaiUASNum)}
+                      </p>
+                      <span className={`inline-block mt-0.5 text-[9px] font-mono border px-1 rounded-sm ${predikatClassName(hitungPredikat(hitungNilaiAkhir(nilaiTugasNum, nilaiUTSNum, nilaiUASNum)))}`}>
+                        {hitungPredikat(hitungNilaiAkhir(nilaiTugasNum, nilaiUTSNum, nilaiUASNum))}
                       </span>
                     </div>
                   </div>
@@ -385,12 +452,12 @@ export default function InputRapotGuru() {
                 <div className="mt-4 flex gap-2 border-t border-slate-100 pt-3">
                   <button
                     onClick={handleSimpanNilai}
-                    disabled={!formMapel.trim()}
+                    disabled={!mapelToSubmit}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-950 text-white rounded text-xs font-mono font-bold tracking-wide transition-colors disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <Save className="w-3.5 h-3.5" /> COMMIT_RECORD
                   </button>
-                  {formMapel && (
+                  {(formMapel || manualMapel) && (
                     <button
                       onClick={resetForm}
                       className="px-3 py-1.5 border border-slate-200 text-slate-500 hover:bg-slate-50 rounded text-xs font-mono font-bold transition-colors cursor-pointer"

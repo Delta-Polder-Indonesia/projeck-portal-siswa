@@ -245,6 +245,44 @@ export type StudentClassMutation = {
   movedAt: string;
 };
 
+export type RpsMeetingRow = {
+  pertemuan: string;
+  kemampuanAkhir: string;
+  materiPembelajaran: string;
+  indikator: string;
+  outputPembelajaran: string;
+  strategiPembelajaran: string;
+  bentukPembelajaran: string;
+  estimasiWaktu: string;
+  bobotPenilaian: string;
+};
+
+export type RpsDocument = {
+  id: string;
+  teacherId: string;
+  classId: string;
+  className: string;
+  subject: string;
+  programStudi: string;
+  fakultas: string;
+  sks: string;
+  rows: RpsMeetingRow[];
+  updatedAt: number;
+};
+
+export type TeacherLessonNote = {
+  id: string;
+  teacherId: string;
+  classId: string;
+  subject: string;
+  date: string;
+  materi: string;
+  adaPr: boolean;
+  prDetail?: string;
+  catatan?: string;
+  updatedAt: number;
+};
+
 // ==================== DATABASE TYPE ====================
 
 type Database = {
@@ -275,6 +313,8 @@ const PENGUMUMAN_ADMIN_KEY = 'portal-siswa-pengumuman-admin';
 const SUBMISSION_KEY = 'portal-siswa-submissions';
 const RAPOT_KEY = 'portal-siswa-rapot';
 const STUDENT_CLASS_MUTATION_KEY = 'portal-siswa-class-mutations';
+const LESSON_NOTE_KEY = 'portal-siswa-lesson-notes';
+const RPS_DOCUMENT_KEY = 'portal-siswa-rps-documents';
 const STORE_UPDATED_EVENT = 'absensi_store_updated';
 const APPROX_LOCAL_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024;
 
@@ -992,6 +1032,65 @@ export function deleteNilaiRapot(id: string) {
 export function getTahunAjaranRapotSiswa(studentId: string): string[] {
   const set = new Set(getNilaiRapot().filter((item) => item.studentId === studentId).map((item) => item.tahunAjaran));
   return Array.from(set).sort((a, b) => b.localeCompare(a));
+}
+
+// ==================== CATATAN RPS GURU ====================
+
+export function getTeacherLessonNotes(teacherId: string, classId?: string, subject?: string): TeacherLessonNote[] {
+  const all = readLocalKey<TeacherLessonNote[]>(LESSON_NOTE_KEY, []);
+  return all
+    .filter((item) => {
+      if (item.teacherId !== teacherId) return false;
+      if (classId && item.classId !== classId) return false;
+      if (subject && item.subject !== subject) return false;
+      return true;
+    })
+    .sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+export function upsertTeacherLessonNote(
+  payload: Omit<TeacherLessonNote, 'id' | 'updatedAt'> & { id?: string },
+) {
+  const all = readLocalKey<TeacherLessonNote[]>(LESSON_NOTE_KEY, []);
+  const note: TeacherLessonNote = {
+    ...payload,
+    id: payload.id || `note-${Date.now()}`,
+    updatedAt: Date.now(),
+  };
+
+  const index = all.findIndex((item) => item.id === note.id);
+  if (index >= 0) {
+    all[index] = note;
+  } else {
+    all.push(note);
+  }
+
+  localStorage.setItem(LESSON_NOTE_KEY, JSON.stringify(all));
+  notifyStoreUpdated();
+  return note;
+}
+
+// ==================== DOKUMEN RPS GURU ====================
+
+export function getRpsDocument(teacherId: string, classId: string, subject: string): RpsDocument | null {
+  const all = readLocalKey<RpsDocument[]>(RPS_DOCUMENT_KEY, []);
+  return all.find((item) => item.teacherId === teacherId && item.classId === classId && item.subject === subject) || null;
+}
+
+export function saveRpsDocument(payload: Omit<RpsDocument, 'id' | 'updatedAt'> & { id?: string }) {
+  const all = readLocalKey<RpsDocument[]>(RPS_DOCUMENT_KEY, []);
+  const id = payload.id || `rps-${Date.now()}`;
+  const next: RpsDocument = {
+    ...payload,
+    id,
+    updatedAt: Date.now(),
+  };
+  const index = all.findIndex((item) => item.id === id || (item.teacherId === next.teacherId && item.classId === next.classId && item.subject === next.subject));
+  if (index >= 0) all[index] = next;
+  else all.push(next);
+  localStorage.setItem(RPS_DOCUMENT_KEY, JSON.stringify(all));
+  notifyStoreUpdated();
+  return next;
 }
 
 // ==================== BACKUP & RESTORE ====================

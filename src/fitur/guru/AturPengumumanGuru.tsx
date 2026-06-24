@@ -49,7 +49,8 @@ export default function AturPengumumanGuru() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4 bg-white p-2 text-xs text-slate-600 antialiased selection:bg-slate-200">
+    /* PERUBAHAN 1: Mengubah mx-auto max-w-5xl menjadi w-full agar full layar */
+    <div className="w-full space-y-4 bg-white p-2 text-xs text-slate-600 antialiased selection:bg-slate-200">
       {/* HEADER CONTROL CONTAINER */}
       <div className="flex flex-col justify-between gap-3 rounded-sm border border-slate-200/80 bg-white p-3 sm:flex-row sm:items-center">
         <div className="min-w-0">
@@ -107,12 +108,12 @@ export default function AturPengumumanGuru() {
             <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Isi Konten Pesan
             </label>
+            {/* PERUBAHAN 2: Mengganti resize-none menjadi resize-y dan menambahkan field-sizing-content serta min-h agar melar penuh otomatis ke bawah */}
             <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}
               placeholder="Tulis deskripsi atau instruksi formal kelas di sini..."
-              rows={8}
-              className="w-full resize-none rounded-sm border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none transition-colors placeholder:text-slate-300 hover:border-slate-300 focus:border-slate-900 leading-4"
+              className="w-full min-h-[120px] h-auto resize-y rounded-sm border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none transition-colors placeholder:text-slate-300 hover:border-slate-300 focus:border-slate-900 leading-4 field-sizing-content overflow-hidden"
             />
           </div>
 

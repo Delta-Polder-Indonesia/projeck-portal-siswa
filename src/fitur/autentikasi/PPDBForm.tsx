@@ -1,3 +1,4 @@
+// PPDBForm.tsx
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { User, FileText, X, MapPin, Users, GraduationCap, CheckCircle } from 'lucide-react';
 import { submitPPDBApplication } from '../../data/store';
@@ -12,13 +13,10 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
 
   // 2. STATE FORMULIR UTAMA (COMPLIANT SCHEMA)
   const [formData, setFormData] = useState({
-    // SEKSI A: Informasi Pendaftaran
     jenjangTujuan: '',
     sekolahTujuan: '',
     jalurPendaftaran: 'REGULER',
     majorId: '',
-
-    // SEKSI B: Data Calon Peserta Didik
     nisn: '',
     nik: '',
     namaLengkap: '',
@@ -30,8 +28,6 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
     anakKe: '',
     jumlahSaudara: '',
     golonganDarah: '',
-
-    // SEKSI C: Data Alamat Domisili
     alamatLengkap: '',
     rt: '',
     rw: '',
@@ -41,8 +37,6 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
     kabupatenKota: '',
     provinsi: '',
     kodePos: '',
-
-    // SEKSI D & E: Data Orang Tua / Wali
     namaAyah: '',
     nikAyah: '',
     pendidikanAyah: '',
@@ -59,13 +53,9 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
     pekerjaanWali: '',
     penghasilanWali: '',
     nomorHpWali: '',
-
-    // SEKSI F: Data Kontak
     nomorHp: '',
     whatsApp: '',
     email: '',
-
-    // SEKSI G: Riwayat Sekolah Asal
     sekolahAsal: '',
     npsnSekolahAsal: '',
     alasanPindah: '',
@@ -82,13 +72,11 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
     kipPkh: null,
   });
 
-  // Handle Input Teknis Standar
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle Upload Berkas Kontrol Batas 3MB
   const handleFileChange = (zone: string, e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -100,7 +88,6 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
     }
   };
 
-  // Submit Handler Akhir
   const fileToDataUrl = (file: File) =>
     new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -171,7 +158,13 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   return (
-    <div className="mx-auto w-full max-w-7xl bg-white px-4 pt-2 font-sans text-slate-900 sm:px-6 lg:px-8">
+    /* KONTROL STRUKTUR GITHUB STYLE LAYOUT:
+      Menghilangkan pembatasan max-width (max-w-none) dan menyamakan padding horizontal (px-4 sm:px-6) 
+      agar pas mentok dan presisi mengikuti layout TutorialModal.
+    */
+    <div className="w-full">
+      
+      {/* Header Form */}
       <div className="mb-6 flex items-start justify-between border-b border-slate-300 pb-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">FORMULIR PENDAFTARAN PPDB UNIVERSAL</h2>
@@ -179,15 +172,18 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
             Sistem Pengisian Riwayat Administratif Siswa Multi-Jenjang Terintegrasi.
           </p>
         </div>
+        
+        {/* Tombol Tutup disamakan style-nya dengan yang ada pada TutorialModal */}
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1 rounded border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-slate-100"
+          className="p-2.5 rounded-xl border-2 border-gray-300 text-gray-500 bg-white font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer hover:bg-gray-50 snap-none"
         >
           <X className="h-3.5 w-3.5" /> Tutup
         </button>
       </div>
 
+      {/* Wizard Steps Indicator */}
       <div className="mb-6 grid grid-cols-5 divide-x divide-slate-200 rounded border border-slate-200 bg-slate-50 text-center">
         {[
           { step: 1, label: 'Jalur & Instansi' },
@@ -205,11 +201,12 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
         ))}
       </div>
 
+      {/* Isi Formulir Wizard */}
       <form onSubmit={handleSubmitPPDB} className="space-y-6">
         {currentStep === 1 && (
           <div className="space-y-4">
             <h3 className="flex items-center gap-2 border-b pb-1.5 text-sm font-bold tracking-wider text-slate-900 uppercase">
-              <GraduationCap className="h-4 w-4 text-cyan-700" /> I. Pilihan Instansi Akademik
+              <GraduationCap className="h-4 w-4 text-cyan-700" /> I. Pilihan Instansi Academic
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div className="space-y-1">
@@ -596,12 +593,13 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
           </div>
         )}
 
+        {/* Footer Navigasi Langkah Kontrol */}
         <div className="flex items-center justify-between border-t border-slate-200 pt-4">
           <button
             type="button"
             onClick={prevStep}
             disabled={currentStep === 1}
-            className="rounded border border-slate-300 bg-white px-4 py-1.5 text-xs font-bold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50"
+            className="rounded border border-slate-300 bg-white px-4 py-1.5 text-xs font-bold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-50 cursor-pointer"
           >
             Kembali
           </button>
@@ -610,14 +608,14 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
             <button
               type="button"
               onClick={nextStep}
-              className="rounded bg-slate-900 px-4 py-1.5 text-xs font-bold text-white hover:bg-slate-800"
+              className="rounded bg-slate-900 px-4 py-1.5 text-xs font-bold text-white hover:bg-slate-800 cursor-pointer"
             >
               Lanjutkan Langkah
             </button>
           ) : (
             <button
               type="submit"
-              className="flex items-center gap-1 rounded bg-emerald-700 px-5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-800"
+              className="flex items-center gap-1 rounded bg-emerald-700 px-5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-800 cursor-pointer"
             >
               <CheckCircle className="h-3.5 w-3.5" /> Kirim Data Pendaftaran Final
             </button>
