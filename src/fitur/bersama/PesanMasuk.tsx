@@ -29,6 +29,7 @@ export default function PesanMasuk() {
 
     const [activeChatId, setActiveChatId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [roleFilter, setRoleFilter] = useState<'all' | 'guru' | 'siswa'>('all'); // State filter tab
     const [messageInput, setMessageInput] = useState('');
     const [subjectInput, setSubjectInput] = useState('');
 
@@ -41,10 +42,12 @@ export default function PesanMasuk() {
     }, [user]);
 
     const filteredUsers = useMemo(() => {
-        return allUsers.filter(u =>
-            u.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [allUsers, searchTerm]);
+        return allUsers.filter(u => {
+            const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesRole = roleFilter === 'all' || u.role.toLowerCase() === roleFilter;
+            return matchesSearch && matchesRole;
+        });
+    }, [allUsers, searchTerm, roleFilter]);
 
     const activeContact = allUsers.find(u => u.id === activeChatId);
 
@@ -84,23 +87,55 @@ export default function PesanMasuk() {
 
             {/* Sidebar Contacts - Bersih & Rapat */}
             <div className="w-1/3 min-w-[280px] max-w-[340px] border-r border-slate-200 flex flex-col bg-slate-50/50">
-                <div className="p-4 border-b border-slate-200 bg-white">
-                    <h2 className="text-lg font-bold text-slate-900 mb-3 tracking-tight">Pesan Personal</h2>
+                <div className="p-4 border-b border-slate-200 bg-white space-y-3">
+                    <h2 className="text-lg font-bold text-slate-900 tracking-tight">Pesan Personal</h2>
+                    
+                    {/* Input Pencarian */}
                     <div className="relative">
-                        <Search className="w-5 h-5 absolute left-3 top-2.5 text-slate-400" />
+                        <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
                         <input
                             type="text"
-                            placeholder="Cari guru atau siswa..."
+                            placeholder="Cari nama..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:border-slate-600 focus:ring-1 focus:ring-slate-600 transition-shadow"
+                            className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-md text-sm focus:outline-none focus:border-slate-600 focus:ring-1 focus:ring-slate-600 transition-shadow"
                         />
+                    </div>
+
+                    {/* Simple Tab Filter: Semua | Guru | Siswa */}
+                    <div className="flex items-center gap-1.5 text-xs font-mono text-slate-400">
+                        <button
+                            type="button"
+                            onClick={() => setRoleFilter('all')}
+                            className={`hover:text-slate-900 transition-colors cursor-pointer ${roleFilter === 'all' ? 'text-slate-900 font-bold underline underline-offset-4' : ''}`}
+                        >
+                            SEMUA
+                        </button>
+                        <span>|</span>
+                        <button
+                            type="button"
+                            onClick={() => setRoleFilter('guru')}
+                            className={`hover:text-slate-900 transition-colors cursor-pointer ${roleFilter === 'guru' ? 'text-slate-900 font-bold underline underline-offset-4' : ''}`}
+                        >
+                            GURU
+                        </button>
+                        <span>|</span>
+                        <button
+                            type="button"
+                            onClick={() => setRoleFilter('siswa')}
+                            className={`hover:text-slate-900 transition-colors cursor-pointer ${roleFilter === 'siswa' ? 'text-slate-900 font-bold underline underline-offset-4' : ''}`}
+                        >
+                            SISWA
+                        </button>
                     </div>
                 </div>
 
+                {/* Manifes Daftar Kontak */}
                 <div className="flex-1 overflow-y-auto w-full divide-y divide-slate-100/50 bg-white">
                     {filteredUsers.length === 0 ? (
-                        <p className="text-center text-slate-500 mt-6 text-sm">Tidak ada kontak ditemukan.</p>
+                        <div className="text-center py-8 px-4 font-mono">
+                            <p className="text-xs text-slate-400 uppercase tracking-wider">EMPTY_RESULT</p>
+                        </div>
                     ) : (
                         filteredUsers.map(u => (
                             <button
@@ -195,7 +230,7 @@ export default function PesanMasuk() {
                                     />
                                     <button
                                         type="submit"
-                                        className="bg-slate-800 hover:bg-slate-900 text-white rounded-lg p-3 transition-colors flex items-center justify-center shrink-0 shadow-sm disabled:opacity-50"
+                                        className="bg-slate-800 hover:bg-slate-900 text-white rounded-lg p-3 transition-colors flex items-center justify-center shrink-0 shadow-sm disabled:opacity-50 cursor-pointer"
                                         disabled={!messageInput.trim()}
                                     >
                                         <Send className="w-5 h-5" />
@@ -211,7 +246,7 @@ export default function PesanMasuk() {
                             <User className="w-10 h-10 text-slate-300" />
                         </div>
                         <p className="text-lg font-bold text-slate-700 uppercase tracking-wide">Pesan Personal</p>
-                        <p className="text-sm text-slate-500 mt-2 text-center max-w-sm">Pilih guru atau murid dari daftar di sebelah kiri untuk mulai mengirim dan menerima pesan secara privat.</p>
+                        <p className="text-sm text-slate-500 mt-2 text-center max-w-sm">Pilih guru atau siswa dari daftar di sebelah kiri untuk mulai mengirim dan menerima pesan secara privat.</p>
                     </div>
                 )}
             </div>

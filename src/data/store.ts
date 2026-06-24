@@ -1,57 +1,286 @@
-import {
-  Student,
-  Teacher,
-  ClassRoom,
-  AttendanceRecord,
-  ClassRosterItem,
-  ClassAnnouncement,
-  OnlineAssignment,
-  AssignmentSubmission,
-  SuratIzin,
-  TagihanSekolah,
-  PengaturanTagihan,
-  PengumumanAdmin,
-  NilaiRapot,
-} from '../types';
-import { kompresDataUrlGambar } from '../utils/gambar';
+// ==================== TYPES ====================
 
-const STORAGE_KEYS = {
-  students: 'absensi_students',
-  teachers: 'absensi_teachers',
-  classes: 'absensi_classes',
-  attendance: 'absensi_attendance',
-  rosters: 'absensi_rosters',
-  announcements: 'absensi_announcements',
-  assignments: 'absensi_assignments',
-  submissions: 'absensi_submissions',
-  letters: 'absensi_letters',
-  bills: 'absensi_bills',
-  adminBillingSettings: 'absensi_admin_billing_settings',
-  adminAnnouncements: 'absensi_admin_announcements',
-  rapot: 'absensi_rapot',
-  initialized: 'absensi_initialized',
+export type Announcement = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
 };
 
-const STORE_UPDATED_EVENT = 'absensi_store_updated';
+export type Teacher = {
+  id: string;
+  name: string;
+  nip: string;
+  password: string;
+  subject: string;
+  email: string;
+  classIds: string[];
+  avatar?: string;
+};
 
+export type SchoolClass = {
+  id: string;
+  name: string;
+  grade: string;
+  teacherId: string;
+};
+
+export type AttendanceEntry = {
+  id: string;
+  classId: string;
+  studentId: string;
+  date: string;
+  status: 'Hadir' | 'Izin' | 'Sakit' | 'Alpa';
+};
+
+export type ClassRoster = {
+  id: string;
+  classId: string;
+  title: string;
+  subject?: string;
+  dayOfWeek?: number;
+  startTime?: string;
+  endTime?: string;
+  room?: string;
+  teacherName?: string;
+  updatedBy?: string;
+  updatedAt?: number;
+};
+
+export type ClassAnnouncement = {
+  id: string;
+  classId: string;
+  title: string;
+  content: string;
+  message?: string;
+  createdBy?: string;
+  createdAt?: number;
+};
+
+export type OnlineAssignment = {
+  id: string;
+  classId: string;
+  title: string;
+  dueDate: string;
+  description?: string;
+  createdBy?: string;
+  createdAt?: number;
+};
+
+export type Student = {
+  id: string;
+  name: string;
+  nis: string;
+  password: string;
+  classId: string;
+  gender: 'L' | 'P';
+  avatar?: string;
+};
+
+export type PPDBApplicationStatus = 'pending' | 'approved' | 'rejected';
+
+export type PPDBApplication = {
+  id: string;
+  registrationNo: string;
+  submittedAt: string;
+  processedAt?: string;
+  status: PPDBApplicationStatus;
+  jenjangTujuan: string;
+  sekolahTujuan: string;
+  jalurPendaftaran: string;
+  namaLengkap: string;
+  nisn: string;
+  nik: string;
+  tempatLahir: string;
+  tanggalLahir: string;
+  jenisKelamin: string;
+  alamatLengkap: string;
+  desaKelurahan: string;
+  kecamatan: string;
+  kabupatenKota: string;
+  nomorHp: string;
+  email: string;
+  sekolahAsal: string;
+  namaAyah: string;
+  namaIbu: string;
+  agama?: string;
+  kewenangnegaraan?: string;
+  anakKe?: string;
+  jumlahSaudara?: string;
+  golonganDarah?: string;
+  rt?: string;
+  rw?: string;
+  dusun?: string;
+  provinsi?: string;
+  kodePos?: string;
+  namaWali?: string;
+  hubunganWali?: string;
+  nomorHpWali?: string;
+  majorId?: string;
+  npsnSekolahAsal?: string;
+  alasanPindah?: string;
+  pasFotoDataUrl?: string;
+  dokumen: string[];
+  assignedNis?: string;
+  assignedClassId?: string;
+  note?: string;
+};
+
+export type Message = {
+  id: string;
+  sender: string;
+  receiverRole: 'teacher' | 'student' | 'all';
+  subject: string;
+  content: string;
+  date: string;
+};
+
+export type AttendanceRecord = {
+  date: string;
+  subject: string;
+  status: 'Hadir' | 'Izin' | 'Sakit' | 'Alpa';
+};
+
+export type Task = {
+  id: string;
+  title: string;
+  subject: string;
+  dueDate: string;
+  status: 'Aktif' | 'Selesai';
+};
+
+export type Bill = {
+  id: string;
+  name: string;
+  amount: number;
+  dueDate: string;
+  status: 'Lunas' | 'Belum Lunas';
+};
+
+export type Grade = {
+  subject: string;
+  assignment: number;
+  midterm: number;
+  final: number;
+};
+
+export type SuratIzin = {
+  id: string;
+  studentId: string;
+  classId: string;
+  type: 'izin' | 'sakit';
+  subject: string;
+  message: string;
+  letterDate: string;
+  startDate: string;
+  endDate: string;
+  status: 'menunggu' | 'disetujui' | 'ditolak';
+  attachmentDataUrl?: string;
+  createdAt: number;
+};
+
+export type TagihanSekolah = {
+  id: string;
+  studentId: string;
+  year: number;
+  month: number;
+  amount: number;
+  dueDate: string;
+  status: 'lunas' | 'belum_lunas';
+  paymentMethod?: string;
+  paidAt?: number;
+};
+
+export type PengaturanTagihan = {
+  monthlyAmount: number;
+  dueDay: number;
+  updatedAt: number;
+  updatedBy: string;
+};
+
+export type PengumumanAdmin = {
+  id: string;
+  title: string;
+  message: string;
+  targetScope: 'all' | 'classes';
+  targetClassIds: string[];
+  createdAt: number;
+  createdBy: string;
+  imageDataUrl?: string;
+  imageName?: string;
+};
+
+export type AssignmentSubmission = {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  answer: string;
+  submittedAt: number;
+  grade?: number;
+  feedback?: string;
+};
+
+export type NilaiRapot = {
+  id: string;
+  studentId: string;
+  classId: string;
+  tahunAjaran: string;
+  semester: string;
+  mataPelajaran: string;
+  nilaiHarian: number;
+  nilaiUTS: number;
+  nilaiUAS: number;
+  nilaiAkhir: number;
+  createdBy: string;
+  createdAt: number;
+};
+
+export type StudentClassMutation = {
+  id: string;
+  studentId: string;
+  studentName: string;
+  fromClassId: string;
+  toClassId: string;
+  note: string;
+  movedAt: string;
+};
+
+// ==================== DATABASE TYPE ====================
+
+type Database = {
+  announcements: Announcement[];
+  teachers: Teacher[];
+  classes: SchoolClass[];
+  students: Student[];
+  ppdbApplications: PPDBApplication[];
+  attendances: AttendanceEntry[];
+  classRosters: ClassRoster[];
+  classAnnouncements: ClassAnnouncement[];
+  onlineAssignments: OnlineAssignment[];
+  messages: Message[];
+  attendance: AttendanceRecord[];
+  tasks: Task[];
+  bills: Bill[];
+  grades: Grade[];
+  schedule: Array<{ day: string; subject: string; time: string; teacher: string }>;
+};
+
+// ==================== CONSTANTS ====================
+
+const STORAGE_KEY = 'portal-siswa-db-v1';
+const SURAT_KEY = 'portal-siswa-surat';
+const TAGIHAN_KEY = 'portal-siswa-tagihan';
+const PENGATURAN_TAGIHAN_KEY = 'portal-siswa-pengaturan-tagihan';
+const PENGUMUMAN_ADMIN_KEY = 'portal-siswa-pengumuman-admin';
+const SUBMISSION_KEY = 'portal-siswa-submissions';
+const RAPOT_KEY = 'portal-siswa-rapot';
+const STUDENT_CLASS_MUTATION_KEY = 'portal-siswa-class-mutations';
+const STORE_UPDATED_EVENT = 'absensi_store_updated';
 const APPROX_LOCAL_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024;
+
 let storeVersion = 0;
 
-function readJsonFromStorage<T>(key: string, fallback: T): T {
-  const raw = localStorage.getItem(key);
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    localStorage.removeItem(key);
-    return fallback;
-  }
-}
-
-function readArrayFromStorage<T>(key: string): T[] {
-  const parsed = readJsonFromStorage<unknown>(key, []);
-  return Array.isArray(parsed) ? (parsed as T[]) : [];
-}
+// ==================== INTERFACES ====================
 
 export interface RingkasanPenyimpananBrowser {
   usedBytes: number;
@@ -71,437 +300,11 @@ export interface HasilPulihkanCadangan {
   pesan: string;
 }
 
+// ==================== CORE ====================
+
 function notifyStoreUpdated() {
   storeVersion += 1;
   window.dispatchEvent(new CustomEvent(STORE_UPDATED_EVENT));
-}
-
-export const store = {
-  getSnapshot: () => storeVersion,
-  subscribe: (listener: () => void) => subscribeStore(listener),
-};
-
-export function getRingkasanPenyimpananBrowser(): RingkasanPenyimpananBrowser {
-  let usedBytes = 0;
-  for (let i = 0; i < localStorage.length; i += 1) {
-    const key = localStorage.key(i) || '';
-    const value = localStorage.getItem(key) || '';
-    // localStorage stores UTF-16 strings, so each character is around 2 bytes.
-    usedBytes += (key.length + value.length) * 2;
-  }
-
-  const usedPercent = Math.min(
-    100,
-    Math.round((usedBytes / APPROX_LOCAL_STORAGE_LIMIT_BYTES) * 100),
-  );
-
-  return {
-    usedBytes,
-    limitBytes: APPROX_LOCAL_STORAGE_LIMIT_BYTES,
-    usedPercent,
-    remainingBytes: Math.max(0, APPROX_LOCAL_STORAGE_LIMIT_BYTES - usedBytes),
-  };
-}
-
-// Default data
-const defaultTeachers: Teacher[] = [
-  { id: 't1', name: 'Budi Santoso, S.Pd', nip: '198501012010011001', subject: 'Matematika', password: 'guru123', classIds: ['c1', 'c2'] },
-  { id: 't2', name: 'Siti Rahayu, S.Pd', nip: '198702152011012002', subject: 'Bahasa Indonesia', password: 'guru123', classIds: ['c3', 'c4'] },
-  { id: 't3', name: 'Ahmad Fauzi, S.Pd', nip: '199003202012011003', subject: 'IPA', password: 'guru123', classIds: ['c5', 'c6'] },
-];
-
-const defaultClasses: ClassRoom[] = [
-  { id: 'c1', name: 'X-A', grade: 'X', teacherId: 't1' },
-  { id: 'c2', name: 'X-B', grade: 'X', teacherId: 't1' },
-  { id: 'c3', name: 'XI-A', grade: 'XI', teacherId: 't2' },
-  { id: 'c4', name: 'XI-B', grade: 'XI', teacherId: 't2' },
-  { id: 'c5', name: 'XII-A', grade: 'XII', teacherId: 't3' },
-  { id: 'c6', name: 'XII-B', grade: 'XII', teacherId: 't3' },
-];
-
-const defaultStudents: Student[] = [
-  // Kelas X-A
-  { id: 's1', name: 'Andi Pratama', nis: '2024001', classId: 'c1', gender: 'L', password: 'siswa123' },
-  { id: 's2', name: 'Bella Safitri', nis: '2024002', classId: 'c1', gender: 'P', password: 'siswa123' },
-  { id: 's3', name: 'Cahyo Wibowo', nis: '2024003', classId: 'c1', gender: 'L', password: 'siswa123' },
-  { id: 's4', name: 'Dewi Anggraini', nis: '2024004', classId: 'c1', gender: 'P', password: 'siswa123' },
-  { id: 's5', name: 'Eko Saputra', nis: '2024005', classId: 'c1', gender: 'L', password: 'siswa123' },
-  { id: 's6', name: 'Fitri Handayani', nis: '2024006', classId: 'c1', gender: 'P', password: 'siswa123' },
-  { id: 's7', name: 'Gunawan Setiadi', nis: '2024007', classId: 'c1', gender: 'L', password: 'siswa123' },
-  { id: 's8', name: 'Hana Permata', nis: '2024008', classId: 'c1', gender: 'P', password: 'siswa123' },
-  // Kelas X-B
-  { id: 's9', name: 'Indra Kusuma', nis: '2024009', classId: 'c2', gender: 'L', password: 'siswa123' },
-  { id: 's10', name: 'Jelita Maharani', nis: '2024010', classId: 'c2', gender: 'P', password: 'siswa123' },
-  { id: 's11', name: 'Kevin Aditya', nis: '2024011', classId: 'c2', gender: 'L', password: 'siswa123' },
-  { id: 's12', name: 'Lina Marlina', nis: '2024012', classId: 'c2', gender: 'P', password: 'siswa123' },
-  { id: 's13', name: 'Muhammad Rizki', nis: '2024013', classId: 'c2', gender: 'L', password: 'siswa123' },
-  { id: 's14', name: 'Nur Fadilah', nis: '2024014', classId: 'c2', gender: 'P', password: 'siswa123' },
-  // Kelas XI-A
-  { id: 's15', name: 'Oscar Permadi', nis: '2023001', classId: 'c3', gender: 'L', password: 'siswa123' },
-  { id: 's16', name: 'Putri Ramadhani', nis: '2023002', classId: 'c3', gender: 'P', password: 'siswa123' },
-  { id: 's17', name: 'Qory Sandrina', nis: '2023003', classId: 'c3', gender: 'P', password: 'siswa123' },
-  { id: 's18', name: 'Rudi Hartono', nis: '2023004', classId: 'c3', gender: 'L', password: 'siswa123' },
-  { id: 's19', name: 'Sari Dewi', nis: '2023005', classId: 'c3', gender: 'P', password: 'siswa123' },
-  { id: 's20', name: 'Taufik Hidayat', nis: '2023006', classId: 'c3', gender: 'L', password: 'siswa123' },
-  // Kelas XI-B
-  { id: 's21', name: 'Umar Faruq', nis: '2023007', classId: 'c4', gender: 'L', password: 'siswa123' },
-  { id: 's22', name: 'Vina Oktavia', nis: '2023008', classId: 'c4', gender: 'P', password: 'siswa123' },
-  { id: 's23', name: 'Wahyu Nugroho', nis: '2023009', classId: 'c4', gender: 'L', password: 'siswa123' },
-  { id: 's24', name: 'Xena Valentina', nis: '2023010', classId: 'c4', gender: 'P', password: 'siswa123' },
-  // Kelas XII-A
-  { id: 's25', name: 'Yoga Pratama', nis: '2022001', classId: 'c5', gender: 'L', password: 'siswa123' },
-  { id: 's26', name: 'Zahra Amelia', nis: '2022002', classId: 'c5', gender: 'P', password: 'siswa123' },
-  { id: 's27', name: 'Arif Budiman', nis: '2022003', classId: 'c5', gender: 'L', password: 'siswa123' },
-  { id: 's28', name: 'Bunga Citra', nis: '2022004', classId: 'c5', gender: 'P', password: 'siswa123' },
-  // Kelas XII-B
-  { id: 's29', name: 'Candra Wijaya', nis: '2022005', classId: 'c6', gender: 'L', password: 'siswa123' },
-  { id: 's30', name: 'Dian Pertiwi', nis: '2022006', classId: 'c6', gender: 'P', password: 'siswa123' },
-  { id: 's31', name: 'Erwin Prasetyo', nis: '2022007', classId: 'c6', gender: 'L', password: 'siswa123' },
-  { id: 's32', name: 'Farah Nabila', nis: '2022008', classId: 'c6', gender: 'P', password: 'siswa123' },
-];
-
-const defaultRosters: ClassRosterItem[] = [
-  { id: 'r1', classId: 'c1', subject: 'Matematika', dayOfWeek: 1, startTime: '07:30', endTime: '09:00', room: 'R-101', teacherName: 'Budi Santoso, S.Pd', updatedBy: 't1', updatedAt: Date.now() },
-  { id: 'r2', classId: 'c1', subject: 'Bahasa Indonesia', dayOfWeek: 2, startTime: '08:00', endTime: '09:30', room: 'R-101', teacherName: 'Siti Rahayu, S.Pd', updatedBy: 't2', updatedAt: Date.now() },
-  { id: 'r3', classId: 'c2', subject: 'Matematika', dayOfWeek: 1, startTime: '09:30', endTime: '11:00', room: 'R-102', teacherName: 'Budi Santoso, S.Pd', updatedBy: 't1', updatedAt: Date.now() },
-  { id: 'r4', classId: 'c3', subject: 'Bahasa Indonesia', dayOfWeek: 3, startTime: '07:30', endTime: '09:00', room: 'R-201', teacherName: 'Siti Rahayu, S.Pd', updatedBy: 't2', updatedAt: Date.now() },
-  { id: 'r5', classId: 'c4', subject: 'IPA', dayOfWeek: 4, startTime: '10:00', endTime: '11:30', room: 'Lab IPA', teacherName: 'Ahmad Fauzi, S.Pd', updatedBy: 't3', updatedAt: Date.now() },
-  { id: 'r6', classId: 'c5', subject: 'IPA', dayOfWeek: 2, startTime: '09:30', endTime: '11:00', room: 'Lab IPA', teacherName: 'Ahmad Fauzi, S.Pd', updatedBy: 't3', updatedAt: Date.now() },
-  { id: 'r7', classId: 'c6', subject: 'Matematika', dayOfWeek: 5, startTime: '07:30', endTime: '09:00', room: 'R-302', teacherName: 'Budi Santoso, S.Pd', updatedBy: 't1', updatedAt: Date.now() },
-];
-
-const defaultAnnouncements: ClassAnnouncement[] = [
-  { id: 'a1', classId: 'c1', title: 'Ulangan Harian', message: 'Ulangan Matematika hari Jumat jam pertama.', createdBy: 't1', createdAt: Date.now() - 2 * 24 * 60 * 60 * 1000 },
-  { id: 'a2', classId: 'c2', title: 'Tugas Bahasa Indonesia', message: 'Kumpulkan rangkuman cerpen maksimal Kamis.', createdBy: 't2', createdAt: Date.now() - 24 * 60 * 60 * 1000 },
-  { id: 'a3', classId: 'c5', title: 'Praktikum IPA', message: 'Bawa jas lab untuk praktikum minggu ini.', createdBy: 't3', createdAt: Date.now() - 3 * 24 * 60 * 60 * 1000 },
-];
-
-const defaultAssignments: OnlineAssignment[] = [
-  {
-    id: 'task_1',
-    classId: 'c1',
-    title: 'Rangkuman Bab Persamaan Linear',
-    description: 'Tulis rangkuman 1 halaman dan sertakan 5 contoh soal beserta jawaban.',
-    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    createdBy: 't1',
-    createdAt: Date.now() - 12 * 60 * 60 * 1000,
-  },
-  {
-    id: 'task_2',
-    classId: 'c3',
-    title: 'Resensi Cerpen',
-    description: 'Buat resensi cerpen minimal 300 kata, tulis langsung pada kolom jawaban.',
-    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    createdBy: 't2',
-    createdAt: Date.now() - 8 * 60 * 60 * 1000,
-  },
-];
-
-function generateSampleAttendance(): AttendanceRecord[] {
-  const records: AttendanceRecord[] = [];
-  const statuses: AttendanceRecord['status'][] = ['hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'izin', 'sakit', 'alpha'];
-  const today = new Date();
-
-  for (let dayOffset = 1; dayOffset <= 14; dayOffset++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - dayOffset);
-    if (date.getDay() === 0 || date.getDay() === 6) continue;
-
-    const dateStr = date.toISOString().split('T')[0];
-
-    defaultStudents.forEach((student) => {
-      const cls = defaultClasses.find(c => c.id === student.classId);
-      if (!cls) return;
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
-      records.push({
-        id: `att_${student.id}_${dateStr}`,
-        studentId: student.id,
-        classId: student.classId,
-        date: dateStr,
-        status,
-        markedBy: cls.teacherId,
-        timestamp: date.getTime(),
-      });
-    });
-  }
-
-  return records;
-}
-
-function generateDefaultBills(): TagihanSekolah[] {
-  const currentYear = new Date().getFullYear();
-  const years = [currentYear, currentYear + 1];
-  const bills: TagihanSekolah[] = [];
-
-  defaultStudents.forEach((student) => {
-    years.forEach((year) => {
-      for (let month = 1; month <= 12; month += 1) {
-        const paid = year === currentYear && month < new Date().getMonth() + 1;
-        bills.push({
-          id: `bill_${student.id}_${year}_${month}`,
-          studentId: student.id,
-          year,
-          month,
-          amount: 250000,
-          dueDate: `${year}-${String(month).padStart(2, '0')}-10`,
-          status: paid ? 'lunas' : 'belum_lunas',
-          paymentMethod: paid ? 'atm' : undefined,
-          paidAt: paid ? new Date(year, month - 1, 5).getTime() : undefined,
-        });
-      }
-    });
-  });
-
-  return bills;
-}
-
-function getDefaultPengaturanTagihan(): PengaturanTagihan {
-  return {
-    monthlyAmount: 250000,
-    dueDay: 10,
-    updatedAt: Date.now(),
-    updatedBy: 'system',
-  };
-}
-
-export function initializeData() {
-  const initialized = localStorage.getItem(STORAGE_KEYS.initialized);
-  if (!initialized) {
-    localStorage.setItem(STORAGE_KEYS.teachers, JSON.stringify(defaultTeachers));
-    localStorage.setItem(STORAGE_KEYS.classes, JSON.stringify(defaultClasses));
-    localStorage.setItem(STORAGE_KEYS.students, JSON.stringify(defaultStudents));
-    localStorage.setItem(STORAGE_KEYS.attendance, JSON.stringify(generateSampleAttendance()));
-    localStorage.setItem(STORAGE_KEYS.rosters, JSON.stringify(defaultRosters));
-    localStorage.setItem(STORAGE_KEYS.announcements, JSON.stringify(defaultAnnouncements));
-    localStorage.setItem(STORAGE_KEYS.assignments, JSON.stringify(defaultAssignments));
-    localStorage.setItem(STORAGE_KEYS.submissions, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.letters, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.bills, JSON.stringify(generateDefaultBills()));
-    localStorage.setItem(STORAGE_KEYS.adminBillingSettings, JSON.stringify(getDefaultPengaturanTagihan()));
-    localStorage.setItem(STORAGE_KEYS.adminAnnouncements, JSON.stringify([]));
-    localStorage.setItem(STORAGE_KEYS.initialized, 'true');
-  } else if (!localStorage.getItem(STORAGE_KEYS.bills)) {
-    localStorage.setItem(STORAGE_KEYS.bills, JSON.stringify(generateDefaultBills()));
-    if (!localStorage.getItem(STORAGE_KEYS.adminBillingSettings)) {
-      localStorage.setItem(STORAGE_KEYS.adminBillingSettings, JSON.stringify(getDefaultPengaturanTagihan()));
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.adminAnnouncements)) {
-      localStorage.setItem(STORAGE_KEYS.adminAnnouncements, JSON.stringify([]));
-    }
-  } else {
-    if (!localStorage.getItem(STORAGE_KEYS.adminBillingSettings)) {
-      localStorage.setItem(STORAGE_KEYS.adminBillingSettings, JSON.stringify(getDefaultPengaturanTagihan()));
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.adminAnnouncements)) {
-      localStorage.setItem(STORAGE_KEYS.adminAnnouncements, JSON.stringify([]));
-    }
-  }
-}
-
-// CRUD Operations
-export function getTeachers(): Teacher[] {
-  return readArrayFromStorage<Teacher>(STORAGE_KEYS.teachers).map((item) => ({
-    ...item,
-    id: item.id || `t_${Date.now()}`,
-    name: item.name || 'Guru',
-    nip: item.nip || '',
-    subject: item.subject || '-',
-    password: item.password || '',
-    classIds: Array.isArray(item.classIds) ? item.classIds.filter(Boolean) : [],
-  }));
-}
-
-export function getStudents(): Student[] {
-  return readArrayFromStorage<Student>(STORAGE_KEYS.students).map((item) => ({
-    ...item,
-    id: item.id || `s_${Date.now()}`,
-    name: item.name || 'Siswa',
-    nis: item.nis || '',
-    classId: item.classId || '',
-    gender: item.gender === 'P' ? 'P' : 'L',
-    password: item.password || '',
-  }));
-}
-
-export function getClasses(): ClassRoom[] {
-  return readArrayFromStorage<ClassRoom>(STORAGE_KEYS.classes).map((item) => ({
-    ...item,
-    id: item.id || `c_${Date.now()}`,
-    name: item.name || '-',
-    grade: item.grade || '-',
-    teacherId: item.teacherId || '',
-  }));
-}
-
-export function getAttendance(): AttendanceRecord[] {
-  return readArrayFromStorage<AttendanceRecord>(STORAGE_KEYS.attendance);
-}
-
-export function saveTeachers(teachers: Teacher[]) {
-  localStorage.setItem(STORAGE_KEYS.teachers, JSON.stringify(teachers));
-  notifyStoreUpdated();
-}
-
-export function saveStudents(students: Student[]) {
-  localStorage.setItem(STORAGE_KEYS.students, JSON.stringify(students));
-  notifyStoreUpdated();
-}
-
-export function saveClasses(classes: ClassRoom[]) {
-  localStorage.setItem(STORAGE_KEYS.classes, JSON.stringify(classes));
-  notifyStoreUpdated();
-}
-
-export function saveAttendance(records: AttendanceRecord[]) {
-  localStorage.setItem(STORAGE_KEYS.attendance, JSON.stringify(records));
-  notifyStoreUpdated();
-}
-
-export function addStudent(student: Student) {
-  const students = getStudents();
-  students.push(student);
-  saveStudents(students);
-}
-
-export function updateStudent(student: Student) {
-  const students = getStudents();
-  const idx = students.findIndex(s => s.id === student.id);
-  if (idx >= 0) students[idx] = student;
-  saveStudents(students);
-}
-
-export function deleteStudent(id: string) {
-  const students = getStudents().filter(s => s.id !== id);
-  saveStudents(students);
-  // Also remove attendance
-  const attendance = getAttendance().filter(a => a.studentId !== id);
-  saveAttendance(attendance);
-}
-
-export function addAttendanceRecords(records: AttendanceRecord[]) {
-  const existing = getAttendance();
-  // Remove existing records for same student+date combo
-  const newKeys = new Set(records.map(r => `${r.studentId}_${r.date}`));
-  const filtered = existing.filter(e => !newKeys.has(`${e.studentId}_${e.date}`));
-  filtered.push(...records);
-  saveAttendance(filtered);
-}
-
-export function getStudentsByClass(classId: string): Student[] {
-  return getStudents().filter(s => s.classId === classId);
-}
-
-export function getAttendanceByDate(date: string, classId?: string): AttendanceRecord[] {
-  const records = getAttendance();
-  return records.filter(r => r.date === date && (classId ? r.classId === classId : true));
-}
-
-export function getAttendanceByStudent(studentId: string): AttendanceRecord[] {
-  return getAttendance().filter(r => r.studentId === studentId);
-}
-
-export function getAttendanceByDateRange(startDate: string, endDate: string, classId?: string): AttendanceRecord[] {
-  return getAttendance().filter(r => {
-    const dateMatch = r.date >= startDate && r.date <= endDate;
-    const classMatch = classId ? r.classId === classId : true;
-    return dateMatch && classMatch;
-  });
-}
-
-export function getOnlineAssignmentsByClass(classId: string): OnlineAssignment[] {
-  const assignments = readJsonFromStorage<OnlineAssignment[]>(STORAGE_KEYS.assignments, []);
-  return assignments
-    .filter(item => item.classId === classId)
-    .sort((a, b) => b.createdAt - a.createdAt);
-}
-
-export function addOnlineAssignment(item: OnlineAssignment) {
-  const assignments = readJsonFromStorage<OnlineAssignment[]>(STORAGE_KEYS.assignments, []);
-  assignments.push(item);
-  localStorage.setItem(STORAGE_KEYS.assignments, JSON.stringify(assignments));
-  notifyStoreUpdated();
-}
-
-export function deleteOnlineAssignment(id: string) {
-  const assignments = readJsonFromStorage<OnlineAssignment[]>(STORAGE_KEYS.assignments, []);
-  const nextAssignments = assignments.filter(item => item.id !== id);
-  localStorage.setItem(STORAGE_KEYS.assignments, JSON.stringify(nextAssignments));
-
-  const submissions = readJsonFromStorage<AssignmentSubmission[]>(STORAGE_KEYS.submissions, []);
-  const nextSubmissions = submissions.filter(item => item.assignmentId !== id);
-  localStorage.setItem(STORAGE_KEYS.submissions, JSON.stringify(nextSubmissions));
-  notifyStoreUpdated();
-}
-
-export function getSubmissionsByAssignment(assignmentId: string): AssignmentSubmission[] {
-  const submissions = readJsonFromStorage<AssignmentSubmission[]>(STORAGE_KEYS.submissions, []);
-  return submissions
-    .filter(item => item.assignmentId === assignmentId)
-    .sort((a, b) => b.submittedAt - a.submittedAt);
-}
-
-export function getSubmissionByAssignmentAndStudent(
-  assignmentId: string,
-  studentId: string,
-): AssignmentSubmission | null {
-  const submissions = readJsonFromStorage<AssignmentSubmission[]>(STORAGE_KEYS.submissions, []);
-  return submissions.find(item => item.assignmentId === assignmentId && item.studentId === studentId) || null;
-}
-
-export function upsertAssignmentSubmission(item: AssignmentSubmission) {
-  const submissions = readJsonFromStorage<AssignmentSubmission[]>(STORAGE_KEYS.submissions, []);
-  const index = submissions.findIndex(
-    submission => submission.assignmentId === item.assignmentId && submission.studentId === item.studentId,
-  );
-  if (index >= 0) {
-    submissions[index] = item;
-  } else {
-    submissions.push(item);
-  }
-  localStorage.setItem(STORAGE_KEYS.submissions, JSON.stringify(submissions));
-  notifyStoreUpdated();
-}
-
-export function getClassRosters(classId: string): ClassRosterItem[] {
-  const rosters = readArrayFromStorage<ClassRosterItem>(STORAGE_KEYS.rosters);
-  return rosters
-    .filter(r => r.classId === classId)
-    .sort((a, b) => (a.dayOfWeek - b.dayOfWeek) || a.startTime.localeCompare(b.startTime));
-}
-
-export function addClassRoster(item: ClassRosterItem) {
-  const rosters = readJsonFromStorage<ClassRosterItem[]>(STORAGE_KEYS.rosters, []);
-  rosters.push(item);
-  localStorage.setItem(STORAGE_KEYS.rosters, JSON.stringify(rosters));
-  notifyStoreUpdated();
-}
-
-export function deleteClassRoster(id: string) {
-  const rosters = readJsonFromStorage<ClassRosterItem[]>(STORAGE_KEYS.rosters, []);
-  const next = rosters.filter(item => item.id !== id);
-  localStorage.setItem(STORAGE_KEYS.rosters, JSON.stringify(next));
-  notifyStoreUpdated();
-}
-
-export function getClassAnnouncements(classId: string): ClassAnnouncement[] {
-  const announcements = readArrayFromStorage<ClassAnnouncement>(STORAGE_KEYS.announcements);
-  return announcements
-    .filter(item => item.classId === classId)
-    .sort((a, b) => b.createdAt - a.createdAt);
-}
-
-export function addClassAnnouncement(item: ClassAnnouncement) {
-  const announcements = readJsonFromStorage<ClassAnnouncement[]>(STORAGE_KEYS.announcements, []);
-  announcements.push(item);
-  localStorage.setItem(STORAGE_KEYS.announcements, JSON.stringify(announcements));
-  notifyStoreUpdated();
-}
-
-export function deleteClassAnnouncement(id: string) {
-  const announcements = readJsonFromStorage<ClassAnnouncement[]>(STORAGE_KEYS.announcements, []);
-  const next = announcements.filter(item => item.id !== id);
-  localStorage.setItem(STORAGE_KEYS.announcements, JSON.stringify(next));
-  notifyStoreUpdated();
 }
 
 export function subscribeStore(listener: () => void) {
@@ -513,179 +316,612 @@ export function subscribeStore(listener: () => void) {
   };
 }
 
-export function getSuratIzin(): SuratIzin[] {
-  const letters = readArrayFromStorage<SuratIzin>(STORAGE_KEYS.letters);
+export const store = {
+  getSnapshot: () => storeVersion,
+  subscribe: (listener: () => void) => subscribeStore(listener),
+};
+
+// ==================== INITIAL DATA ====================
+
+const initialData: Database = {
+  announcements: [
+    {
+      id: 'a1',
+      title: 'Ujian Tengah Semester Dimulai 5 Oktober',
+      content: 'Pastikan seluruh siswa membawa kartu ujian dan hadir 15 menit sebelum jadwal.',
+      date: '2026-10-01',
+    },
+    {
+      id: 'a2',
+      title: 'Pendaftaran Ekstrakurikuler Dibuka',
+      content: 'Pendaftaran kegiatan basket, paduan suara, dan coding dibuka sampai 10 Oktober.',
+      date: '2026-09-29',
+    },
+  ],
+  teachers: [
+    {
+      id: 't1',
+      name: 'Bapak Andi Pratama',
+      nip: '198501012010011001',
+      password: 'guru123',
+      subject: 'Matematika',
+      email: 'andi@sekolah.id',
+      classIds: ['c1'],
+    },
+    {
+      id: 't2',
+      name: 'Ibu Rina Kartika',
+      nip: '198701022012012002',
+      password: 'guru123',
+      subject: 'Bahasa Indonesia',
+      email: 'rina@sekolah.id',
+      classIds: ['c2'],
+    },
+    {
+      id: 't3',
+      name: 'Bapak Dedi Saputra',
+      nip: '198901032014013003',
+      password: 'guru123',
+      subject: 'Fisika',
+      email: 'dedi@sekolah.id',
+      classIds: [],
+    },
+  ],
+  classes: [
+    { id: 'c1', name: 'X IPA 1', grade: 'X', teacherId: 't1' },
+    { id: 'c2', name: 'X IPA 2', grade: 'X', teacherId: 't2' },
+    { id: 'c3', name: 'X IPS 1', grade: 'X', teacherId: '' },
+  ],
+  students: [
+    { id: 's1', name: 'Siti Rahma', nis: '2024001', password: 'siswa123', classId: 'c1', gender: 'P' },
+    { id: 's2', name: 'Budi Santoso', nis: '2024002', password: 'siswa123', classId: 'c1', gender: 'L' },
+    { id: 's3', name: 'Nabila Putri', nis: '2024003', password: 'siswa123', classId: 'c2', gender: 'P' },
+  ],
+  ppdbApplications: [],
+  attendances: [
+    { id: 'att-1', classId: 'c1', studentId: 's1', date: '2026-09-25', status: 'Hadir' },
+    { id: 'att-2', classId: 'c1', studentId: 's2', date: '2026-09-25', status: 'Hadir' },
+  ],
+  classRosters: [],
+  classAnnouncements: [],
+  onlineAssignments: [],
+  messages: [
+    {
+      id: 'm1',
+      sender: 'Wali Kelas X IPA 1',
+      receiverRole: 'all',
+      subject: 'Pengumpulan Berkas Orang Tua',
+      content: 'Mohon kumpulkan fotokopi KTP orang tua paling lambat Jumat ini.',
+      date: '2026-09-28',
+    },
+    {
+      id: 'm2',
+      sender: 'Kepala Sekolah',
+      receiverRole: 'teacher',
+      subject: 'Rapat Kurikulum',
+      content: 'Rapat kurikulum akan dilaksanakan hari Senin pukul 13.00 di ruang guru.',
+      date: '2026-09-27',
+    },
+  ],
+  attendance: [
+    { date: '2026-09-25', subject: 'Matematika', status: 'Hadir' },
+    { date: '2026-09-24', subject: 'Fisika', status: 'Hadir' },
+    { date: '2026-09-23', subject: 'Bahasa Indonesia', status: 'Izin' },
+    { date: '2026-09-22', subject: 'Biologi', status: 'Hadir' },
+  ],
+  tasks: [
+    { id: 'k1', title: 'Latihan Soal Trigonometri', subject: 'Matematika', dueDate: '2026-10-04', status: 'Aktif' },
+    { id: 'k2', title: 'Rangkuman Bab Cerpen', subject: 'Bahasa Indonesia', dueDate: '2026-10-03', status: 'Aktif' },
+    { id: 'k3', title: 'Laporan Praktikum Gaya', subject: 'Fisika', dueDate: '2026-09-29', status: 'Selesai' },
+  ],
+  bills: [
+    { id: 'b1', name: 'SPP Oktober 2026', amount: 300000, dueDate: '2026-10-10', status: 'Belum Lunas' },
+    { id: 'b2', name: 'Kegiatan Laboratorium', amount: 150000, dueDate: '2026-09-20', status: 'Lunas' },
+  ],
+  grades: [
+    { subject: 'Matematika', assignment: 84, midterm: 81, final: 88 },
+    { subject: 'Bahasa Indonesia', assignment: 86, midterm: 83, final: 85 },
+    { subject: 'Fisika', assignment: 80, midterm: 79, final: 84 },
+  ],
+  schedule: [
+    { day: 'Senin', subject: 'Matematika', time: '07.00 - 08.30', teacher: 'Bapak Andi Pratama' },
+    { day: 'Selasa', subject: 'Bahasa Indonesia', time: '08.40 - 10.10', teacher: 'Ibu Rina Kartika' },
+    { day: 'Rabu', subject: 'Fisika', time: '10.20 - 11.50', teacher: 'Bapak Dedi Saputra' },
+  ],
+};
+
+// ==================== DB HELPERS ====================
+
+function readDB(): Database {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return initialData;
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<Database>;
+    return {
+      ...initialData,
+      ...parsed,
+      teachers: (parsed.teachers ?? initialData.teachers).map((teacher, index) => ({
+        ...initialData.teachers[index % initialData.teachers.length],
+        ...teacher,
+        classIds: teacher.classIds ?? [],
+      })),
+      classes: (parsed.classes ?? initialData.classes).map((classItem, index) => ({
+        ...initialData.classes[index % initialData.classes.length],
+        ...classItem,
+        grade: classItem.grade ?? 'X',
+      })),
+      students: (parsed.students ?? initialData.students).map((student, index) => ({
+        ...initialData.students[index % initialData.students.length],
+        ...student,
+        gender: student.gender === 'P' ? 'P' : 'L',
+      })),
+      ppdbApplications: parsed.ppdbApplications ?? initialData.ppdbApplications,
+      attendances: parsed.attendances ?? initialData.attendances,
+      classRosters: parsed.classRosters ?? initialData.classRosters,
+      classAnnouncements: parsed.classAnnouncements ?? initialData.classAnnouncements,
+      onlineAssignments: parsed.onlineAssignments ?? initialData.onlineAssignments,
+    };
+  } catch {
+    return initialData;
+  }
+}
+
+function writeDB(data: Database) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  notifyStoreUpdated();
+}
+
+function readLocalKey<T>(key: string, fallback: T): T {
+  const raw = localStorage.getItem(key);
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+// ==================== INIT ====================
+
+export function initializeData() {
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    writeDB(initialData);
+  }
+}
+
+// ==================== ANNOUNCEMENTS ====================
+
+export function getSchoolAnnouncements() {
+  return readDB().announcements;
+}
+
+export function addSchoolAnnouncement(title: string, content: string) {
+  const db = readDB();
+  db.announcements = [
+    { id: `a${Date.now()}`, title, content, date: new Date().toISOString().slice(0, 10) },
+    ...db.announcements,
+  ];
+  writeDB(db);
+}
+
+// ==================== TEACHERS ====================
+
+export function getTeacherList() {
+  return readDB().teachers;
+}
+
+export function getTeachers() {
+  return getTeacherList();
+}
+
+export function saveTeachers(nextTeachers: Teacher[]) {
+  const db = readDB();
+  db.teachers = nextTeachers;
+  writeDB(db);
+}
+
+// ==================== CLASSES ====================
+
+export function getClasses() {
+  return readDB().classes;
+}
+
+export function saveClasses(nextClasses: SchoolClass[]) {
+  const db = readDB();
+  db.classes = nextClasses;
+  writeDB(db);
+}
+
+// ==================== STUDENTS ====================
+
+export function getStudents() {
+  return readDB().students;
+}
+
+export function saveStudents(nextStudents: Student[]) {
+  const db = readDB();
+  db.students = nextStudents;
+  writeDB(db);
+}
+
+export function getStudentsByClass(classId: string): Student[] {
+  return getStudents().filter((s) => s.classId === classId);
+}
+
+export function updateStudent(student: Student) {
   const students = getStudents();
-  // Backward compatibility for older data that did not store status yet.
-  return letters
-    .map(item => ({
-      ...item,
-      classId: item.classId || students.find((student) => student.id === item.studentId)?.classId || '',
-      type: item.type || 'izin',
-      subject: item.subject || 'Surat',
-      letterDate: item.letterDate || new Date(item.createdAt).toISOString().split('T')[0],
-      status: item.status || 'menunggu',
-    }))
-    .sort((a, b) => b.createdAt - a.createdAt);
+  const idx = students.findIndex((s) => s.id === student.id);
+  if (idx >= 0) students[idx] = student;
+  saveStudents(students);
+}
+
+export function deleteStudent(id: string) {
+  saveStudents(getStudents().filter((s) => s.id !== id));
+  const db = readDB();
+  db.attendances = db.attendances.filter((a) => a.studentId !== id);
+  writeDB(db);
+}
+
+export function addStudent(student: Student) {
+  const students = getStudents();
+  students.push(student);
+  saveStudents(students);
+}
+
+export function getStudentClassMutations(studentId?: string) {
+  const all = readLocalKey<StudentClassMutation[]>(STUDENT_CLASS_MUTATION_KEY, []);
+  const filtered = studentId ? all.filter((item) => item.studentId === studentId) : all;
+  return filtered.sort((a, b) => new Date(b.movedAt).getTime() - new Date(a.movedAt).getTime());
+}
+
+export function addStudentClassMutation(payload: Omit<StudentClassMutation, 'id' | 'movedAt'>) {
+  const all = readLocalKey<StudentClassMutation[]>(STUDENT_CLASS_MUTATION_KEY, []);
+  all.unshift({ ...payload, id: `mut-${Date.now()}`, movedAt: new Date().toISOString() });
+  localStorage.setItem(STUDENT_CLASS_MUTATION_KEY, JSON.stringify(all));
+  notifyStoreUpdated();
+}
+
+// ==================== PPDB ====================
+
+function generateRegistrationNo() {
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const random = Math.floor(Math.random() * 900 + 100);
+  return `PPDB-${stamp}-${random}`;
+}
+
+function generateStudentNis(students: Student[]) {
+  const year = new Date().getFullYear();
+  const maxSerial = students.reduce((max, student) => {
+    const parsed = Number.parseInt(student.nis.slice(-3), 10);
+    return Number.isNaN(parsed) ? max : Math.max(max, parsed);
+  }, 0);
+  return `${year}${String(maxSerial + 1).padStart(3, '0')}`;
+}
+
+export function submitPPDBApplication(payload: Omit<PPDBApplication, 'id' | 'registrationNo' | 'submittedAt' | 'status'>) {
+  const db = readDB();
+  const application: PPDBApplication = {
+    ...payload,
+    id: `ppdb-${Date.now()}`,
+    registrationNo: generateRegistrationNo(),
+    submittedAt: new Date().toISOString(),
+    status: 'pending',
+  };
+  db.ppdbApplications = [application, ...db.ppdbApplications];
+  writeDB(db);
+  return application;
+}
+
+export function getPPDBApplications() {
+  return readDB().ppdbApplications;
+}
+
+export function approvePPDBApplication(applicationId: string, classId: string) {
+  const db = readDB();
+  const target = db.ppdbApplications.find((item) => item.id === applicationId);
+  if (!target) return { ok: false, message: 'Data pendaftar tidak ditemukan.' };
+  if (target.status !== 'pending') return { ok: false, message: 'Pendaftar sudah diproses sebelumnya.' };
+  const targetClass = db.classes.find((item) => item.id === classId);
+  if (!targetClass) return { ok: false, message: 'Kelas tujuan tidak ditemukan.' };
+
+  const newNis = target.nisn.trim() || generateStudentNis(db.students);
+  if (db.students.some((item) => item.nis === newNis)) {
+    return { ok: false, message: 'NIS/NISN bentrok dengan data siswa aktif.' };
+  }
+
+  db.students = [
+    {
+      id: `s-${Date.now()}`,
+      name: target.namaLengkap,
+      nis: newNis,
+      password: 'siswa123',
+      classId,
+      gender: target.jenisKelamin?.toLowerCase().startsWith('p') ? 'P' : 'L',
+    },
+    ...db.students,
+  ];
+
+  db.ppdbApplications = db.ppdbApplications.map((item) =>
+    item.id === applicationId
+      ? { ...item, status: 'approved', processedAt: new Date().toISOString(), assignedNis: newNis, assignedClassId: classId }
+      : item,
+  );
+
+  writeDB(db);
+  return { ok: true, message: `Pendaftar ${target.namaLengkap} diterima ke kelas ${targetClass.name}.` };
+}
+
+export function rejectPPDBApplication(applicationId: string, note = '') {
+  const db = readDB();
+  const target = db.ppdbApplications.find((item) => item.id === applicationId);
+  if (!target) return { ok: false, message: 'Data pendaftar tidak ditemukan.' };
+  if (target.status !== 'pending') return { ok: false, message: 'Pendaftar sudah diproses sebelumnya.' };
+  db.ppdbApplications = db.ppdbApplications.map((item) =>
+    item.id === applicationId ? { ...item, status: 'rejected', processedAt: new Date().toISOString(), note } : item,
+  );
+  writeDB(db);
+  return { ok: true, message: `Pendaftar ${target.namaLengkap} ditandai tidak lolos seleksi.` };
+}
+
+// ==================== ATTENDANCE ====================
+
+export function getAttendance() {
+  return readDB().attendances;
+}
+
+export function saveAttendance(nextAttendance: AttendanceEntry[]) {
+  const db = readDB();
+  db.attendances = nextAttendance;
+  writeDB(db);
+}
+
+export function getAttendanceByDate(date: string, classId?: string): AttendanceEntry[] {
+  return getAttendance().filter((r) => r.date === date && (classId ? r.classId === classId : true));
+}
+
+export function getAttendanceByDateRange(startDate: string, endDate: string, classId?: string): AttendanceEntry[] {
+  return getAttendance().filter((r) => {
+    const dateMatch = r.date >= startDate && r.date <= endDate;
+    const classMatch = classId ? r.classId === classId : true;
+    return dateMatch && classMatch;
+  });
+}
+
+export function getAttendanceByStudent(studentId: string): AttendanceEntry[] {
+  return getAttendance().filter((r) => r.studentId === studentId);
+}
+
+export function addAttendanceRecords(records: AttendanceEntry[]) {
+  const existing = getAttendance();
+  const newKeys = new Set(records.map((r) => `${r.studentId}_${r.date}`));
+  const filtered = existing.filter((e) => !newKeys.has(`${e.studentId}_${e.date}`));
+  filtered.push(...records);
+  saveAttendance(filtered);
+}
+
+export function getAttendanceRecords() {
+  return readDB().attendance;
+}
+
+// ==================== CLASS ROSTERS ====================
+
+export function getClassRosters(classId: string): ClassRoster[] {
+  return readDB().classRosters.filter((item) => item.classId === classId);
+}
+
+export function addClassRoster(item: ClassRoster) {
+  const db = readDB();
+  db.classRosters = [...db.classRosters, item];
+  writeDB(db);
+}
+
+export function deleteClassRoster(rosterId: string) {
+  const db = readDB();
+  db.classRosters = db.classRosters.filter((item) => item.id !== rosterId);
+  writeDB(db);
+}
+
+// ==================== CLASS ANNOUNCEMENTS ====================
+
+export function getClassAnnouncements(classId: string): ClassAnnouncement[] {
+  return readDB().classAnnouncements.filter((item) => item.classId === classId);
+}
+
+export function addClassAnnouncement(item: ClassAnnouncement) {
+  const db = readDB();
+  db.classAnnouncements = [item, ...db.classAnnouncements];
+  writeDB(db);
+}
+
+export function deleteClassAnnouncement(announcementId: string) {
+  const db = readDB();
+  db.classAnnouncements = db.classAnnouncements.filter((item) => item.id !== announcementId);
+  writeDB(db);
+}
+
+// ==================== ONLINE ASSIGNMENTS ====================
+
+export function getOnlineAssignmentsByClass(classId: string): OnlineAssignment[] {
+  return readDB().onlineAssignments.filter((item) => item.classId === classId);
+}
+
+export function addOnlineAssignment(item: OnlineAssignment) {
+  const db = readDB();
+  db.onlineAssignments = [item, ...db.onlineAssignments];
+  writeDB(db);
+}
+
+export function deleteOnlineAssignment(assignmentId: string) {
+  const db = readDB();
+  db.onlineAssignments = db.onlineAssignments.filter((item) => item.id !== assignmentId);
+  writeDB(db);
+}
+
+// ==================== ASSIGNMENT SUBMISSIONS ====================
+
+export function getSubmissionsByAssignment(assignmentId: string): AssignmentSubmission[] {
+  const all = readLocalKey<AssignmentSubmission[]>(SUBMISSION_KEY, []);
+  return all.filter((item) => item.assignmentId === assignmentId).sort((a, b) => b.submittedAt - a.submittedAt);
+}
+
+export function getSubmissionByAssignmentAndStudent(assignmentId: string, studentId: string): AssignmentSubmission | null {
+  const all = readLocalKey<AssignmentSubmission[]>(SUBMISSION_KEY, []);
+  return all.find((item) => item.assignmentId === assignmentId && item.studentId === studentId) ?? null;
+}
+
+export function upsertAssignmentSubmission(item: AssignmentSubmission) {
+  const all = readLocalKey<AssignmentSubmission[]>(SUBMISSION_KEY, []);
+  const idx = all.findIndex((s) => s.assignmentId === item.assignmentId && s.studentId === item.studentId);
+  if (idx >= 0) all[idx] = item;
+  else all.push(item);
+  localStorage.setItem(SUBMISSION_KEY, JSON.stringify(all));
+  notifyStoreUpdated();
+}
+
+// ==================== MESSAGES ====================
+
+export function getMessagesForRole(role: 'teacher' | 'student') {
+  return readDB().messages.filter((msg) => msg.receiverRole === role || msg.receiverRole === 'all');
+}
+
+export function addMessage(sender: string, receiverRole: 'teacher' | 'student' | 'all', subject: string, content: string) {
+  const db = readDB();
+  db.messages = [{ id: `m${Date.now()}`, sender, receiverRole, subject, content, date: new Date().toISOString().slice(0, 10) }, ...db.messages];
+  writeDB(db);
+}
+
+// ==================== TASKS ====================
+
+export function getTasks() {
+  return readDB().tasks;
+}
+
+export function addTask(title: string, subject: string, dueDate: string) {
+  const db = readDB();
+  db.tasks = [{ id: `k${Date.now()}`, title, subject, dueDate, status: 'Aktif' }, ...db.tasks];
+  writeDB(db);
+}
+
+// ==================== BILLS (simple) ====================
+
+export function getBills() {
+  return readDB().bills;
+}
+
+// ==================== GRADES ====================
+
+export function getGrades() {
+  return readDB().grades;
+}
+
+// ==================== SCHEDULE ====================
+
+export function getSchedule() {
+  return readDB().schedule;
+}
+
+// ==================== SURAT IZIN ====================
+
+export function getSuratIzin(): SuratIzin[] {
+  const all = readLocalKey<SuratIzin[]>(SURAT_KEY, []);
+  return all.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 export function getSuratIzinByStudent(studentId: string): SuratIzin[] {
-  return getSuratIzin().filter(item => item.studentId === studentId);
+  return getSuratIzin().filter((item) => item.studentId === studentId);
 }
 
 export function addSuratIzin(item: SuratIzin) {
-  const letters = getSuratIzin();
-  letters.push(item);
-  localStorage.setItem(STORAGE_KEYS.letters, JSON.stringify(letters));
+  const all = getSuratIzin();
+  all.push(item);
+  localStorage.setItem(SURAT_KEY, JSON.stringify(all));
   notifyStoreUpdated();
 }
 
 export function updateStatusSuratIzin(id: string, status: SuratIzin['status']) {
-  const letters = getSuratIzin();
-  const updated = letters.map(item => (item.id === id ? { ...item, status } : item));
-  localStorage.setItem(STORAGE_KEYS.letters, JSON.stringify(updated));
+  const all = getSuratIzin().map((item) => (item.id === id ? { ...item, status } : item));
+  localStorage.setItem(SURAT_KEY, JSON.stringify(all));
   notifyStoreUpdated();
 }
 
+// ==================== TAGIHAN SEKOLAH ====================
+
+function getDefaultPengaturanTagihan(): PengaturanTagihan {
+  return { monthlyAmount: 250000, dueDay: 10, updatedAt: Date.now(), updatedBy: 'system' };
+}
+
 export function getTagihanSekolahBySiswa(studentId: string, year: number): TagihanSekolah[] {
-  const bills = readArrayFromStorage<TagihanSekolah>(STORAGE_KEYS.bills);
-  return bills
-    .filter(item => item.studentId === studentId && item.year === year)
-    .sort((a, b) => a.month - b.month);
+  const all = readLocalKey<TagihanSekolah[]>(TAGIHAN_KEY, []);
+  return all.filter((item) => item.studentId === studentId && item.year === year).sort((a, b) => a.month - b.month);
 }
 
 export function getTahunTagihanSiswa(studentId: string): number[] {
-  const bills = readArrayFromStorage<TagihanSekolah>(STORAGE_KEYS.bills);
-  const years = new Set(
-    bills
-      .filter(item => item.studentId === studentId)
-      .map(item => item.year),
-  );
+  const all = readLocalKey<TagihanSekolah[]>(TAGIHAN_KEY, []);
+  const years = new Set(all.filter((item) => item.studentId === studentId).map((item) => item.year));
   return Array.from(years).sort((a, b) => b - a);
 }
 
-export function bayarTagihanSekolah(
-  id: string,
-  paymentMethod: TagihanSekolah['paymentMethod'],
-) {
-  const bills = readArrayFromStorage<TagihanSekolah>(STORAGE_KEYS.bills);
-  const updated = bills.map(item => (
-    item.id === id
-      ? {
-        ...item,
-        status: 'lunas' as const,
-        paymentMethod,
-        paidAt: Date.now(),
-      }
-      : item
-  ));
-  localStorage.setItem(STORAGE_KEYS.bills, JSON.stringify(updated));
+export function bayarTagihanSekolah(id: string, paymentMethod: string) {
+  const all = readLocalKey<TagihanSekolah[]>(TAGIHAN_KEY, []);
+  const updated = all.map((item) => (item.id === id ? { ...item, status: 'lunas', paymentMethod, paidAt: Date.now() } : item));
+  localStorage.setItem(TAGIHAN_KEY, JSON.stringify(updated));
   notifyStoreUpdated();
 }
 
 export function getPengaturanTagihan(): PengaturanTagihan {
-  return readJsonFromStorage<PengaturanTagihan>(
-    STORAGE_KEYS.adminBillingSettings,
-    getDefaultPengaturanTagihan(),
-  );
+  return readLocalKey<PengaturanTagihan>(PENGATURAN_TAGIHAN_KEY, getDefaultPengaturanTagihan());
 }
 
 export function setPengaturanTagihan(config: PengaturanTagihan) {
-  localStorage.setItem(STORAGE_KEYS.adminBillingSettings, JSON.stringify(config));
+  localStorage.setItem(PENGATURAN_TAGIHAN_KEY, JSON.stringify(config));
   notifyStoreUpdated();
 }
 
-export function terapkanTagihanTahunanUntukSemuaSiswa(
-  year: number,
-  monthlyAmount: number,
-  dueDay: number,
-  updatedBy: string,
-) {
+export function terapkanTagihanTahunanUntukSemuaSiswa(year: number, monthlyAmount: number, dueDay: number, updatedBy: string) {
   const students = getStudents();
-  const bills = readJsonFromStorage<TagihanSekolah[]>(STORAGE_KEYS.bills, []);
-
+  const existing = readLocalKey<TagihanSekolah[]>(TAGIHAN_KEY, []);
   const dueDaySafe = Math.min(28, Math.max(1, dueDay));
-  const nextBills: TagihanSekolah[] = [...bills];
+  const next = [...existing];
 
   students.forEach((student) => {
     for (let month = 1; month <= 12; month += 1) {
       const billId = `bill_${student.id}_${year}_${month}`;
       const dueDate = `${year}-${String(month).padStart(2, '0')}-${String(dueDaySafe).padStart(2, '0')}`;
-      const existingIndex = nextBills.findIndex(item => item.id === billId);
-
-      if (existingIndex >= 0) {
-        nextBills[existingIndex] = {
-          ...nextBills[existingIndex],
-          amount: monthlyAmount,
-          dueDate,
-        };
-      } else {
-        nextBills.push({
-          id: billId,
-          studentId: student.id,
-          year,
-          month,
-          amount: monthlyAmount,
-          dueDate,
-          status: 'belum_lunas',
-        });
+      const idx = next.findIndex((item) => item.id === billId);
+      if (idx >= 0) next[idx] = { ...next[idx], amount: monthlyAmount, dueDate };
+      else {
+        next.push({ id: billId, studentId: student.id, year, month, amount: monthlyAmount, dueDate, status: 'belum_lunas' });
       }
     }
   });
 
-  localStorage.setItem(STORAGE_KEYS.bills, JSON.stringify(nextBills));
-  localStorage.setItem(
-    STORAGE_KEYS.adminBillingSettings,
-    JSON.stringify({
-      monthlyAmount,
-      dueDay: dueDaySafe,
-      updatedAt: Date.now(),
-      updatedBy,
-    } satisfies PengaturanTagihan),
-  );
+  localStorage.setItem(TAGIHAN_KEY, JSON.stringify(next));
+  localStorage.setItem(PENGATURAN_TAGIHAN_KEY, JSON.stringify({ monthlyAmount, dueDay: dueDaySafe, updatedAt: Date.now(), updatedBy }));
   notifyStoreUpdated();
 }
 
+// ==================== PENGUMUMAN ADMIN ====================
+
 export function getPengumumanAdmin(): PengumumanAdmin[] {
-  const announcements = readArrayFromStorage<PengumumanAdmin>(STORAGE_KEYS.adminAnnouncements);
-  return announcements
-    .map((item) => ({
-      ...item,
-      id: item.id || `ann_${Date.now()}`,
-      title: item.title || 'Pengumuman',
-      message: item.message || '',
-      targetScope: item.targetScope || 'all',
-      targetClassIds: Array.isArray(item.targetClassIds) ? item.targetClassIds.filter(Boolean) : [],
-      createdAt: typeof item.createdAt === 'number' ? item.createdAt : Date.now(),
-      createdBy: item.createdBy || 'admin',
-    }))
-    .sort((a, b) => b.createdAt - a.createdAt);
+  const all = readLocalKey<PengumumanAdmin[]>(PENGUMUMAN_ADMIN_KEY, []);
+  return all.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 export function getPengumumanAdminUntukKelas(classId: string): PengumumanAdmin[] {
-  return getPengumumanAdmin().filter((item) => {
-    if (item.targetScope === 'classes') {
-      return (item.targetClassIds || []).includes(classId);
-    }
-    return true;
-  });
+  return getPengumumanAdmin().filter((item) => (item.targetScope === 'classes' ? (item.targetClassIds ?? []).includes(classId) : true));
 }
 
 export function getPengumumanAdminUntukGuru(classIds: string[]): PengumumanAdmin[] {
   const classSet = new Set(classIds);
-  return getPengumumanAdmin().filter((item) => {
-    if (item.targetScope === 'classes') {
-      return (item.targetClassIds || []).some((classId) => classSet.has(classId));
-    }
-    return true;
-  });
+  return getPengumumanAdmin().filter((item) => (item.targetScope === 'classes' ? (item.targetClassIds ?? []).some((id) => classSet.has(id)) : true));
 }
 
 export function addPengumumanAdmin(item: PengumumanAdmin): boolean {
-  const announcements = getPengumumanAdmin();
-  announcements.push(item);
+  const all = getPengumumanAdmin();
+  all.push(item);
   try {
-    localStorage.setItem(STORAGE_KEYS.adminAnnouncements, JSON.stringify(announcements));
+    localStorage.setItem(PENGUMUMAN_ADMIN_KEY, JSON.stringify(all));
   } catch {
     return false;
   }
@@ -694,209 +930,32 @@ export function addPengumumanAdmin(item: PengumumanAdmin): boolean {
 }
 
 export function deletePengumumanAdmin(id: string) {
-  const announcements = getPengumumanAdmin().filter(item => item.id !== id);
-  localStorage.setItem(STORAGE_KEYS.adminAnnouncements, JSON.stringify(announcements));
+  const all = getPengumumanAdmin().filter((item) => item.id !== id);
+  localStorage.setItem(PENGUMUMAN_ADMIN_KEY, JSON.stringify(all));
   notifyStoreUpdated();
-}
-
-export function getCadanganDataAplikasi() {
-  const cadangan: Record<string, string | null> = {};
-  Object.values(STORAGE_KEYS).forEach((key) => {
-    cadangan[key] = localStorage.getItem(key);
-  });
-
-  return {
-    app: 'Sistem Absensi Sekolah',
-    exportedAt: new Date().toISOString(),
-    version: 1,
-    data: cadangan,
-  };
-}
-
-export function pulihkanDataAplikasiDariCadangan(fileContent: string): HasilPulihkanCadangan {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(fileContent);
-  } catch {
-    return {
-      berhasil: false,
-      pesan: 'File cadangan tidak valid. Pastikan format JSON benar.',
-    };
-  }
-
-  if (!parsed || typeof parsed !== 'object' || !('data' in parsed)) {
-    return {
-      berhasil: false,
-      pesan: 'Struktur file cadangan tidak dikenali.',
-    };
-  }
-
-  const payload = (parsed as { data?: Record<string, string | null> }).data;
-  if (!payload || typeof payload !== 'object') {
-    return {
-      berhasil: false,
-      pesan: 'Data cadangan tidak ditemukan di dalam file.',
-    };
-  }
-
-  const validKeys = new Set(Object.values(STORAGE_KEYS));
-  let totalDipulihkan = 0;
-
-  try {
-    validKeys.forEach((key) => {
-      if (!Object.prototype.hasOwnProperty.call(payload, key)) {
-        return;
-      }
-
-      const value = payload[key];
-      if (typeof value === 'string') {
-        localStorage.setItem(key, value);
-        totalDipulihkan += 1;
-        return;
-      }
-
-      if (value === null) {
-        localStorage.removeItem(key);
-        totalDipulihkan += 1;
-      }
-    });
-  } catch {
-    return {
-      berhasil: false,
-      pesan: 'Gagal memulihkan data. Periksa kapasitas penyimpanan browser.',
-    };
-  }
-
-  if (totalDipulihkan === 0) {
-    return {
-      berhasil: false,
-      pesan: 'Tidak ada data yang bisa dipulihkan dari file ini.',
-    };
-  }
-
-  if (!localStorage.getItem(STORAGE_KEYS.initialized)) {
-    localStorage.setItem(STORAGE_KEYS.initialized, 'true');
-  }
-
-  notifyStoreUpdated();
-  return {
-    berhasil: true,
-    pesan: `Pemulihan selesai. ${totalDipulihkan} bagian data berhasil dipulihkan.`,
-  };
 }
 
 export function hapusSemuaFotoPengumumanAdmin(): number {
-  const announcements = getPengumumanAdmin();
-  let removedCount = 0;
-
-  const nextAnnouncements = announcements.map((item) => {
-    if (!item.imageDataUrl && !item.imageName) {
-      return item;
-    }
-    removedCount += 1;
-    return {
-      ...item,
-      imageDataUrl: undefined,
-      imageName: undefined,
-    };
+  const all = getPengumumanAdmin();
+  let count = 0;
+  const next = all.map((item) => {
+    if (!item.imageDataUrl && !item.imageName) return item;
+    count += 1;
+    return { ...item, imageDataUrl: undefined, imageName: undefined };
   });
-
-  localStorage.setItem(STORAGE_KEYS.adminAnnouncements, JSON.stringify(nextAnnouncements));
+  localStorage.setItem(PENGUMUMAN_ADMIN_KEY, JSON.stringify(next));
   notifyStoreUpdated();
-  return removedCount;
-}
-
-function isImageDataUrl(value?: string): boolean {
-  return Boolean(value && value.startsWith('data:image/'));
-}
-
-export async function kompresUlangSemuaFotoTersimpan(): Promise<RingkasanKompresFoto> {
-  const summary: RingkasanKompresFoto = {
-    totalDitemukan: 0,
-    totalBerhasil: 0,
-    totalGagal: 0,
-  };
-
-  const students = getStudents();
-  const nextStudents: Student[] = [...students];
-  for (let index = 0; index < students.length; index += 1) {
-    const avatar = students[index].avatar;
-    if (!isImageDataUrl(avatar)) continue;
-
-    summary.totalDitemukan += 1;
-    try {
-      const compressed = await kompresDataUrlGambar(avatar as string, 720, 0.72, 680_000);
-      nextStudents[index] = { ...students[index], avatar: compressed };
-      summary.totalBerhasil += 1;
-    } catch {
-      summary.totalGagal += 1;
-    }
-  }
-  localStorage.setItem(STORAGE_KEYS.students, JSON.stringify(nextStudents));
-
-  const teachers = getTeachers();
-  const nextTeachers: Teacher[] = [...teachers];
-  for (let index = 0; index < teachers.length; index += 1) {
-    const avatar = teachers[index].avatar;
-    if (!isImageDataUrl(avatar)) continue;
-
-    summary.totalDitemukan += 1;
-    try {
-      const compressed = await kompresDataUrlGambar(avatar as string, 720, 0.72, 680_000);
-      nextTeachers[index] = { ...teachers[index], avatar: compressed };
-      summary.totalBerhasil += 1;
-    } catch {
-      summary.totalGagal += 1;
-    }
-  }
-  localStorage.setItem(STORAGE_KEYS.teachers, JSON.stringify(nextTeachers));
-
-  const adminAnnouncements = getPengumumanAdmin();
-  const nextAdminAnnouncements: PengumumanAdmin[] = [...adminAnnouncements];
-  for (let index = 0; index < adminAnnouncements.length; index += 1) {
-    const imageDataUrl = adminAnnouncements[index].imageDataUrl;
-    if (!isImageDataUrl(imageDataUrl)) continue;
-
-    summary.totalDitemukan += 1;
-    try {
-      const compressed = await kompresDataUrlGambar(imageDataUrl as string, 1280, 0.74, 1_000_000);
-      nextAdminAnnouncements[index] = { ...adminAnnouncements[index], imageDataUrl: compressed };
-      summary.totalBerhasil += 1;
-    } catch {
-      summary.totalGagal += 1;
-    }
-  }
-  localStorage.setItem(STORAGE_KEYS.adminAnnouncements, JSON.stringify(nextAdminAnnouncements));
-
-  const letters = getSuratIzin();
-  const nextLetters: SuratIzin[] = [...letters];
-  for (let index = 0; index < letters.length; index += 1) {
-    const attachmentDataUrl = letters[index].attachmentDataUrl;
-    if (!isImageDataUrl(attachmentDataUrl)) continue;
-
-    summary.totalDitemukan += 1;
-    try {
-      const compressed = await kompresDataUrlGambar(attachmentDataUrl as string, 1080, 0.72, 820_000);
-      nextLetters[index] = { ...letters[index], attachmentDataUrl: compressed };
-      summary.totalBerhasil += 1;
-    } catch {
-      summary.totalGagal += 1;
-    }
-  }
-  localStorage.setItem(STORAGE_KEYS.letters, JSON.stringify(nextLetters));
-
-  notifyStoreUpdated();
-  return summary;
+  return count;
 }
 
 // ==================== RAPOT ====================
 
 export function getNilaiRapot(): NilaiRapot[] {
-  return readArrayFromStorage<NilaiRapot>(STORAGE_KEYS.rapot);
+  return readLocalKey<NilaiRapot[]>(RAPOT_KEY, []);
 }
 
 export function getNilaiRapotBySiswa(studentId: string, tahunAjaran?: string, semester?: string): NilaiRapot[] {
-  return getNilaiRapot().filter(item => {
+  return getNilaiRapot().filter((item) => {
     if (item.studentId !== studentId) return false;
     if (tahunAjaran && item.tahunAjaran !== tahunAjaran) return false;
     if (semester && item.semester !== semester) return false;
@@ -905,40 +964,75 @@ export function getNilaiRapotBySiswa(studentId: string, tahunAjaran?: string, se
 }
 
 export function getNilaiRapotByKelas(classId: string, tahunAjaran: string, semester: string): NilaiRapot[] {
-  return getNilaiRapot().filter(
-    item => item.classId === classId && item.tahunAjaran === tahunAjaran && item.semester === semester,
-  );
+  return getNilaiRapot().filter((item) => item.classId === classId && item.tahunAjaran === tahunAjaran && item.semester === semester);
 }
 
 export function upsertNilaiRapot(item: NilaiRapot) {
   const all = getNilaiRapot();
-  const index = all.findIndex(
-    existing =>
-      existing.studentId === item.studentId
-      && existing.classId === item.classId
-      && existing.tahunAjaran === item.tahunAjaran
-      && existing.semester === item.semester
-      && existing.mataPelajaran === item.mataPelajaran,
+  const idx = all.findIndex(
+    (existing) =>
+      existing.studentId === item.studentId &&
+      existing.classId === item.classId &&
+      existing.tahunAjaran === item.tahunAjaran &&
+      existing.semester === item.semester &&
+      existing.mataPelajaran === item.mataPelajaran,
   );
-
-  if (index >= 0) {
-    all[index] = item;
-  } else {
-    all.push(item);
-  }
-
-  localStorage.setItem(STORAGE_KEYS.rapot, JSON.stringify(all));
+  if (idx >= 0) all[idx] = item;
+  else all.push(item);
+  localStorage.setItem(RAPOT_KEY, JSON.stringify(all));
   notifyStoreUpdated();
 }
 
 export function deleteNilaiRapot(id: string) {
-  const all = getNilaiRapot().filter(item => item.id !== id);
-  localStorage.setItem(STORAGE_KEYS.rapot, JSON.stringify(all));
+  const all = getNilaiRapot().filter((item) => item.id !== id);
+  localStorage.setItem(RAPOT_KEY, JSON.stringify(all));
   notifyStoreUpdated();
 }
 
 export function getTahunAjaranRapotSiswa(studentId: string): string[] {
-  const all = getNilaiRapot().filter(item => item.studentId === studentId);
-  const set = new Set(all.map(item => item.tahunAjaran));
+  const set = new Set(getNilaiRapot().filter((item) => item.studentId === studentId).map((item) => item.tahunAjaran));
   return Array.from(set).sort((a, b) => b.localeCompare(a));
+}
+
+// ==================== BACKUP & RESTORE ====================
+
+export function getCadanganDataAplikasi() {
+  return {
+    metadata: { exportedAt: new Date().toISOString(), storageKey: STORAGE_KEY },
+    data: readDB(),
+  };
+}
+
+export function pulihkanDataAplikasiDariCadangan(content: string): HasilPulihkanCadangan {
+  try {
+    const parsed = JSON.parse(content) as { data?: Database } | Database;
+    const restoredData = 'data' in parsed && parsed.data ? parsed.data : (parsed as Database);
+    writeDB(restoredData);
+    return { berhasil: true, pesan: 'Pemulihan data cadangan berhasil.' };
+  } catch {
+    return { berhasil: false, pesan: 'Format file cadangan tidak valid.' };
+  }
+}
+
+// ==================== STORAGE INFO ====================
+
+export function getRingkasanPenyimpananBrowser(): RingkasanPenyimpananBrowser {
+  let usedBytes = 0;
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (!key) continue;
+    const value = localStorage.getItem(key) ?? '';
+    usedBytes += (key.length + value.length) * 2;
+  }
+  const usedPercent = Math.min(100, Math.round((usedBytes / APPROX_LOCAL_STORAGE_LIMIT_BYTES) * 100));
+  return {
+    usedBytes,
+    limitBytes: APPROX_LOCAL_STORAGE_LIMIT_BYTES,
+    usedPercent,
+    remainingBytes: Math.max(0, APPROX_LOCAL_STORAGE_LIMIT_BYTES - usedBytes),
+  };
+}
+
+export async function kompresUlangSemuaFotoTersimpan(): Promise<RingkasanKompresFoto> {
+  return { totalDitemukan: 0, totalBerhasil: 0, totalGagal: 0 };
 }

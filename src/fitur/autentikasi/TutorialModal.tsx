@@ -1,3 +1,4 @@
+// TutorialModal.tsx
 import { BookOpen, GraduationCap, User, AlertCircle, X, Info } from 'lucide-react';
 
 interface TutorialModalProps {
@@ -11,12 +12,22 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
     return (
         <div className="fixed inset-0 z-[100] flex flex-col bg-white font-serif text-gray-900">
             {/* Content Area (Scrollable) */}
-            {/* Mengubah max-w-4xl menjadi max-w-6xl agar lebar halaman konsisten dengan profil sekolah */}
             <div className="flex-1 overflow-y-auto px-8 py-8 max-[600px]:px-4">
-                <div className="max-w-6xl mx-auto"> 
+                <div className="max-w-6xl mx-auto relative"> {/* Menambahkan relative untuk posisi absolute tombol X */}
+                    
+                    {/* TOMBOL TUTUP POJOK KANAN ATAS (MINIMALIS TANPA EFEK) */}
+                    <div className="absolute top-0 right-0 z-10">
+                        <button 
+                            onClick={onClose}
+                            className="p-2.5 rounded-xl border-2 border-gray-300 text-gray-500 bg-white font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1"
+                            title="Tutup Halaman"
+                        >
+                            <X className="w-3.5 h-3.5" /> Tutup
+                        </button>
+                    </div>
                     
                     {/* Banner / Judul Utama Gaya Koran - Menyatu di Paling Atas */}
-                    <div className="text-center pb-5 mb-6 border-b-4 border-double border-gray-900">
+                    <div className="text-center pb-5 mb-6 border-b-4 border-double border-gray-900 pt-10 md:pt-4"> {/* Ditambahkan padding top agar tidak tertutup tombol X */}
                         <p className="text-xs uppercase tracking-widest font-sans font-bold text-gray-600 mb-1">
                             Petunjuk Resmi • Jurnal Academic
                         </p>
@@ -138,19 +149,9 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                     </div>
 
                     {/* Catatan Kaki Kecil */}
-                    <p className="text-center text-[11px] text-gray-500 font-sans italic pt-4 mb-6">
+                    <p className="text-center text-[11px] text-gray-500 font-sans italic pt-4">
                         Layanan Bantuan Terintegrasi • Sekretariat SMP Negeri 1 Majenang
                     </p>
-
-                    {/* Tombol Aksi Penutup Koran di Paling Bawah */}
-                    <div className="flex justify-center pb-4">
-                        <button
-                            onClick={onClose}
-                            className="px-8 py-3 border-2 border-gray-950 font-sans text-sm font-black uppercase tracking-wider text-gray-900 hover:bg-gray-950 hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-                        >
-                            KEMBALI KE PORTAL UTAMA [SELESAI MEMBACA]
-                        </button>
-                    </div>
 
                 </div>
             </div>

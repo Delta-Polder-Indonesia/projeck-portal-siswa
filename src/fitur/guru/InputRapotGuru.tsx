@@ -24,7 +24,8 @@ function hitungNilaiAkhir(tugas: number, uts: number, uas: number): number {
   return Math.round(tugas * 0.3 + uts * 0.3 + uas * 0.4);
 }
 
-const DAFTAR_MAPEL = [
+// Daftar bawaan awal sebagai fallback standardisasi
+const MASTER_MAPEL_DEFAULT = [
   'Matematika',
   'Bahasa Indonesia',
   'Bahasa Inggris',
@@ -60,10 +61,23 @@ export default function InputRapotGuru() {
   const [searchStudent, setSearchStudent] = useState('');
   const [notice, setNotice] = useState('');
 
+  // Sinkronisasi manifes mata pelajaran dengan penyimpanan lokal (localStorage)
+  const [daftarMapel, setDaftarMapel] = useState<string[]>(() => {
+    const saved = localStorage.getItem('app_daftar_mapel');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return MASTER_MAPEL_DEFAULT;
+      }
+    }
+    return MASTER_MAPEL_DEFAULT;
+  });
+
   // Form input per mapel
   const [formMapel, setFormMapel] = useState('');
   const [formTugas, setFormTugas] = useState(0);
-  const [formUTS, setFormUTS] = useState(0);
+  const [formUTS, setFormUTS] = useState(0); // FIX: Sudah diperbaiki menggunakan kurung siku ']'
   const [formUAS, setFormUAS] = useState(0);
   const [formCatatan, setFormCatatan] = useState('');
 
@@ -114,16 +128,28 @@ export default function InputRapotGuru() {
       return;
     }
 
+    const namaMapelClean = formMapel.trim();
     const nilaiAkhir = hitungNilaiAkhir(formTugas, formUTS, formUAS);
     const predikat = hitungPredikat(nilaiAkhir);
 
+    // Evaluasi keunikan entri baru secara Case-Insensitive
+    const isExist = daftarMapel.some(
+      mapel => mapel.toLowerCase() === namaMapelClean.toLowerCase()
+    );
+
+    if (!isExist) {
+      const updatedList = [...daftarMapel, namaMapelClean];
+      setDaftarMapel(updatedList);
+      localStorage.setItem('app_daftar_mapel', JSON.stringify(updatedList));
+    }
+
     const item: NilaiRapot = {
-      id: `rapot_${selectedStudentId}_${tahunAjaran}_${semester}_${formMapel.trim()}`,
+      id: `rapot_${selectedStudentId}_${tahunAjaran}_${semester}_${namaMapelClean}`,
       studentId: selectedStudentId,
       classId: selectedClassId,
       semester,
       tahunAjaran,
-      mataPelajaran: formMapel.trim(),
+      mataPelajaran: namaMapelClean,
       nilaiTugas: formTugas,
       nilaiUTS: formUTS,
       nilaiUAS: formUAS,
@@ -135,7 +161,7 @@ export default function InputRapotGuru() {
     };
 
     upsertNilaiRapot(item);
-    setNotice(`LOG_SUCCESS: Nilai ${formMapel} untuk ${selectedStudent?.name} berhasil disimpan.`);
+    setNotice(`LOG_SUCCESS: Nilai ${namaMapelClean} untuk ${selectedStudent?.name} berhasil disimpan.`);
     resetForm();
   };
 
@@ -154,7 +180,6 @@ export default function InputRapotGuru() {
     setNotice('LOG_DELETED: Nilai berhasil dihapus.');
   };
 
-  // Transformasi indikator predikat berbasis garis kontras arsitektural mono
   const predikatClassName = (p: string) => {
     switch (p) {
       case 'A': return 'border-slate-900 bg-slate-900 text-white font-bold';
@@ -172,18 +197,6 @@ export default function InputRapotGuru() {
   return (
     <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
       
-      {/* HEADER BAR */}
-      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs">
-        <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase">Input Log Nilai Rapot Siswa</h1>
-        <p className="text-xs text-slate-400 mt-0.5">Pencatatan evaluasi akademis harian, ujian tengah semester, dan ujian akhir berkala per kompartemen kelas.</p>
-      </div>
-
-      {notice && (
-        <div className="bg-white border border-slate-900 rounded px-3 py-2 text-xs font-mono font-bold text-slate-900 shadow-xs">
-          {notice.toUpperCase()}
-        </div>
-      )}
-
       {/* FILTER CONTROL MATRIX */}
       <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs flex flex-wrap gap-4 items-end">
         <div className="space-y-1.5">
@@ -306,17 +319,21 @@ export default function InputRapotGuru() {
                 <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
                   <div className="space-y-1.5">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Mata Pelajaran</label>
-                    <select
+                    <input
+                      type="text"
+                      list="daftar-mapel-dinamis"
                       value={formMapel}
                       onChange={e => setFormMapel(e.target.value)}
-                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-bold text-slate-800 outline-none cursor-pointer transition-colors"
-                    >
-                      <option value="">SELECT_MAPEL...</option>
-                      {DAFTAR_MAPEL.map(mapel => (
-                        <option key={mapel} value={mapel}>{mapel.toUpperCase()}</option>
+                      placeholder="Ketik/Pilih Mapel..."
+                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-bold text-slate-800 outline-none transition-colors"
+                    />
+                    <datalist id="daftar-mapel-dinamis">
+                      {daftarMapel.map(mapel => (
+                        <option key={mapel} value={mapel} />
                       ))}
-                    </select>
+                    </datalist>
                   </div>
+
                   <div className="space-y-1.5">
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Nilai Tugas (30%)</label>
                     <input
@@ -368,7 +385,7 @@ export default function InputRapotGuru() {
                 <div className="mt-4 flex gap-2 border-t border-slate-100 pt-3">
                   <button
                     onClick={handleSimpanNilai}
-                    disabled={!formMapel}
+                    disabled={!formMapel.trim()}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-950 text-white rounded text-xs font-mono font-bold tracking-wide transition-colors disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <Save className="w-3.5 h-3.5" /> COMMIT_RECORD
