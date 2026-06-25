@@ -125,20 +125,21 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* RIGHT SIDE - Login Card (100% Struktur Asli Anda tanpa edit selain pemindahan tombol) */}
+        {/* RIGHT SIDE - Login Card */}
         <div className="flex-shrink-0 w-full max-w-[420px]">
           <div className="rounded-3xl p-10 max-[600px]:p-6"
             style={{
               background: 'rgba(255,255,255,0.08)',
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(255,255,255,0.15)'
-            }}>
+            }}
+          >
 
             {/* Jika sudah pilih role, munculkan tombol Back di dalam card */}
             {role !== null && (
                 <button 
                     onClick={handleBack}
-                    className="flex items-center gap-2 text-white/60 hover:text-white mb-6 transition-all"
+                    className="flex items-center gap-2 text-white/60 hover:text-white mb-4 transition-all text-sm"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     <span>Kembali ke Pilihan Peran</span>
@@ -146,7 +147,7 @@ export default function LoginPage() {
             )}
 
             {role === null ? (
-              <div className="text-center space-y-8">
+              <div className="text-center space-y-5">
                 <h2 className="text-2xl font-bold text-white">Pilih Peran</h2>
                 <div className="flex flex-col gap-4">
                   <button onClick={() => handleSelectRole('teacher')} className="flex items-center justify-center gap-3 p-4 rounded-xl text-white font-semibold border border-white/20 bg-white/5 hover:bg-white/15">
@@ -157,29 +158,22 @@ export default function LoginPage() {
                   </button>
                 </div>
 
-                {/* Sisa tombol bantuan di dalam kontainer login */}
-                <div className="pt-4 border-t border-white/10">
+                {/* Tombol bantuan di kanan bawah */}
+                <div className="pt-1 flex justify-end">
                   <button 
                     type="button"
                     onClick={() => setShowTutorial(true)} 
-                    className="w-full flex items-center justify-center gap-2 text-xs text-slate-300 hover:text-cyan-400 font-medium transition-colors py-1.5 cursor-pointer"
+                    className="flex items-center gap-2 text-xs text-slate-300 hover:text-cyan-400 font-medium transition-colors py-1 cursor-pointer"
                   >
                     <HelpCircle className="w-4 h-4" />
-                    <span>Cara Login / Butuh Bantuan?</span>
+                    <span>Butuh Bantuan?</span>
                   </button>
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-white">Login {role === 'teacher' ? 'Guru' : 'Siswa'}</h2>
-                  <button
-                    type="button"
-                    onClick={() => setShowTutorial(true)}
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 px-2.5 py-1 rounded-lg border border-cyan-500/20 transition-all cursor-pointer"
-                  >
-                    Cara Login
-                  </button>
                 </div>
                 <input 
                   type="text" 
@@ -205,16 +199,23 @@ export default function LoginPage() {
                   </button>
                 </div>
                 <button type="submit" className="w-full py-4 rounded-xl bg-cyan-500 text-slate-900 font-bold hover:bg-cyan-400">Masuk</button>
+                
+                {/* Tombol Cara Login dipindahkan ke kanan bawah agar sejajar & sama bentuknya */}
+                <div className="pt-1 flex justify-end">
+                  <button 
+                    type="button"
+                    onClick={() => setShowTutorial(true)} 
+                    className="flex items-center gap-2 text-xs text-slate-300 hover:text-cyan-400 font-medium transition-colors py-1 cursor-pointer"
+                  >
+                    <HelpCircle className="w-4 h-4" />
+                    <span>Butuh Bantuan?</span>
+                  </button>
+                </div>
               </form>
             )}
           </div>
         </div>
       </main>
-
-      {/* FOOTER */}
-      <footer className="relative z-10 w-full text-center pt-4 text-[11px] text-slate-500 font-medium">
-        &copy; {new Date().getFullYear()} SMP Negeri 1 Majenang. All Rights Reserved.
-      </footer>
 
       {/* Modals */}
       <TutorialModal open={showTutorial} onClose={() => setShowTutorial(false)} />
