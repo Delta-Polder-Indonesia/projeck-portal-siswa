@@ -44,6 +44,7 @@ export default function TabKelolaKelas({ setNotice }: { setNotice: (msg: string)
     const setClassField = (classId: string, field: keyof ClassEditMap[string], value: string) => {
         setClassEdits((prev) => ({
             ...prev,
+            ...prev,
             [classId]: { ...prev[classId], [field]: value },
         }));
     };
@@ -164,57 +165,51 @@ export default function TabKelolaKelas({ setNotice }: { setNotice: (msg: string)
     };
 
     return (
-        <div className="mx-auto max-w-5xl space-y-3 rounded-sm border border-gray-200 p-3">
+        // PERUBAHAN: Menghapus mx-auto, max-w-5xl, rounded-sm, border, dan p-3 agar melebar penuh secara flat
+        <div className="w-full space-y-5">
 
-            {/* STRIP HEADER */}
-            <div className="border-b border-gray-200 pb-1.5">
-                <h3 className="text-xs font-bold uppercase tracking-wide text-gray-800">
-                    Kelola Daftar Kelas
-                </h3>
-            </div>
-
-            {/* FORM TAMBAH KELAS */}
-            <div className="flex flex-wrap items-end gap-2 rounded-sm border border-gray-200 bg-gray-50/50 p-2.5">
+            {/* FORM TAMBAH KELAS (Dibuat flat tanpa card background kelabu yang tebal) */}
+            <div className="flex flex-wrap items-end gap-3 pb-4 border-b border-gray-100">
                 <div className="space-y-1">
-                    <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                    <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                         Nama Kelas Baru
                     </label>
                     <input
                         value={newClassName}
                         onChange={(e) => setNewClassName(e.target.value)}
                         placeholder="Contoh: X-IPA-1"
-                        className="w-48 rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
+                        className="w-52 rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-blue-500"
                     />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                    <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                         Tingkat
                     </label>
                     <input
                         value={newClassGrade}
                         onChange={(e) => setNewClassGrade(e.target.value)}
                         placeholder="Contoh: X, XI, XII"
-                        className="w-36 rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
+                        className="w-36 rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-blue-500"
                     />
                 </div>
                 <button
                     onClick={handleAddClass}
-                    className="inline-flex items-center gap-1.5 rounded-sm bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-blue-700"
+                    className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3.5 py-1.5 text-xs font-bold text-white transition-colors hover:bg-blue-700 shadow-sm"
                 >
                     <UserPlus className="h-3.5 w-3.5" />
                     Tambah Kelas
                 </button>
             </div>
 
-            {/* TABLE GRID */}
-            <div className="overflow-x-auto rounded-sm border border-gray-200">
-                <table className="w-full min-w-[680px] border-collapse">
+            {/* TABLE GRID (Menghapus pembungkus border kotak kaku bawaan table-container) */}
+            <div className="overflow-x-auto w-full">
+                <table className="w-full min-w-[720px] border-collapse text-left">
                     <thead>
-                        <tr className="border-b border-gray-200 bg-gray-50 text-left">
+                        <tr className="border-b border-gray-200 text-left">
                             {['Kode Kelas', 'Nama Kelas', 'Tingkat', 'Guru PJ', 'Siswa', 'Aksi'].map((h) => (
                                 <th
                                     key={h}
-                                    className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-gray-500"
+                                    className="pb-2.5 pt-1 px-1 text-[10px] font-bold uppercase tracking-wide text-gray-400"
                                 >
                                     {h}
                                 </th>
@@ -230,60 +225,60 @@ export default function TabKelolaKelas({ setNotice }: { setNotice: (msg: string)
                             const canDelete = studentCount === 0;
 
                             return (
-                                <tr key={classItem.id} className="transition-colors hover:bg-gray-50/60">
+                                <tr key={classItem.id} className="transition-colors hover:bg-gray-50/40">
 
                                     {/* Kode */}
-                                    <td className="px-2.5 py-1.5 text-[10px] font-mono text-gray-400">
+                                    <td className="px-1 py-3 text-[11px] font-mono text-gray-400">
                                         {classItem.id}
                                     </td>
 
                                     {/* Nama Kelas Input */}
-                                    <td className="px-2.5 py-1.5">
+                                    <td className="px-1 py-2 pr-4">
                                         <input
                                             value={edit?.name || ''}
                                             onChange={(e) => setClassField(classItem.id, 'name', e.target.value)}
-                                            className="w-full rounded-sm border border-gray-300 px-2 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                                            className="w-full max-w-[180px] rounded-md border border-gray-200 px-2.5 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-blue-500"
                                         />
                                     </td>
 
                                     {/* Tingkat Input */}
-                                    <td className="px-2.5 py-1.5">
+                                    <td className="px-1 py-2 pr-4">
                                         <input
                                             value={edit?.grade || ''}
                                             onChange={(e) => setClassField(classItem.id, 'grade', e.target.value)}
-                                            className="w-20 rounded-sm border border-gray-300 px-2 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                                            className="w-20 rounded-md border border-gray-200 px-2.5 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-blue-500"
                                         />
                                     </td>
 
                                     {/* Guru PJ */}
-                                    <td className="px-2.5 py-1.5 text-xs text-gray-700">
+                                    <td className="px-1 py-3 text-xs text-gray-600 font-medium">
                                         {teacherName}
                                     </td>
 
                                     {/* Jumlah Siswa */}
-                                    <td className="px-2.5 py-1.5">
-                                        <span className={`text-xs font-bold tabular-nums ${studentCount > 0 ? 'text-amber-600' : 'text-gray-400'}`}>
+                                    <td className="px-1 py-3">
+                                        <span className={`text-xs font-bold tabular-nums ${studentCount > 0 ? 'text-amber-600' : 'text-gray-300'}`}>
                                             {studentCount}
                                         </span>
                                     </td>
 
                                     {/* Aksi */}
-                                    <td className="px-2.5 py-1.5">
+                                    <td className="px-1 py-2">
                                         {canDelete ? (
                                             <button
                                                 onClick={() => handleDeleteClass(classItem.id)}
                                                 title="Hapus kelas"
-                                                className="inline-flex items-center gap-1 rounded-sm border border-red-200 px-2 py-1 text-[10px] font-bold text-red-700 transition-colors hover:bg-red-50"
+                                                className="inline-flex items-center gap-1 rounded-md border border-red-100 px-2.5 py-1 text-[10px] font-bold text-red-600 transition-colors hover:bg-red-50/50"
                                             >
                                                 <Trash2 className="h-3 w-3" />
-                                                Hapus
+                                                Hapus Kelas
                                             </button>
                                         ) : (
-                                            <div className="flex flex-col gap-1 min-w-[200px]">
-                                                <p className="text-[10px] font-medium text-amber-700">
-                                                    {studentCount} siswa aktif — pindahkan dulu
+                                            <div className="flex flex-col gap-1 min-w-[220px]">
+                                                <p className="text-[10px] font-medium text-amber-600">
+                                                    {studentCount} siswa aktif — migrasikan data
                                                 </p>
-                                                <div className="flex gap-1">
+                                                <div className="flex gap-1.5">
                                                     <select
                                                         value={moveTargets[classItem.id] || ''}
                                                         onChange={(e) =>
@@ -292,7 +287,7 @@ export default function TabKelolaKelas({ setNotice }: { setNotice: (msg: string)
                                                                 [classItem.id]: e.target.value,
                                                             }))
                                                         }
-                                                        className="flex-1 rounded-sm border border-gray-300 px-1.5 py-1 text-[10px] text-gray-700 outline-none focus:border-gray-500"
+                                                        className="flex-1 rounded-md border border-gray-200 px-2 py-1 text-[11px] text-gray-600 bg-white outline-none focus:border-blue-500"
                                                     >
                                                         <option value="">Pilih kelas tujuan</option>
                                                         {classes
@@ -306,10 +301,10 @@ export default function TabKelolaKelas({ setNotice }: { setNotice: (msg: string)
                                                     <button
                                                         onClick={() => handleMoveStudents(classItem.id)}
                                                         disabled={classes.length <= 1}
-                                                        className={`rounded-sm border px-2 py-1 text-[10px] font-bold transition-colors ${
+                                                        className={`rounded-md border px-2 py-1 text-[10px] font-bold transition-colors ${
                                                             classes.length <= 1
-                                                                ? 'cursor-not-allowed border-gray-200 text-gray-400'
-                                                                : 'border-blue-200 text-blue-700 hover:bg-blue-50'
+                                                                ? 'cursor-not-allowed border-gray-100 text-gray-300'
+                                                                : 'border-blue-100 text-blue-600 hover:bg-blue-50/50'
                                                         }`}
                                                     >
                                                         Pindahkan
@@ -326,7 +321,7 @@ export default function TabKelolaKelas({ setNotice }: { setNotice: (msg: string)
                             <tr>
                                 <td
                                     colSpan={6}
-                                    className="px-3 py-8 text-center text-[10px] uppercase tracking-widest text-gray-400"
+                                    className="px-1 py-12 text-center text-[10px] uppercase tracking-widest text-gray-400 font-medium"
                                 >
                                     — Belum ada kelas yang terdaftar —
                                 </td>
@@ -336,14 +331,14 @@ export default function TabKelolaKelas({ setNotice }: { setNotice: (msg: string)
                 </table>
             </div>
 
-            {/* TOMBOL SIMPAN */}
-            <div className="flex justify-end border-t border-gray-200 pt-2">
+            {/* TOMBOL SIMPAN DIBAWAH */}
+            <div className="flex justify-end pt-3 border-t border-gray-100">
                 <button
                     onClick={handleSaveClasses}
-                    className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-gray-800"
+                    className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-blue-700 shadow-sm"
                 >
                     <Save className="h-3.5 w-3.5" />
-                    Simpan Daftar Kelas
+                    Simpan Perubahan Kelas
                 </button>
             </div>
         </div>

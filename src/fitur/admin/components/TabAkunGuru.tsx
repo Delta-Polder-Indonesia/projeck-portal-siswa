@@ -124,18 +124,19 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
         : null;
 
     return (
-        <div className="mx-auto max-w-5xl grid min-h-[420px] gap-3 rounded-sm border border-gray-200 p-3 lg:grid-cols-[220px_1fr]">
+        // PERUBAHAN: Menghapus kontainer border luar, p-3, max-w, dan mx-auto agar fleksibel dan flat
+        <div className="grid min-h-[440px] w-full gap-6 lg:grid-cols-[240px_1fr]">
 
             {/* KOLOM KIRI — DAFTAR GURU */}
-            <div className="space-y-2 border-r border-gray-100 pr-3">
+            <div className="space-y-3 lg:border-r lg:border-gray-100 lg:pr-5">
                 <input
                     value={searchTeacher}
                     onChange={(e) => setSearchTeacher(e.target.value)}
                     placeholder="Cari nama, NIP, mapel..."
-                    className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
+                    className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-blue-500"
                 />
 
-                <div className="max-h-[380px] overflow-y-auto rounded-sm border border-gray-200">
+                <div className="max-h-[400px] overflow-y-auto rounded-md border border-gray-100 bg-white divide-y divide-gray-50">
                     {filteredTeachers.map((teacher) => {
                         const isActive = selectedTeacher?.id === teacher.id;
                         const selectedCount =
@@ -145,19 +146,19 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                             <button
                                 key={teacher.id}
                                 onClick={() => setSelectedTeacherId(teacher.id)}
-                                className={`w-full border-b border-gray-100 px-2.5 py-2 text-left last:border-0 transition-colors ${
+                                className={`w-full px-3 py-2.5 text-left transition-colors ${
                                     isActive
-                                        ? 'bg-blue-50'
-                                        : 'hover:bg-gray-50'
+                                        ? 'bg-blue-50/70'
+                                        : 'hover:bg-gray-50/50'
                                 }`}
                             >
-                                <p className="text-xs font-semibold text-gray-800 truncate">
+                                <p className={`text-xs font-semibold truncate ${isActive ? 'text-blue-700' : 'text-gray-800'}`}>
                                     {teacher.name}
                                 </p>
-                                <p className="text-[10px] text-gray-500 truncate">
+                                <p className="text-[10px] text-gray-400 truncate mt-0.5">
                                     {teacher.nip} · {teacher.subject}
                                 </p>
-                                <p className="text-[10px] font-medium text-blue-600">
+                                <p className="text-[10px] font-medium text-blue-600 mt-1">
                                     {selectedCount} kelas aktif
                                 </p>
                             </button>
@@ -165,7 +166,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                     })}
 
                     {filteredTeachers.length === 0 && (
-                        <p className="px-2.5 py-6 text-center text-[10px] uppercase tracking-wide text-gray-400">
+                        <p className="px-3 py-10 text-center text-[10px] uppercase tracking-wide text-gray-400 font-medium">
                             Guru tidak ditemukan.
                         </p>
                     )}
@@ -175,20 +176,20 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
             {/* KOLOM KANAN — FORM EDITOR */}
             <div className="min-w-0">
                 {selectedTeacher && selectedTeacherEdit ? (
-                    <div className="space-y-3">
+                    <div className="space-y-5">
 
                         {/* STRIP HEADER */}
-                        <div className="border-b border-gray-200 pb-1.5">
+                        <div className="border-b border-gray-100 pb-2">
                             <h3 className="text-xs font-bold uppercase tracking-wide text-gray-800">
                                 Ubah Data Guru —{' '}
-                                <span className="text-blue-700">{selectedTeacher.name}</span>
+                                <span className="text-blue-600">{selectedTeacher.name}</span>
                             </h3>
                         </div>
 
                         {/* FIELD GRID */}
-                        <div className="grid gap-2 md:grid-cols-2">
+                        <div className="grid gap-3 md:grid-cols-2">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                                     Nama Guru
                                 </label>
                                 <input
@@ -197,12 +198,12 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                                         setTeacherField(selectedTeacher.id, 'name', e.target.value)
                                     }
                                     placeholder="Nama guru"
-                                    className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-blue-500"
                                 />
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                                     Mata Pelajaran
                                 </label>
                                 <input
@@ -211,12 +212,12 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                                         setTeacherField(selectedTeacher.id, 'subject', e.target.value)
                                     }
                                     placeholder="Mata pelajaran"
-                                    className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-blue-500"
                                 />
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                                     NIP
                                 </label>
                                 <input
@@ -225,12 +226,12 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                                         setTeacherField(selectedTeacher.id, 'nip', e.target.value)
                                     }
                                     placeholder="NIP"
-                                    className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-blue-500"
                                 />
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                                     Kata Sandi
                                 </label>
                                 <input
@@ -239,24 +240,24 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                                         setTeacherField(selectedTeacher.id, 'password', e.target.value)
                                     }
                                     placeholder="Kata sandi"
-                                    className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                                    className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-blue-500"
                                 />
                             </div>
                         </div>
 
-                        {/* KELAS AJAR — CHECKBOX GRID */}
-                        <div className="space-y-1.5 rounded-sm border border-gray-200 bg-gray-50/50 p-2.5">
-                            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        {/* KELAS AJAR — CHECKBOX GRID (Menghapus latar kelabu kontainer kaku) */}
+                        <div className="space-y-2">
+                            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                                 Kelas Ajar{' '}
-                                <span className="font-normal normal-case text-gray-400">
+                                <span className="font-normal normal-case text-gray-400/80">
                                     — eksklusif, antar-guru tidak saling melihat data
                                 </span>
                             </p>
-                            <div className="grid grid-cols-2 gap-x-4 gap-y-1 md:grid-cols-3">
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3 rounded-md border border-gray-50 bg-gray-50/30 p-3">
                                 {classes.map((item) => (
                                     <label
                                         key={item.id}
-                                        className="flex cursor-pointer items-center gap-1.5 text-[11px] text-gray-700 hover:text-gray-900"
+                                        className="flex cursor-pointer items-center gap-2 text-xs text-gray-600 hover:text-gray-900 select-none"
                                     >
                                         <input
                                             type="checkbox"
@@ -264,19 +265,19 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                                             onChange={() =>
                                                 toggleTeacherClass(selectedTeacher.id, item.id)
                                             }
-                                            className="h-3 w-3 accent-blue-600"
+                                            className="h-3.5 w-3.5 rounded accent-blue-600 cursor-pointer"
                                         />
-                                        {item.name}
+                                        <span>{item.name}</span>
                                     </label>
                                 ))}
                             </div>
                         </div>
 
                         {/* TOMBOL SIMPAN */}
-                        <div className="flex justify-end border-t border-gray-200 pt-2">
+                        <div className="flex justify-end border-t border-gray-100 pt-3">
                             <button
                                 onClick={() => handleSaveTeacher(selectedTeacher.id)}
-                                className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-gray-800"
+                                className="inline-flex items-center gap-1.5 rounded-md bg-gray-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-gray-800 shadow-sm"
                             >
                                 <Save className="h-3.5 w-3.5" />
                                 Simpan Perubahan Guru
@@ -284,8 +285,8 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex h-full items-center justify-center">
-                        <p className="text-[10px] uppercase tracking-widest text-gray-400">
+                    <div className="flex h-full min-h-[200px] items-center justify-center">
+                        <p className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">
                             — Pilih guru untuk mengedit akun —
                         </p>
                     </div>

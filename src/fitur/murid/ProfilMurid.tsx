@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getClasses, getStudents, updateStudent } from '../../data/store';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
-import { Camera, Save, Loader2, X, CheckCircle, AlertCircle, User, AtSign, Phone, MapPin } from 'lucide-react';
+import { Camera, Save, Loader2, X, CheckCircle, AlertCircle, User, AtSign, Phone, MapPin, Fingerprint } from 'lucide-react';
 import ModalPotongFoto from '../bersama/ModalPotongFoto';
 import { bacaFileSebagaiDataUrl } from '../../utils/gambar';
 
@@ -268,15 +268,22 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Hero Profile Banner Card */}
-      <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="h-32 md:h-44 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 relative opacity-95">
-          <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]" />
+      {/* Hero Profile Banner Card dengan Background Image */}
+      <section className=" bg-gradient-to-r from-blue-600 rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div 
+          className="h-32 md:h-44 relative"
+          style={{
+            backgroundImage: `url(${import.meta.env.BASE_URL}images/Dashboard/logo-profile.png)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 25%',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
         </div>
         
         <div className="px-6 md:px-8 pb-6 -mt-12 md:-mt-14 relative flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
-            <div className="relative group shadow-xl rounded-full border-4 border-white bg-white overflow-hidden w-28 h-28 md:w-32 md:h-32">
+            <div className="relative group shadow-xl rounded-full border-4 border-white bg-white overflow-hidden w-28 h-28 md:w-32 md:h-32 shrink-0">
               {avatarPreview ? (
                 <img
                   src={avatarPreview}
@@ -296,8 +303,8 @@ export default function ProfilePage() {
             </div>
             
             <div className="sm:mb-2">
-              <h2 className="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">{student.name}</h2>
-              <p className="text-sm text-slate-400 font-medium mt-0.5">Kelas {className} &bull; NIS {student.nis}</p>
+              <h2 className="text-xl md:text-2xl font-bold text-black tracking-tight">{student.name}</h2>
+              <p className="text-sm text-black font-medium mt-0.5">Kelas {className} &bull; NIS {student.nis}</p>
             </div>
           </div>
 
@@ -322,14 +329,13 @@ export default function ProfilePage() {
         {/* Left Side: Detail Overview */}
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm lg:col-span-5 space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-            <div className="w-1.5 h-5 bg-emerald-500 rounded-full" />
-            <h3 className="font-bold text-slate-800">Detail Data Saat Ini</h3>
+            <h3 className="font-bold text-slate-800">Profil</h3>
           </div>
           
           <div className="space-y-3.5 text-sm">
             {[
               { label: 'Nama Lengkap', value: student.name, icon: <User className="w-4 h-4 text-slate-400" /> },
-              { label: 'Nomor Induk Siswa (NIS)', value: student.nis, icon: <span className="text-xs font-bold text-slate-400">ID</span> },
+              { label: 'Nomor Induk Siswa (NIS)', value: student.nis, icon: <Fingerprint className="w-4 h-4 text-slate-400" /> },
               { label: 'Kelas Aktif', value: className, icon: <span className="text-xs font-bold text-slate-400">RM</span> },
               { label: 'Jenis Kelamin', value: student.gender === 'L' ? 'Laki-laki' : 'Perempuan', icon: <span className="text-xs font-bold text-slate-400">JK</span> },
               { label: 'Alamat Surel (Email)', value: student.email || 'Belum diisi', isItalic: !student.email, icon: <AtSign className="w-4 h-4 text-slate-400" /> },
@@ -355,8 +361,7 @@ export default function ProfilePage() {
         {/* Right Side: Interactive Form */}
         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm lg:col-span-7 space-y-5">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-            <div className="w-1.5 h-5 bg-teal-500 rounded-full" />
-            <h3 className="font-bold text-slate-800">Modifikasi Pengaturan Profil</h3>
+            <h3 className="font-bold text-slate-800">Pengaturan Profil</h3>
           </div>
           
           <div className="space-y-4">

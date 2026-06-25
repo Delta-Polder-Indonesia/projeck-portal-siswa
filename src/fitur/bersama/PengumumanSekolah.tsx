@@ -40,7 +40,7 @@ export default function PengumumanSekolah() {
     }, [previewImage]);
 
     return (
-        <div className="w-full h-full p-6 md:p-8 lg:p-10 antialiased text-slate-700 bg-white">
+        <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
             {/* Header Judul - Polos & Menyatu dengan Halaman */}
             <div className="border-b border-slate-200 pb-4 mb-6">
                 <div className="flex items-center gap-3">

@@ -1,34 +1,36 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getClasses, getStudents, getSuratIzin, getTeachers, updateStatusSuratIzin } from '../../data/store';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 import { Calendar, ChevronLeft, ChevronRight, MailOpen } from 'lucide-react';
 
-type LetterItem = ReturnType<typeof getSuratIzin>[number] & { studentName: string; studentNis: string; className: string };
+type LetterItem = ReturnType<typeof getSuratIzin>[number] & {
+  studentName: string;
+  studentNis: string;
+  className: string;
+};
 
 export default function KotakSuratGuru() {
   const { user } = useAuth();
   const storeVersion = useStoreVersion();
-  const [selectedLetterId, setSelectedLetterId] = useState('');
-  
-  const [selectedMonth, setSelectedMonth] = useState(() => {
+  const [selectedLetterId, setSelectedLetterId] = useState<string>('');
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<'semua' | LetterItem['status']>('semua');
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
 
-  // 1. Mengambil data Guru Pengampu
-  const teacher = useMemo(() => getTeachers().find(item => item.id === user?.id), [user, storeVersion]);
+  const teacher = useMemo(() => {
+    return getTeachers().find(item => item.id === user?.id);
+  }, [user, storeVersion]);
 
-  // 2. Optimasi pengambilan data surat menggunakan Hash Map
   const letters = useMemo(() => {
     if (!teacher) return [];
-    
     const studentMap = new Map(getStudents().map(s => [s.id, s]));
     const classMap = new Map(getClasses().map(c => [c.id, c]));
-    
     return getSuratIzin()
       .filter(item => teacher.classIds.includes(item.classId))
       .map(item => {
@@ -43,7 +45,6 @@ export default function KotakSuratGuru() {
       });
   }, [teacher, storeVersion]);
 
-  // 3. Filter data surat berdasarkan tanggal/status terpilih
   const filteredLetters = useMemo(() => {
     return letters.filter(item => {
       const dateMatch = selectedDate ? item.letterDate === selectedDate : true;
@@ -52,18 +53,21 @@ export default function KotakSuratGuru() {
     });
   }, [letters, selectedDate, selectedStatus]);
 
-  // 4. Menentukan surat aktif yang sedang dibuka detailnya
-  const selectedLetter = useMemo(
-    () => filteredLetters.find(item => item.id === selectedLetterId) || null,
-    [filteredLetters, selectedLetterId],
-  );
+  const selectedLetter = useMemo(() => {
+    return filteredLetters.find(item => item.id === selectedLetterId) || null;
+  }, [filteredLetters, selectedLetterId]);
+
+  useEffect(() => {
+    if (selectedLetterId && !filteredLetters.some(item => item.id === selectedLetterId)) {
+      setSelectedLetterId('');
+    }
+  }, [filteredLetters, selectedLetterId]);
 
   const monthLabel = useMemo(() => {
     const [year, month] = selectedMonth.split('-').map(Number);
     return new Date(year, month - 1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
   }, [selectedMonth]);
 
-  // 5. Kalkulasi matriks tanggal kalender
   const calendarData = useMemo(() => {
     const [year, month] = selectedMonth.split('-').map(Number);
     const firstDay = new Date(year, month - 1, 1);
@@ -108,6 +112,10 @@ export default function KotakSuratGuru() {
     setSelectedDate(null);
   };
 
+  const handleUpdateStatus = (id: string, status: LetterItem['status']) => {
+    updateStatusSuratIzin(id, status);
+  };
+
   const typeLabel: Record<LetterItem['type'], string> = {
     izin: 'Izin',
     sakit: 'Sakit',
@@ -121,108 +129,112 @@ export default function KotakSuratGuru() {
     ditolak: 'Ditolak',
   };
 
-  // Komparasi badge status arsitektural mono (Bukan warna pastel cerah)
-  const getStatusBadgeStyle = (status: LetterItem['status'], isSelectedSidebar: boolean = false) => {
-    if (isSelectedSidebar) return 'bg-slate-800 border-slate-700 text-white font-mono';
+  const getStatusBadgeStyle = (status: LetterItem['status'], isSelectedSidebar = false) => {
+    if (isSelectedSidebar) return 'bg-slate-800 border-slate-700 text-white';
     switch (status) {
       case 'disetujui': return 'border-slate-900 bg-slate-900 text-white';
-      case 'menunggu': return 'border-slate-900 bg-white text-slate-900';
-      case 'ditolak': return 'border-slate-300 bg-white text-slate-400 line-through';
-      default: return 'border-slate-200 bg-white text-slate-400';
+      case 'menunggu':  return 'border-slate-900 bg-white text-slate-900';
+      case 'ditolak':   return 'border-slate-300 bg-white text-slate-400 line-through';
+      default:          return 'border-slate-200 bg-white text-slate-400';
     }
   };
 
   return (
-     <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
-      {/* HEADER PANEL */}
-      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs">
-        <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase">KOTAK SURAT SISWA</h1>
-        <p className="text-xs text-slate-400 mt-0.5">
-          Pencatatan evaluasi berkas masuk, dokumen perizinan, dan laporan sakit berkala per kompartemen kelas.
-        </p>
-      </div>
+    <div className="w-full bg-white p-4 text-xs text-slate-700 antialiased space-y-4">
 
-      {/* FILTERS BAR */}
-      <section className="bg-white rounded-lg p-3 shadow-xs border border-slate-200 flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2">Filter Status:</span>
-          <button
-            onClick={() => {
-              setSelectedStatus('semua');
-              setSelectedLetterId('');
-            }}
-            className={`px-3 py-1 rounded border text-xs font-mono font-bold transition-all uppercase tracking-wide cursor-pointer ${
-              selectedStatus === 'semua' ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            Semua
-          </button>
-          {(['menunggu', 'disetujui', 'ditolak'] as const).map(status => (
-            <button
-              key={status}
-              onClick={() => {
-                setSelectedStatus(status);
-                setSelectedLetterId('');
-              }}
-              className={`px-3 py-1 rounded border text-xs font-mono font-bold transition-all uppercase tracking-wide cursor-pointer ${
-                selectedStatus === status ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              {statusLabel[status]}
-            </button>
-          ))}
+      {/* ── HEADER ─────────────────────────────────────────────── */}
+      <header className="flex items-center justify-between border-b border-slate-300 pb-3">
+        <div>
+          <h1 className="text-base font-bold tracking-tight text-slate-950 uppercase">
+            Sistem Informasi Akademik
+          </h1>
+          <p className="text-[11px] text-slate-500">
+            Pencatatan evaluasi berkas masuk, dokumen perizinan, dan laporan sakit berkala per kompartemen kelas.
+          </p>
         </div>
 
-        {/* INTERFACE DROPDOWN KALENDER */}
-        <div className="w-full sm:w-auto flex items-center justify-end relative">
-          <button
-            onClick={() => setShowCalendar(current => !current)}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3 py-1 rounded border border-slate-200 text-xs font-mono font-bold text-slate-800 bg-white hover:bg-slate-50 transition-all cursor-pointer"
-          >
-            <Calendar className="w-3.5 h-3.5 text-slate-900" />
-            KALENDER_SURAT
-          </button>
+        {/* Tombol kalender di pojok kanan header */}
+        <div className="flex items-center gap-2 border-l border-slate-300 pl-4 relative">
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+              Arsip Kalender
+            </span>
+            <button
+              onClick={() => setShowCalendar(prev => !prev)}
+              className="mt-0.5 inline-flex items-center gap-1.5 border border-slate-900 bg-white px-2 py-1 text-xs font-bold text-slate-900 uppercase outline-none cursor-pointer hover:bg-slate-50 transition-colors"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              {selectedDate ? selectedDate : monthLabel.toUpperCase()}
+            </button>
+          </div>
 
+          {/* KALENDER DROPDOWN */}
           {showCalendar && (
-            <div className="absolute right-0 top-full mt-2 w-[290px] bg-white border border-slate-900 rounded shadow-xs p-3 z-20">
+            <div className="absolute right-0 top-full mt-2 w-[290px] bg-white border border-slate-900 p-3 z-20 shadow-none">
+              {/* Nav bulan */}
               <div className="flex items-center justify-between mb-2">
-                <h2 className="font-mono font-bold text-slate-900 text-[10px] uppercase tracking-wider">Arsip Bulanan</h2>
+                <h2 className="text-[10px] font-bold uppercase tracking-wider text-slate-900">
+                  Arsip Bulanan
+                </h2>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => navigateMonth(-1)} className="p-1 border border-slate-200 hover:bg-slate-50 rounded text-slate-600 cursor-pointer"><ChevronLeft className="w-3.5 h-3.5" /></button>
-                  <span className="text-xs font-mono font-bold text-slate-900 min-w-[100px] text-center uppercase">{monthLabel}</span>
-                  <button onClick={() => navigateMonth(1)} className="p-1 border border-slate-200 hover:bg-slate-50 rounded text-slate-600 cursor-pointer"><ChevronRight className="w-3.5 h-3.5" /></button>
+                  <button
+                    onClick={() => navigateMonth(-1)}
+                    className="p-1 border border-slate-300 text-slate-600 hover:border-slate-900 transition-colors cursor-pointer"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="text-[11px] font-bold text-slate-900 min-w-[100px] text-center uppercase">
+                    {monthLabel}
+                  </span>
+                  <button
+                    onClick={() => navigateMonth(1)}
+                    className="p-1 border border-slate-300 text-slate-600 hover:border-slate-900 transition-colors cursor-pointer"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 
+              {/* Label hari */}
               <div className="grid grid-cols-7 gap-1 mb-1">
                 {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => (
-                  <div key={day} className="text-center text-[9px] font-mono font-bold text-slate-400 py-0.5 uppercase">{day}</div>
+                  <div
+                    key={day}
+                    className="text-center text-[9px] font-bold text-slate-400 py-0.5 uppercase"
+                  >
+                    {day}
+                  </div>
                 ))}
               </div>
 
+              {/* Grid tanggal */}
               <div className="space-y-1">
-                {calendarData.weeks.map((week, weekIndex) => (
-                  <div key={`${selectedMonth}_${weekIndex}`} className="grid grid-cols-7 gap-1">
-                    {week.map((day, dayIndex) => (
+                {calendarData.weeks.map((week, wIdx) => (
+                  <div key={`${selectedMonth}_${wIdx}`} className="grid grid-cols-7 gap-1">
+                    {week.map((day, dIdx) => (
                       <button
-                        key={`${day.date}_${dayIndex}`}
+                        key={`${day.date}_${dIdx}`}
                         disabled={day.day === 0}
                         onClick={() => {
                           setSelectedDate(day.date || null);
                           setSelectedLetterId('');
                           setShowCalendar(false);
                         }}
-                        className={`relative aspect-square rounded text-[11px] font-mono font-bold transition-all border ${
+                        className={`relative aspect-square text-[11px] font-bold border cursor-pointer transition-colors ${
                           day.day === 0
                             ? 'bg-transparent border-transparent'
                             : selectedDate === day.date
                               ? 'border-slate-900 bg-slate-900 text-white'
-                              : day.count > 0 ? 'border-slate-900 bg-white text-slate-900' : 'border-transparent text-slate-500 hover:bg-slate-50'
+                              : day.count > 0
+                                ? 'border-slate-900 bg-white text-slate-900 hover:bg-slate-50'
+                                : 'border-transparent text-slate-500 hover:border-slate-200'
                         }`}
                       >
                         {day.day > 0 ? day.day : ''}
                         {day.count > 0 && selectedDate !== day.date && (
-                          <span className="absolute right-1 bottom-0.5 text-[8px] font-black text-slate-900 font-mono">.{day.count}</span>
+                          <span className="absolute right-0.5 bottom-0 text-[8px] font-black text-slate-900">
+                            .{day.count}
+                          </span>
                         )}
                       </button>
                     ))}
@@ -230,10 +242,12 @@ export default function KotakSuratGuru() {
                 ))}
               </div>
 
-              <div className="mt-2 pt-2 border-t border-slate-100 text-[10px] font-mono text-slate-400 flex items-center justify-between uppercase">
-                <span>Total surat:</span>
-                <strong className="text-slate-900 font-bold">{calendarData.monthLettersCount}</strong>
+              {/* Footer kalender */}
+              <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-400 uppercase">
+                <span>Total surat bulan ini:</span>
+                <strong className="text-slate-900">{calendarData.monthLettersCount}</strong>
               </div>
+
               {selectedDate && (
                 <button
                   onClick={() => {
@@ -241,138 +255,256 @@ export default function KotakSuratGuru() {
                     setSelectedLetterId('');
                     setShowCalendar(false);
                   }}
-                  className="mt-1.5 w-full text-center border border-slate-200 hover:bg-slate-50 text-[10px] text-slate-600 font-mono font-bold py-1 rounded cursor-pointer uppercase"
+                  className="mt-1.5 w-full border border-slate-300 text-[10px] text-slate-600 font-bold py-1 uppercase hover:border-slate-900 hover:text-slate-900 transition-colors cursor-pointer"
                 >
-                  Hapus filter tanggal
+                  Hapus Filter Tanggal
                 </button>
               )}
             </div>
           )}
         </div>
+      </header>
+
+      {/* ── FILTER STATUS BAR ───────────────────────────────────── */}
+      <section className="border border-slate-300 p-3 bg-white">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">
+            Filter Status:
+          </span>
+
+          <button
+            onClick={() => { setSelectedStatus('semua'); setSelectedLetterId(''); }}
+            className={`px-3 py-1 border text-[10px] font-bold uppercase tracking-wide cursor-pointer transition-colors ${
+              selectedStatus === 'semua'
+                ? 'bg-slate-900 border-slate-900 text-white'
+                : 'bg-white border-slate-300 text-slate-600 hover:border-slate-900'
+            }`}
+          >
+            Semua
+          </button>
+
+          {(['menunggu', 'disetujui', 'ditolak'] as const).map(status => (
+            <button
+              key={status}
+              onClick={() => { setSelectedStatus(status); setSelectedLetterId(''); }}
+              className={`px-3 py-1 border text-[10px] font-bold uppercase tracking-wide cursor-pointer transition-colors ${
+                selectedStatus === status
+                  ? 'bg-slate-900 border-slate-900 text-white'
+                  : 'bg-white border-slate-300 text-slate-600 hover:border-slate-900'
+              }`}
+            >
+              {statusLabel[status]}
+            </button>
+          ))}
+        </div>
       </section>
 
-      {/* NOTIFIKASI FILTER AKTIF */}
+      {/* ── NOTIFIKASI FILTER AKTIF ─────────────────────────────── */}
       {(selectedDate || selectedStatus !== 'semua') && (
-        <div className="bg-white border border-slate-900 rounded px-3 py-1.5 text-[11px] text-slate-900 font-mono font-bold uppercase shadow-xs">
-          Filter aktif:{' '}
-          <span className="text-slate-950 font-black">
-            {selectedDate ? `TANGGAL_${selectedDate}` : 'Semua Tanggal'}
+        <div className="border border-slate-900 px-3 py-2 bg-slate-50 text-[11px] text-slate-900 font-bold uppercase tracking-tight">
+          Filter Aktif:{' '}
+          <span className="font-black">
+            {selectedDate ? `TANGGAL · ${selectedDate}` : 'SEMUA TANGGAL'}
           </span>
           <span className="mx-2 text-slate-300">|</span>
-          Status: <span className="text-slate-950 font-black">{selectedStatus.toUpperCase()}</span>
+          Status:{' '}
+          <span className="font-black">{selectedStatus.toUpperCase()}</span>
         </div>
       )}
 
-      {/* DUA KOLOM DATA UTAMA (STRUKTUR STRUKTURAL UTUH) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        {/* DAFTAR SURAT (KIRI) */}
-        <section className="bg-white rounded-lg border border-slate-200 shadow-xs p-4 lg:col-span-4 w-full">
-          <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">DAFTAR BERKAS MASUK</h2>
+      {/* ── TWO-COLUMN WORKSPACE ────────────────────────────────── */}
+      <div className="grid items-start gap-4 lg:grid-cols-12">
+
+        {/* PANEL KIRI — DAFTAR SURAT */}
+        <section className="border border-slate-300 p-3 lg:col-span-4">
+
+          {/* Section header — seragam dengan Code 1 */}
+          <div className="flex items-center gap-2 border-b border-slate-900 pb-2 mb-3 text-[10px] font-bold tracking-wider text-slate-900 uppercase">
+            <MailOpen className="h-4 w-4 text-slate-950" />
+            <span>Daftar Berkas Masuk ({filteredLetters.length})</span>
+          </div>
+
           <div className="space-y-1.5 max-h-[520px] overflow-y-auto pr-0.5">
             {filteredLetters.map(item => {
               const isSelected = selectedLetterId === item.id;
               return (
                 <button
                   key={item.id}
+                  type="button"
                   onClick={() => setSelectedLetterId(item.id)}
-                  className={`w-full text-left border rounded p-2.5 transition-all flex flex-col cursor-pointer ${
-                    isSelected ? 'border-slate-900 bg-slate-900 text-white shadow-xs' : 'border-slate-100 hover:bg-slate-50 text-slate-700'
+                  className={`w-full text-left border p-2.5 flex flex-col cursor-pointer transition-colors ${
+                    isSelected
+                      ? 'border-slate-900 bg-slate-900 text-white'
+                      : 'border-slate-200 text-slate-700 hover:bg-slate-50'
                   }`}
                 >
+                  {/* Baris atas: nama + badge status */}
                   <div className="flex items-center justify-between gap-2 w-full">
-                    <p className={`text-xs font-bold uppercase truncate ${isSelected ? 'text-white' : 'text-slate-800'}`}>{item.studentName}</p>
-                    <span className={`inline-flex items-center px-1.5 py-0.5 border rounded-xs text-[9px] font-mono font-bold uppercase shrink-0 ${getStatusBadgeStyle(item.status, isSelected)}`}>
+                    <p className={`text-xs font-bold uppercase truncate ${
+                      isSelected ? 'text-white' : 'text-slate-800'
+                    }`}>
+                      {item.studentName}
+                    </p>
+                    <span className={`inline-flex items-center px-1.5 py-0.5 border text-[9px] font-bold uppercase shrink-0 ${
+                      getStatusBadgeStyle(item.status, isSelected)
+                    }`}>
                       {statusLabel[item.status]}
                     </span>
                   </div>
-                  <p className={`text-[10px] font-mono mt-0.5 ${isSelected ? 'text-slate-300' : 'text-slate-400'}`}>{item.studentNis} &bull; {item.className.toUpperCase()}</p>
-                  <p className={`text-[11px] font-mono mt-1.5 truncate p-1 rounded-xs w-full ${isSelected ? 'bg-slate-800 text-slate-200' : 'bg-slate-50 text-slate-600'}`}>
-                    <span className={`text-[10px] font-bold mr-1 ${isSelected ? 'text-white' : 'text-slate-900'}`}>[{typeLabel[item.type].toUpperCase()}]</span>
+
+                  {/* NIS & kelas */}
+                  <p className={`text-[10px] mt-0.5 ${
+                    isSelected ? 'text-slate-300' : 'text-slate-400'
+                  }`}>
+                    {item.studentNis} &bull; {item.className.toUpperCase()}
+                  </p>
+
+                  {/* Subject preview */}
+                  <p className={`text-[11px] mt-1.5 truncate px-1.5 py-1 w-full ${
+                    isSelected ? 'bg-slate-800 text-slate-200' : 'bg-slate-50 text-slate-600'
+                  }`}>
+                    <span className={`text-[10px] font-bold mr-1 ${
+                      isSelected ? 'text-white' : 'text-slate-900'
+                    }`}>
+                      [{typeLabel[item.type].toUpperCase()}]
+                    </span>
                     {item.subject}
                   </p>
                 </button>
               );
             })}
+
             {filteredLetters.length === 0 && (
-              <div className="text-center py-8 border border-dashed border-slate-200 rounded">
-                <p className="text-[11px] font-mono font-bold text-slate-400 uppercase">Tidak ada surat ditemukan</p>
-                <p className="text-[10px] text-slate-400 mt-0.5 px-2">Sesuaikan filter atau tanggal arsip Anda.</p>
+              <div className="border border-dashed border-slate-300 bg-slate-50/50 py-14 text-center">
+                <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                  EMPTY_MAILBOX_FEED
+                </p>
+                <p className="mt-0.5 text-[10px] text-slate-400">
+                  Tidak ada surat sesuai filter aktif.
+                </p>
               </div>
             )}
           </div>
         </section>
 
-        {/* DETAIL PRATINJAU SURAT AKTIF (KANAN) */}
-        <section className="bg-white rounded-lg border border-slate-200 shadow-xs p-4 lg:col-span-8 w-full min-h-[380px] flex flex-col justify-between">
+        {/* PANEL KANAN — DETAIL SURAT */}
+        <section className="border border-slate-300 p-3 lg:col-span-8 min-h-[380px] flex flex-col">
+
+          {/* Section header */}
+          <div className="flex items-center gap-2 border-b border-slate-900 pb-2 mb-3 text-[10px] font-bold tracking-wider text-slate-900 uppercase">
+            <MailOpen className="h-4 w-4 text-slate-950" />
+            <span>Pratinjau Dokumen</span>
+          </div>
+
           {!selectedLetter ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
-              <div className="w-10 h-10 bg-white border border-slate-200 text-slate-400 flex items-center justify-center rounded mb-2">
-                <MailOpen className="w-4 h-4 text-slate-900" />
-              </div>
-              <h3 className="text-xs font-mono font-bold text-slate-800 uppercase">Pratinjau Dokumen</h3>
-              <p className="text-[11px] text-slate-400 mt-0.5 max-w-xs">Silakan pilih salah satu surat siswa pada daftar menu di sebelah kiri untuk melihat isi pesan secara lengkap.</p>
+            /* Empty state */
+            <div className="flex-1 flex flex-col items-center justify-center border border-dashed border-slate-300 bg-slate-50/50 py-14 text-center">
+              <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                AWAITING_DOCUMENT_SELECTION
+              </p>
+              <p className="mt-0.5 text-[10px] text-slate-400 max-w-xs">
+                Pilih salah satu surat pada panel kiri untuk melihat isi dokumen secara lengkap.
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="border-b border-slate-200 pb-3">
-                <span className="text-[9px] font-mono font-bold text-slate-900 bg-white border border-slate-900 px-1.5 py-0.5 rounded-xs uppercase">
-                  Jenis Dokumen: {typeLabel[selectedLetter.type].toUpperCase()}
+
+              {/* Meta header dokumen */}
+              <div className="border-b border-slate-300 pb-3">
+                <span className="text-[9px] font-bold text-slate-900 bg-white border border-slate-900 px-1.5 py-0.5 uppercase">
+                  Jenis: {typeLabel[selectedLetter.type].toUpperCase()}
                 </span>
-                <h2 className="text-sm font-black text-slate-900 mt-2 uppercase tracking-tight">{selectedLetter.subject}</h2>
-                
-                <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-slate-400">
+                <h2 className="text-sm font-black text-slate-900 mt-2 uppercase tracking-tight">
+                  {selectedLetter.subject}
+                </h2>
+                <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] text-slate-400">
                   <p>
-                    Siswa: <span className="text-slate-800 font-bold uppercase">{selectedLetter.studentName}</span> ({selectedLetter.studentNis}) &bull; <span className="text-slate-800 font-bold">{selectedLetter.className.toUpperCase()}</span>
+                    Siswa:{' '}
+                    <span className="text-slate-800 font-bold uppercase">
+                      {selectedLetter.studentName}
+                    </span>{' '}
+                    ({selectedLetter.studentNis}) &bull;{' '}
+                    <span className="text-slate-800 font-bold">
+                      {selectedLetter.className.toUpperCase()}
+                    </span>
                   </p>
-                  <p>Kirim: {new Date(selectedLetter.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</p>
+                  <p>
+                    Dikirim:{' '}
+                    {new Date(selectedLetter.createdAt)
+                      .toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })
+                      .toUpperCase()}
+                  </p>
                 </div>
               </div>
 
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wider">Pesan Lengkap:</span>
-                <div className="bg-slate-50/50 border border-slate-100 rounded p-3">
-                  <p className="text-xs leading-relaxed text-slate-800 font-medium whitespace-pre-line">{selectedLetter.message}</p>
+              {/* Isi pesan */}
+              <div className="space-y-1">
+                <label className="block text-[10px] font-bold uppercase tracking-wide text-slate-600">
+                  Pesan Lengkap
+                </label>
+                <div className="border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs leading-relaxed text-slate-800 whitespace-pre-line">
+                    {selectedLetter.message}
+                  </p>
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="min-w-0 font-mono">
-                  <span className="text-[9px] font-bold text-slate-400 block uppercase tracking-wider">Berkas Lampiran</span>
-                  <p className="text-xs font-bold text-slate-900 uppercase truncate">{selectedLetter.attachmentName || 'Tidak ada berkas fisik'}</p>
+              {/* Lampiran */}
+              <div className="border border-slate-300 bg-white p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
+                    Berkas Lampiran
+                  </span>
+                  <p className="text-xs font-bold text-slate-900 uppercase truncate">
+                    {selectedLetter.attachmentName || 'Tidak ada berkas fisik'}
+                  </p>
                 </div>
                 {selectedLetter.attachmentDataUrl && (
                   <a
                     href={selectedLetter.attachmentDataUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center justify-center px-2.5 py-1 bg-white border border-slate-900 hover:bg-slate-50 text-slate-900 rounded text-xs font-mono font-bold transition-all shrink-0 cursor-pointer uppercase"
+                    className="inline-flex items-center justify-center px-3 py-1.5 bg-white border border-slate-900 text-slate-900 text-[10px] font-bold uppercase shrink-0 hover:bg-slate-50 transition-colors"
                   >
                     Buka Lampiran
                   </a>
                 )}
               </div>
 
-              <div className="pt-3 border-t border-slate-200">
-                <p className="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider">Validasi Status Persetujuan:</p>
+              {/* Validasi status */}
+              <div className="pt-3 border-t border-slate-300">
+                <label className="block text-[10px] font-bold uppercase tracking-wide text-slate-600 mb-2">
+                  Validasi Status Persetujuan
+                </label>
                 <div className="flex flex-wrap gap-1.5">
                   {(['menunggu', 'disetujui', 'ditolak'] as const).map(status => {
                     const isActive = selectedLetter.status === status;
                     return (
                       <button
                         key={status}
-                        onClick={() => updateStatusSuratIzin(selectedLetter.id, status)}
-                        className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all uppercase cursor-pointer border ${
+                        type="button"
+                        onClick={() => handleUpdateStatus(selectedLetter.id, status)}
+                        className={`px-3 py-1.5 text-[10px] font-bold uppercase border cursor-pointer transition-colors ${
                           isActive
-                            ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
-                            : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                            ? 'bg-slate-900 border-slate-900 text-white'
+                            : 'bg-white border-slate-300 text-slate-500 hover:border-slate-900 hover:text-slate-900'
                         }`}
                       >
-                        {status === 'menunggu' ? 'Set Menunggu' : status === 'disetujui' ? 'Setujui' : 'Tolak'}
+                        {status === 'menunggu'
+                          ? 'Set Menunggu'
+                          : status === 'disetujui'
+                            ? 'Setujui'
+                            : 'Tolak'}
                       </button>
                     );
                   })}
                 </div>
               </div>
+
             </div>
           )}
         </section>

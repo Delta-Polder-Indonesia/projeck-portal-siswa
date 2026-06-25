@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getTeachers, getClasses, getStudentsByClass, getAttendanceByDateRange } from '../../data/store';
-import { FileText, Download, Filter, Layers } from 'lucide-react';
+import { FileText, Download, Filter } from 'lucide-react';
 
 export default function ReportPage() {
   const { user } = useAuth();
@@ -61,14 +61,13 @@ export default function ReportPage() {
     return { total, hadir, izin, sakit, alpha, percentage: total > 0 ? Math.round((hadir / total) * 100) : 0 };
   }, [reportData]);
 
-  // Transformasi gaya indikator status berbasis garis kontras arsitektural mono
   const statusClassName = (status: string) => {
     switch (status) {
       case 'hadir': return 'border-slate-900 bg-slate-900 text-white font-bold';
       case 'izin': return 'border-slate-900 bg-white text-slate-900 font-bold';
       case 'sakit': return 'border-slate-400 bg-white text-slate-600 font-bold';
-      case 'alpha': return 'border-slate-200 bg-white text-slate-300 line-through';
-      default: return 'border-slate-100 bg-slate-50/50 text-slate-300';
+      case 'alpha': return 'border-slate-300 bg-white text-slate-400 line-through';
+      default: return 'border-slate-200 bg-slate-50/50 text-slate-300';
     }
   };
 
@@ -100,48 +99,62 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
+    <div className="w-full bg-white p-4 text-xs text-slate-700 antialiased selection:bg-slate-200 space-y-4">
       
       {/* HEADER BAR */}
-      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs">
-        <h1 className="text-sm font-bold text-slate-900 tracking-tight uppercase">Laporan & Kearsipan Absensi Siswa</h1>
-        <p className="text-xs text-slate-400 mt-0.5">Kompilasi matriks kehadiran komprehensif, pelacakan histori data berkala, dan penarikan berkas log eksternal.</p>
-      </div>
+      <header className="border-b border-slate-300 pb-3">
+        <h1 className="text-base font-bold tracking-tight text-slate-950 uppercase">
+          Laporan & Kearsipan Absensi Siswa
+        </h1>
+        <p className="text-[11px] text-slate-500 mt-0.5">
+          Kompilasi matriks kehadiran komprehensif, pelacakan histori data berkala, dan penarikan berkas log eksternal.
+        </p>
+      </header>
 
       {/* FILTERS CONTROL MATRIX */}
-      <div className="bg-white rounded-lg p-4 border border-slate-200/80 shadow-xs">
-        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2 mb-3.5">
-          <Filter className="w-3 h-3 text-slate-500" />
+      <div className="border border-slate-300 p-3 bg-white">
+        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2 mb-3">
+          <Filter className="w-3 h-3 text-slate-400" />
           <span>Konfigurasi Parameter Penayangan Laporan</span>
         </div>
         <div className="flex flex-wrap gap-4 items-end justify-between">
           <div className="flex flex-wrap gap-4 items-center">
-            <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Kompartemen Kelas</label>
+            <div className="space-y-1">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600">Kompartemen Kelas</label>
               <select
                 value={selectedClass}
                 onChange={e => setSelectedClass(e.target.value)}
-                className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none cursor-pointer transition-colors min-w-[160px]"
+                className="px-2.5 py-1.5 bg-white border border-slate-300 focus:border-slate-900 text-xs font-mono font-bold text-slate-800 outline-none cursor-pointer min-w-[160px] rounded-none"
               >
                 <option value="">SELECT_CLASS...</option>
                 {classes.map(c => <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>)}
               </select>
             </div>
-            <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Batas Awal Log</label>
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors" />
+            <div className="space-y-1">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600">Batas Awal Log</label>
+              <input 
+                type="date" 
+                value={startDate} 
+                onChange={e => setStartDate(e.target.value)}
+                className="px-2.5 py-1.5 bg-white border border-slate-300 focus:border-slate-900 text-xs font-mono font-bold text-slate-800 outline-none rounded-none" 
+              />
             </div>
-            <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Batas Akhir Log</label>
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-                className="px-2.5 py-1.5 bg-white border border-slate-200 focus:border-slate-900 rounded text-xs font-mono font-bold text-slate-800 outline-none transition-colors" />
+            <div className="space-y-1">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600">Batas Akhir Log</label>
+              <input 
+                type="date" 
+                value={endDate} 
+                onChange={e => setEndDate(e.target.value)}
+                className="px-2.5 py-1.5 bg-white border border-slate-300 focus:border-slate-900 text-xs font-mono font-bold text-slate-800 outline-none rounded-none" 
+              />
             </div>
           </div>
           
           {reportData.length > 0 && (
-            <button onClick={handleExportCSV}
-              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-950 border border-slate-900 text-white rounded text-xs font-mono font-bold tracking-wide transition-colors flex items-center gap-1.5 cursor-pointer">
+            <button 
+              onClick={handleExportCSV}
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-950 border border-slate-900 text-white text-xs font-mono font-bold tracking-wide transition-colors flex items-center gap-1.5 cursor-pointer rounded-none"
+            >
               <Download className="w-3.5 h-3.5" /> EXPORT_TO_CSV
             </button>
           )}
@@ -149,9 +162,9 @@ export default function ReportPage() {
       </div>
 
       {!selectedClass ? (
-        <div className="py-24 text-center border border-dashed border-slate-200 rounded-lg bg-slate-50/40">
-          <p className="text-xs font-mono text-slate-400 uppercase tracking-wider">AWAITING_QUERY_PARAMETERS</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Tentukan parameter target kelas binaan di atas untuk memetakan visualisasi histori rekapitulasi data.</p>
+        <div className="py-24 text-center border border-dashed border-slate-300 bg-slate-50/50 rounded-none">
+          <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">AWAITING_QUERY_PARAMETERS</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Tentukan parameter target kelas binaan di atas untuk memetakan visualisasi histori rekapitulasi data.</p>
         </div>
       ) : (
         <>
@@ -165,67 +178,67 @@ export default function ReportPage() {
               { label: 'INDEXED_ALPHA', value: overallStats.alpha },
               { label: 'AVG_ATTENDANCE', value: `${overallStats.percentage}%` }
             ].map((stat, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-3 border border-slate-200 shadow-xs flex flex-col justify-between min-h-[75px]">
-                <span className="text-[9px] font-mono font-bold tracking-wider text-slate-400 border-b border-slate-50 pb-1">{stat.label}</span>
-                <p className="text-lg font-bold font-mono text-slate-900 mt-1 tracking-tight">{stat.value}</p>
+              <div key={idx} className="bg-white p-3 border border-slate-300 flex flex-col justify-between min-h-[75px] rounded-none">
+                <span className="text-[9px] font-mono font-bold tracking-wider text-slate-400 border-b border-slate-200 pb-1">{stat.label}</span>
+                <p className="text-base font-bold font-mono text-slate-900 mt-1 tracking-tight">{stat.value}</p>
               </div>
             ))}
           </div>
 
           {/* MASTER SUMMARY REKAP TABLE */}
-          <div className="bg-white rounded-lg border border-slate-200/80 shadow-xs overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-slate-200 bg-slate-50/70 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-slate-500" />
+          <div className="bg-white border border-slate-300 overflow-hidden rounded-none">
+            <div className="px-4 py-2.5 border-b border-slate-300 bg-slate-50 font-mono flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-slate-400" />
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700">Matriks Komparasi Absensi & Lembar Log Harian</span>
             </div>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
                 <thead>
-                  <tr className="bg-slate-50/30 border-b border-slate-200 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    <th className="px-3 py-2.5 w-12 text-center">NO</th>
-                    <th className="px-3 py-2.5 w-52">IDENTITAS_SISWA</th>
-                    <th className="px-3 py-2.5 w-24">NIS_CODE</th>
-                    <th className="px-2 py-2.5 w-10 text-center text-slate-800">H</th>
-                    <th className="px-2 py-2.5 w-10 text-center text-slate-800">I</th>
-                    <th className="px-2 py-2.5 w-10 text-center text-slate-800">S</th>
-                    <th className="px-2 py-2.5 w-10 text-center text-slate-800">A</th>
-                    <th className="px-2 py-2.5 w-12 text-center">TOT</th>
-                    <th className="px-3 py-2.5 w-16 text-center">%_RATE</th>
+                  <tr className="bg-slate-50 border-b border-slate-300 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    <th className="px-3 py-2.5 w-12 text-center border-r border-slate-200">NO</th>
+                    <th className="px-3 py-2.5 w-52 border-r border-slate-200">IDENTITAS_SISWA</th>
+                    <th className="px-3 py-2.5 w-24 border-r border-slate-200">NIS_CODE</th>
+                    <th className="px-2 py-2.5 w-10 text-center text-slate-900 border-r border-slate-200 bg-slate-100/50">H</th>
+                    <th className="px-2 py-2.5 w-10 text-center text-slate-800 border-r border-slate-200">I</th>
+                    <th className="px-2 py-2.5 w-10 text-center text-slate-800 border-r border-slate-200">S</th>
+                    <th className="px-2 py-2.5 w-10 text-center text-slate-800 border-r border-slate-200">A</th>
+                    <th className="px-2 py-2.5 w-12 text-center border-r border-slate-200">TOT</th>
+                    <th className="px-3 py-2.5 w-16 text-center border-r border-slate-200">%_RATE</th>
                     
                     {/* Header Tanggal Dinamis */}
                     {dates.map(d => (
-                      <th key={d} className="px-1 py-2.5 text-center text-[9px] font-bold border-l border-slate-100 w-11 text-slate-500 bg-slate-50/40">
+                      <th key={d} className="px-1 py-2.5 text-center text-[9px] font-bold border-r border-slate-200 w-11 text-slate-500 bg-slate-50/60 last:border-r-0">
                         {new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }).toUpperCase()}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-200">
                   {reportData.map((student, idx) => (
-                    <tr key={student.id} className="hover:bg-slate-50/40 transition-colors text-xs">
-                      <td className="px-3 py-2 font-mono text-slate-400 text-center">{idx + 1}</td>
-                      <td className="px-3 py-2 font-bold text-slate-900 uppercase truncate tracking-tight">{student.name}</td>
-                      <td className="px-3 py-2 font-mono text-slate-400 font-bold">{student.nis}</td>
-                      <td className="text-center px-2 py-2 font-mono font-bold text-slate-900 bg-slate-50/20">{student.hadir}</td>
-                      <td className="text-center px-2 py-2 font-mono font-bold text-slate-700">{student.izin}</td>
-                      <td className="text-center px-2 py-2 font-mono text-slate-500">{student.sakit}</td>
-                      <td className="text-center px-2 py-2 font-mono text-slate-300 line-through">{student.alpha}</td>
-                      <td className="text-center px-2 py-2 font-mono text-slate-400 font-bold border-r border-slate-100">{student.total}</td>
-                      <td className="text-center px-3 py-2">
-                        <span className={`text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded-sm border ${
+                    <tr key={student.id} className="hover:bg-slate-50/60 transition-colors text-xs">
+                      <td className="px-3 py-2 font-mono text-slate-400 text-center border-r border-slate-200">{idx + 1}</td>
+                      <td className="px-3 py-2 font-bold text-slate-900 uppercase truncate tracking-tight border-r border-slate-200">{student.name}</td>
+                      <td className="px-3 py-2 font-mono text-slate-500 font-bold border-r border-slate-200">{student.nis}</td>
+                      <td className="text-center px-2 py-2 font-mono font-bold text-slate-900 bg-slate-50/40 border-r border-slate-200">{student.hadir}</td>
+                      <td className="text-center px-2 py-2 font-mono font-bold text-slate-700 border-r border-slate-200">{student.izin}</td>
+                      <td className="text-center px-2 py-2 font-mono text-slate-600 font-bold border-r border-slate-200">{student.sakit}</td>
+                      <td className="text-center px-2 py-2 font-mono text-slate-400 line-through border-r border-slate-200">{student.alpha}</td>
+                      <td className="text-center px-2 py-2 font-mono text-slate-800 font-bold border-r border-slate-200">{student.total}</td>
+                      <td className="text-center px-3 py-2 border-r border-slate-200">
+                        <span className={`text-[9px] font-mono font-extrabold px-1.5 py-0.5 border rounded-none ${
                           student.percentage >= 80 ? 'bg-slate-900 border-slate-900 text-white' :
                           student.percentage >= 60 ? 'bg-white border-slate-900 text-slate-900' :
-                          'bg-white border-slate-200 text-slate-400 line-through'
+                          'bg-white border-slate-300 text-slate-400 line-through'
                         }`}>
                           {student.percentage}%
                         </span>
                       </td>
 
                       {/* Render Grid Log Harian Monokrom */}
-                      {dates.map(d => (
-                        <td key={d} className="text-center px-0.5 py-1.5 border-l border-slate-100/70 align-middle">
-                          <span className={`text-[9px] font-mono border w-5 h-5 inline-flex items-center justify-center rounded-sm ${statusClassName(student.dailyStatus[d] || '')}`}>
+                      {dates.map((d, dIdx) => (
+                        <td key={d} className={`text-center px-0.5 py-1.5 align-middle border-r border-slate-200 ${dIdx === dates.length - 1 ? 'border-r-0' : ''}`}>
+                          <span className={`text-[9px] font-mono border w-5 h-5 inline-flex items-center justify-center rounded-none ${statusClassName(student.dailyStatus[d] || '')}`}>
                             {statusLabel(student.dailyStatus[d] || '')}
                           </span>
                         </td>
@@ -237,7 +250,7 @@ export default function ReportPage() {
             </div>
             
             {reportData.length === 0 && (
-              <div className="py-8 text-center font-mono text-[11px] text-slate-400 uppercase">NO_LOG_DATA_FOUND_WITHIN_RANGE</div>
+              <div className="py-12 text-center font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">NO_LOG_DATA_FOUND_WITHIN_RANGE</div>
             )}
           </div>
         </>

@@ -51,7 +51,7 @@ export default function RosterPage() {
   }, [selectedDayRosters]);
 
   return (
-    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-100">
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
       
       {/* HEADER HALAMAN */}
       <header className="mb-4 pb-2 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -60,7 +60,7 @@ export default function RosterPage() {
           <p className="text-[11px] text-slate-400 mt-1 leading-none">Manajemen waktu kelas dan informasi ruang kuliah aktif Anda.</p>
         </div>
         {classRoom && (
-          <div className="text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded-sm border border-slate-200/60 self-start sm:self-auto leading-none">
+          <div className="text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded-sm border border-slate-220/60 self-start sm:self-auto leading-none">
             Kelas: <span className="text-slate-800 font-bold">{classRoom.name}</span>
           </div>
         )}
@@ -74,7 +74,7 @@ export default function RosterPage() {
               key={day.value}
               type="button"
               onClick={() => setSelectedDay(day.value)}
-              className={`px-2 py-1 rounded-sm text-xs font-medium transition-all cursor-pointer text-center leading-normal ${
+              className={`px-2 py-1 rounded-sm text-xs font-medium cursor-pointer text-center leading-normal ${
                 selectedDay === day.value
                   ? 'bg-slate-900 text-white font-bold'
                   : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
@@ -95,7 +95,7 @@ export default function RosterPage() {
           </h2>
         </div>
 
-        <div className="border border-slate-100 rounded-sm overflow-hidden shadow-sm">
+        <div className="border border-slate-100 rounded-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-xs text-left border-collapse">
               <thead>
@@ -109,7 +109,7 @@ export default function RosterPage() {
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white text-slate-600">
                 {selectedDayTableRows.map(row => (
-                  <tr key={`${selectedDay}-${row.periodLabel}`} className="hover:bg-slate-50/10 transition-colors leading-tight">
+                  <tr key={`${selectedDay}-${row.periodLabel}`} className="hover:bg-slate-50/50 leading-tight">
                     <td className="px-3 py-1.5 font-bold text-slate-900 font-mono">
                       {row.periodLabel}
                     </td>

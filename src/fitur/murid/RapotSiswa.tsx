@@ -153,7 +153,7 @@ export default function RapotSiswa() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-100">
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
       
       {/* PANEL FILTER ATAS (Normal & Compact) */}
       <div className="mb-4 pb-2 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">

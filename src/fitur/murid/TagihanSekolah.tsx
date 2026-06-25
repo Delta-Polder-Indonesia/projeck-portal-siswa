@@ -65,7 +65,6 @@ export default function TagihanSekolahPage() {
 
   const bills = useMemo(() => {
     if (!user) return [];
-    // Perbaikan typo: getTagihanSchoolBySiswa -> getTagihanSekolahBySiswa
     return getTagihanSekolahBySiswa(user.id, activeYear);
   }, [user, activeYear, storeVersion]);
 
@@ -251,7 +250,7 @@ export default function TagihanSekolahPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-50 space-y-4">
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
       
       {/* HEADER HALAMAN & RINGKASAN */}
       <section className="space-y-2.5">
@@ -269,7 +268,7 @@ export default function TagihanSekolahPage() {
                 setSelectedBillIds([]); 
                 setInfoMessage('');
               }}
-              className="border border-slate-200 rounded-sm px-2 py-0.5 text-xs font-semibold bg-white text-slate-700 cursor-pointer focus:outline-hidden hover:border-slate-300 transition-colors"
+              className="border border-slate-200 rounded-sm px-2 py-0.5 text-xs font-semibold bg-white text-slate-700 cursor-pointer focus:outline-hidden hover:border-slate-300"
             >
               {availableYears.map(year => (
                 <option key={year} value={year}>{year}</option>
@@ -302,13 +301,13 @@ export default function TagihanSekolahPage() {
           <button
             type="button"
             onClick={handleUnduhDaftarTahunanPdf}
-            className="text-[10px] font-bold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded-sm transition-colors cursor-pointer self-start sm:self-auto leading-none"
+            className="text-[10px] font-bold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded-sm cursor-pointer self-start sm:self-auto leading-none"
           >
             Unduh Laporan Tahunan (.PDF)
           </button>
         </div>
         
-        <div className="border border-slate-100 rounded-sm overflow-hidden shadow-sm">
+        <div className="border border-slate-100 rounded-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-xs text-left border-collapse">
               <thead>
@@ -327,8 +326,8 @@ export default function TagihanSekolahPage() {
                   return (
                     <tr 
                       key={item.id} 
-                      className={`transition-colors leading-tight ${
-                        isSelected ? 'bg-slate-50/70 font-semibold' : 'hover:bg-slate-50/10'
+                      className={`leading-tight ${
+                        isSelected ? 'bg-slate-50/70 font-semibold' : 'hover:bg-slate-50/50'
                       }`}
                     >
                       <td className="px-3 py-1.5 font-bold text-slate-900">{MONTH_NAMES[item.month - 1]}</td>
@@ -348,7 +347,7 @@ export default function TagihanSekolahPage() {
                           <button
                             type="button"
                             onClick={() => handleToggleSelectBill(item.id)}
-                            className={`w-[76px] py-0.5 rounded-sm text-[10px] font-bold tracking-tight transition-all text-center inline-block cursor-pointer border ${
+                            className={`w-[76px] py-0.5 rounded-sm text-[10px] font-bold tracking-tight text-center inline-block cursor-pointer border ${
                               isSelected
                                 ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600'
                                 : 'bg-white text-slate-800 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
@@ -360,7 +359,7 @@ export default function TagihanSekolahPage() {
                           <button
                             type="button"
                             onClick={() => handleUnduhBuktiPdf(item)}
-                            className="w-[76px] py-0.5 rounded-sm border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:text-slate-800 transition-colors text-center inline-block cursor-pointer text-[10px] font-bold"
+                            className="w-[76px] py-0.5 rounded-sm border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:text-slate-800 text-center inline-block cursor-pointer text-[10px] font-bold"
                           >
                             Unduh Resi
                           </button>
@@ -376,7 +375,7 @@ export default function TagihanSekolahPage() {
       </section>
 
       {/* METODE PEMBAYARAN HUB */}
-      <section className="border border-slate-100 rounded-sm p-3 space-y-3 shadow-sm">
+      <section className="border border-slate-100 rounded-sm p-3 space-y-3">
         <div className="leading-none">
           <h2 className="text-[10px] font-bold text-slate-900 uppercase tracking-wider">Kanal Gerbang Pembayaran</h2>
           <p className="text-[11px] text-slate-400 mt-1 font-medium">Pilih salah satu instrumen keuangan pembayaran sah di bawah ini.</p>
@@ -390,9 +389,9 @@ export default function TagihanSekolahPage() {
                 key={method.value}
                 type="button"
                 onClick={() => setSelectedMethod(method.value)}
-                className={`rounded-sm border p-2 text-left transition-all cursor-pointer ${
+                className={`rounded-sm border p-2 text-left cursor-pointer ${
                   isTarget
-                    ? 'border-slate-900 bg-slate-50/50 ring-1 ring-slate-900'
+                    ? 'border-slate-900 bg-slate-50/50'
                     : 'border-slate-200 hover:border-slate-300 bg-white'
                 }`}
               >
@@ -422,7 +421,7 @@ export default function TagihanSekolahPage() {
                 </span>
               </p>
             ) : (
-              <p className="text-slate-400 italic text-[11px] font-medium">Pilih satu atau several bulan pada tabel rincian di atas untuk memuat otorisasi kas.</p>
+              <p className="text-slate-400 italic text-[11px] font-medium">Pilih satu atau beberapa bulan pada tabel rincian di atas untuk memuat otorisasi kas.</p>
             )}
           </div>
           
@@ -430,7 +429,7 @@ export default function TagihanSekolahPage() {
             type="button"
             onClick={handleBayarMulti}
             disabled={billsToPay.length === 0}
-            className="px-3 py-1.5 rounded-sm bg-slate-900 text-white text-xs font-bold disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed hover:bg-black transition-all cursor-pointer self-start md:self-auto shadow-xs"
+            className="px-3 py-1.5 rounded-sm bg-slate-900 text-white text-xs font-bold disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed hover:bg-black cursor-pointer self-start md:self-auto"
           >
             Eksekusi Transaksi ({billsToPay.length})
           </button>

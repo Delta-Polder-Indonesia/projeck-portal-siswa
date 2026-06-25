@@ -16,6 +16,9 @@ export type Teacher = {
   email: string;
   classIds: string[];
   avatar?: string;
+  phone?: string;
+  whatsapp?: string;
+  address?: string;
 };
 
 export type SchoolClass = {
@@ -559,6 +562,13 @@ export function saveTeachers(nextTeachers: Teacher[]) {
   const db = readDB();
   db.teachers = nextTeachers;
   writeDB(db);
+}
+
+export function updateTeacher(teacher: Teacher) {
+  const teachers = getTeachers();
+  const idx = teachers.findIndex((t) => t.id === teacher.id);
+  if (idx >= 0) teachers[idx] = teacher;
+  saveTeachers(teachers);
 }
 
 // ==================== CLASSES ====================

@@ -94,40 +94,41 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
     };
 
     return (
-        <div className="mx-auto max-w-5xl space-y-4 rounded-sm border border-gray-200 p-3">
+        // PERUBAHAN: Menghapus border pembungkus luar, max-w, mx-auto, dan p-3 untuk desain flat & seamless
+        <div className="w-full space-y-5">
 
             {/* TWO-COLUMN LAYOUT */}
-            <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+            <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
 
                 {/* KOLOM KIRI — FORM INPUT */}
-                <div className="space-y-3">
+                <div className="space-y-4">
 
                     {/* STRIP HEADER */}
-                    <div className="border-b border-gray-200 pb-1.5">
+                    <div className="border-b border-gray-100 pb-2">
                         <h3 className="text-xs font-bold uppercase tracking-wide text-gray-800">
                             Pengumuman Admin Sekolah
                         </h3>
-                        <p className="mt-0.5 text-[10px] text-gray-500">
+                        <p className="mt-0.5 text-[10px] text-gray-400">
                             Dapat ditujukan ke semua kelas atau kelas tertentu. Mendukung teks dan foto.
                         </p>
                     </div>
 
                     {/* JUDUL */}
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                             Judul Pengumuman
                         </label>
                         <input
                             value={judulPengumumanAdmin}
                             onChange={(e) => setJudulPengumumanAdmin(e.target.value)}
                             placeholder="Judul pengumuman"
-                            className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
+                            className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-blue-500"
                         />
                     </div>
 
                     {/* ISI */}
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                             Isi Pengumuman
                         </label>
                         <textarea
@@ -135,13 +136,13 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
                             onChange={(e) => setIsiPengumumanAdmin(e.target.value)}
                             placeholder="Isi pengumuman"
                             rows={4}
-                            className="w-full resize-none rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500 leading-4"
+                            className="w-full resize-none rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-blue-500 leading-relaxed"
                         />
                     </div>
 
                     {/* TARGET SCOPE */}
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                             Tujuan Pengumuman
                         </label>
                         <select
@@ -151,33 +152,35 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
                                 setTargetPengumumanAdmin(nextValue);
                                 if (nextValue === 'all') setTargetKelasPengumumanAdmin([]);
                             }}
-                            className="w-full rounded-sm border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-blue-500"
                         >
                             <option value="all">Semua Kelas (Global)</option>
                             <option value="classes">Kelas Tertentu</option>
                         </select>
                     </div>
 
-                    {/* CHECKBOX KELAS — hanya muncul jika targetScope = classes */}
+                    {/* CHECKBOX KELAS */}
                     {targetPengumumanAdmin === 'classes' && (
-                        <div className="space-y-1.5 rounded-sm border border-gray-200 bg-gray-50/50 p-2.5">
-                            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        <div className="space-y-2 rounded-md border border-gray-100 bg-gray-50/50 p-3">
+                            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                                 Pilih Kelas Tujuan
                             </p>
-                            <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">
                                 {classes.map((item) => (
                                     <label
                                         key={item.id}
-                                        className="flex cursor-pointer items-center gap-1.5 text-[11px] text-gray-700 hover:text-gray-900"
+                                        className="flex cursor-pointer items-center gap-2 text-[11px] text-gray-600 hover:text-gray-900 select-none"
                                     >
                                         <input
                                             type="checkbox"
                                             checked={targetKelasPengumumanAdmin.includes(item.id)}
                                             onChange={() => toggleTargetKelasPengumuman(item.id)}
-                                            className="h-3 w-3 accent-gray-700"
+                                            className="h-3.5 w-3.5 rounded border-gray-300 accent-blue-600 transition-colors"
                                         />
-                                        {item.name}{' '}
-                                        <span className="text-[10px] text-gray-400">({item.grade})</span>
+                                        <span>
+                                            {item.name}{' '}
+                                            <span className="text-[10px] text-gray-400 font-mono">({item.grade})</span>
+                                        </span>
                                     </label>
                                 ))}
                             </div>
@@ -186,7 +189,7 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
 
                     {/* FOTO PENGUMUMAN */}
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        <label className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
                             Foto Pengumuman{' '}
                             <span className="font-normal normal-case text-gray-400">— opsional</span>
                         </label>
@@ -194,7 +197,7 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
                             type="file"
                             accept="image/*"
                             onChange={handlePilihFotoPengumuman}
-                            className="block w-full text-[10px] text-gray-600 file:mr-2 file:rounded-sm file:border file:border-gray-300 file:bg-white file:px-2 file:py-1 file:text-[10px] file:font-medium file:text-gray-700 file:transition-colors file:hover:bg-gray-50"
+                            className="block w-full text-[10px] text-gray-500 file:mr-2 file:rounded-md file:border file:border-gray-200 file:bg-white file:px-3 file:py-1 file:text-[10px] file:font-medium file:text-gray-600 file:transition-colors file:hover:bg-gray-50 file:cursor-pointer"
                         />
                         <p className="text-[10px] text-gray-400">
                             Foto akan tampil di dasbor kelas tujuan pengumuman.
@@ -203,14 +206,14 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
 
                     {/* PREVIEW FOTO */}
                     {fotoPengumumanDataUrl && (
-                        <div className="rounded-sm border border-gray-200 p-2">
+                        <div className="rounded-md border border-gray-100 p-2 bg-gray-50/30">
                             <img
                                 src={fotoPengumumanDataUrl}
                                 alt={fotoPengumumanNama || 'Preview foto pengumuman'}
-                                className="max-h-44 w-full rounded-sm object-cover"
+                                className="max-h-44 w-full rounded-md object-cover"
                             />
-                            <div className="mt-1.5 flex items-center justify-between gap-2">
-                                <p className="truncate text-[10px] text-gray-500">
+                            <div className="mt-2 flex items-center justify-between gap-2">
+                                <p className="truncate text-[10px] text-gray-400 font-mono">
                                     {fotoPengumumanNama || 'Foto terpilih'}
                                 </p>
                                 <button
@@ -219,7 +222,7 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
                                         setFotoPengumumanDataUrl(undefined);
                                         setFotoPengumumanNama('');
                                     }}
-                                    className="rounded-sm border border-gray-300 px-2 py-1 text-[10px] font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                                    className="rounded-md border border-gray-200 px-2.5 py-1 text-[10px] font-medium text-red-600 bg-white transition-colors hover:bg-red-50 hover:border-red-200"
                                 >
                                     Hapus Foto
                                 </button>
@@ -228,10 +231,10 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
                     )}
 
                     {/* TOMBOL PUBLIKASI */}
-                    <div className="flex justify-end border-t border-gray-200 pt-2">
+                    <div className="flex justify-end border-t border-gray-100 pt-3">
                         <button
                             onClick={handleSimpanPengumumanAdmin}
-                            className="inline-flex items-center gap-1.5 rounded-sm bg-gray-900 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-gray-800"
+                            className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-blue-700 shadow-sm"
                         >
                             <Save className="h-3.5 w-3.5" />
                             Publikasikan Pengumuman
@@ -240,19 +243,20 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
                 </div>
 
                 {/* KOLOM KANAN — RIWAYAT PENGUMUMAN */}
-                <div className="space-y-2">
-                    <div className="border-b border-gray-200 pb-1.5">
+                <div className="space-y-3">
+                    <div className="border-b border-gray-100 pb-2">
                         <p className="text-xs font-bold uppercase tracking-wide text-gray-800">
                             Riwayat Pengumuman{' '}
-                            <span className="font-normal text-gray-400">({pengumumanAdminList.length})</span>
+                            <span className="font-normal text-gray-400 font-mono">({pengumumanAdminList.length})</span>
                         </p>
                     </div>
 
-                    <div className="max-h-[520px] space-y-2 overflow-y-auto pr-0.5">
+                    {/* SCROLL CONTAINER */}
+                    <div className="max-h-[540px] space-y-2.5 overflow-y-auto pr-1 scrollbar-thin">
                         {pengumumanAdminList.map((item) => (
                             <article
                                 key={item.id}
-                                className="rounded-sm border border-gray-200 bg-white p-2.5 transition-colors hover:border-gray-300"
+                                className="rounded-md border border-gray-100 bg-white p-3 transition-shadow hover:shadow-sm"
                             >
                                 {/* Header artikel */}
                                 <div className="flex items-start justify-between gap-2">
@@ -260,35 +264,35 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
                                         <h4 className="truncate text-xs font-bold text-gray-800">
                                             {item.title}
                                         </h4>
-                                        <p className="text-[10px] text-gray-400">
+                                        <p className="text-[10px] text-gray-400 font-mono">
                                             {new Date(item.createdAt).toLocaleString('id-ID')}
                                         </p>
                                     </div>
                                     <button
                                         onClick={() => deletePengumumanAdmin(item.id)}
-                                        className="shrink-0 rounded-sm border border-red-200 p-1 text-red-600 transition-colors hover:bg-red-50"
+                                        className="shrink-0 rounded-md border border-gray-100 p-1.5 text-gray-400 transition-colors hover:text-red-600 hover:bg-red-50 hover:border-red-100"
                                         title="Hapus pengumuman"
                                     >
-                                        <Trash2 className="h-3 w-3" />
+                                        <Trash2 className="h-3.5 w-3.5" />
                                     </button>
                                 </div>
 
                                 {/* Target kelas */}
-                                <p className="mt-1 text-[10px] font-medium text-blue-700">
-                                    Tujuan:{' '}
-                                    {item.targetScope === 'classes'
-                                        ? (item.targetClassIds || [])
-                                            .map(
-                                                (classId) =>
-                                                    classes.find((c) => c.id === classId)?.name ||
-                                                    classId,
-                                            )
-                                            .join(', ')
-                                        : 'Semua kelas'}
-                                </p>
+                                <div className="mt-1.5 flex items-center">
+                                    <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
+                                        {item.targetScope === 'classes' ? 'Kelas Spesifik' : 'Semua Kelas'}
+                                    </span>
+                                    {item.targetScope === 'classes' && (
+                                        <p className="ml-1.5 truncate text-[10px] text-gray-500 font-medium">
+                                            {(item.targetClassIds || [])
+                                                .map((classId) => classes.find((c) => c.id === classId)?.name || classId)
+                                                .join(', ')}
+                                        </p>
+                                    )}
+                                </div>
 
                                 {/* Isi pesan */}
-                                <p className="mt-1 border-t border-gray-100 pt-1 text-xs text-gray-700 leading-4">
+                                <p className="mt-2 border-t border-gray-50 pt-2 text-xs text-gray-600 leading-relaxed whitespace-pre-line">
                                     {item.message}
                                 </p>
 
@@ -297,14 +301,14 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
                                     <img
                                         src={item.imageDataUrl}
                                         alt={item.imageName || item.title}
-                                        className="mt-2 h-auto w-full rounded-sm border border-gray-200 bg-gray-50 object-contain"
+                                        className="mt-2.5 h-auto w-full rounded-md border border-gray-100 bg-gray-50 object-contain max-h-32"
                                     />
                                 )}
                             </article>
                         ))}
 
                         {pengumumanAdminList.length === 0 && (
-                            <div className="rounded-sm border border-dashed border-gray-200 bg-gray-50/40 py-10 text-center">
+                            <div className="rounded-md border border-dashed border-gray-200 bg-gray-50/40 py-12 text-center">
                                 <p className="text-[10px] uppercase tracking-widest text-gray-400">
                                     — Belum ada pengumuman —
                                 </p>

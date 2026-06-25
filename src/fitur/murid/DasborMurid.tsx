@@ -88,7 +88,7 @@ export default function StudentDashboard() {
   }, [todayRosters, currentDayOfWeek]);
 
   return (
-    <div className="w-full max-w-5xl mx-auto h-full p-3 antialiased text-slate-700 bg-white">
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
 
       {/* HEADER UTAMA */}
       <header className="mb-3 flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-2 border-b border-slate-200">
@@ -101,14 +101,14 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium bg-white border border-slate-200 rounded-sm px-2 py-1 shadow-sm shrink-0 self-start sm:self-end">
+        <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium bg-white border border-slate-200 rounded-sm px-2 py-1 shrink-0 self-start sm:self-end">
           <Calendar className="w-3.5 h-3.5 text-slate-500" />
           <span>{dayNames[currentDayOfWeek]}, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
         </div>
       </header>
 
       {/* METRIK PERFORMA */}
-      <section className="mb-3 bg-white border border-slate-200 rounded-sm p-3 shadow-sm">
+      <section className="mb-3 bg-white border border-slate-200 rounded-sm p-3">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <div className="border-r border-slate-100 last:border-0 pr-2">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Rasio Hadir</span>
@@ -151,7 +151,7 @@ export default function StudentDashboard() {
               Tidak ada jadwal pelajaran pada hari Minggu.
             </div>
           ) : (
-            <div className="overflow-x-auto bg-white border border-slate-200 rounded-sm shadow-sm">
+            <div className="overflow-x-auto bg-white border border-slate-200 rounded-sm">
               <table className="w-full text-left table-fixed">
                 <thead className="bg-slate-50">
                   <tr className="border-b border-slate-200 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
@@ -205,7 +205,7 @@ export default function StudentDashboard() {
 
           <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
             {classAnnouncements.map(item => (
-              <div key={item.id} className="text-xs bg-white p-2.5 border border-slate-200 rounded-sm shadow-sm hover:shadow-md transition-shadow">
+              <div key={item.id} className="text-xs bg-white p-2.5 border border-slate-200 rounded-sm">
                 <div className="flex items-start justify-between gap-1.5 border-b border-slate-100 pb-1 mb-1">
                   <h3 className="font-bold text-slate-900 leading-tight truncate">{item.title}</h3>
                   <span className="text-[10px] font-mono font-medium text-slate-400 bg-slate-50 px-1 py-0.5 rounded-sm shrink-0">

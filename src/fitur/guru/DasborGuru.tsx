@@ -105,20 +105,27 @@ export default function DasborGuru() {
   }
 
   return (
-    /* PERUBAHAN: Mengganti 'mx-auto max-w-5xl' menjadi 'w-full' agar memenuhi layar */
-    <div className="w-full space-y-5 bg-white p-4 text-xs text-slate-700 antialiased">
-      <header className="flex items-center justify-between border-b border-slate-200 pb-3">
+    <div className="w-full bg-white p-4 text-xs text-slate-700">
+      <header className="flex items-center justify-between border-b border-slate-300 pb-3">
         <div>
-          <h1 className="text-base font-bold tracking-tight text-slate-950 uppercase">Sistem Informasi Akademik</h1>
-          <p className="text-[11px] text-slate-500">Panel ringkas untuk melihat kelas, mata pelajaran, dan ruang mengajar hari ini.</p>
+          <h1 className="text-base font-bold tracking-tight text-slate-950 uppercase">
+            Sistem Informasi Akademik
+          </h1>
+          <p className="text-[11px] text-slate-500">
+            Panel ringkas untuk melihat kelas, mata pelajaran, dan ruang mengajar hari ini.
+          </p>
         </div>
-        <div className="border-l border-slate-200 pl-4 text-right">
-          <p className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Guru Aktif</p>
-          <p className="text-sm font-bold text-slate-900">{user?.name?.toUpperCase() || '-'}</p>
+        <div className="border-l border-slate-300 pl-4 text-right">
+          <p className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+            Guru Aktif
+          </p>
+          <p className="text-sm font-bold text-slate-900">
+            {user?.name?.toUpperCase() || '-'}
+          </p>
         </div>
       </header>
 
-      <div className="grid grid-cols-2 gap-2 border-b border-slate-200 pb-4 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2 border-b border-slate-300 pb-4 pt-4 md:grid-cols-3 lg:grid-cols-6">
         {[
           { label: 'Total Siswa Binaan', value: stats.totalStudents, icon: Users, alert: false },
           { label: 'Hadir Hari Ini', value: stats.todayHadir, icon: CheckCircle, alert: false },
@@ -129,31 +136,43 @@ export default function DasborGuru() {
         ].map((card) => (
           <div
             key={card.label}
-            className={`flex min-h-[74px] flex-col justify-between rounded border p-2.5 ${
-              card.alert ? 'border-rose-200 bg-rose-50/30' : 'border-slate-200 bg-white hover:border-slate-300'
+            className={`flex min-h-[74px] flex-col justify-between border p-2.5 ${
+              card.alert ? 'border-rose-300 bg-rose-50' : 'border-slate-300 bg-white'
             }`}
           >
-            <div className={`flex items-center justify-between border-b pb-1 ${card.alert ? 'border-rose-100' : 'border-slate-100'}`}>
-              <span className={`text-[10px] font-bold tracking-wide uppercase ${card.alert ? 'text-rose-600' : 'text-slate-500'}`}>{card.label}</span>
-              <card.icon className={`h-3.5 w-3.5 ${card.alert ? 'text-rose-500' : 'text-slate-400'}`} />
+            <div className={`flex items-center justify-between border-b pb-1 ${
+              card.alert ? 'border-rose-200' : 'border-slate-200'
+            }`}>
+              <span className={`text-[10px] font-bold tracking-wide uppercase ${
+                card.alert ? 'text-rose-700' : 'text-slate-600'
+              }`}>
+                {card.label}
+              </span>
+              <card.icon className={`h-3.5 w-3.5 ${
+                card.alert ? 'text-rose-600' : 'text-slate-500'
+              }`} />
             </div>
             <div className="mt-1 text-center">
-              <p className={`text-lg font-black tracking-tight ${card.alert ? 'text-rose-700' : 'text-slate-900'}`}>{card.value}</p>
+              <p className={`text-lg font-black tracking-tight ${
+                card.alert ? 'text-rose-800' : 'text-slate-900'
+              }`}>
+                {card.value}
+              </p>
             </div>
           </div>
         ))}
       </div>
 
-      <section className="space-y-3">
+      <section className="space-y-3 pt-4">
         <div className="flex items-center gap-2 border-b border-slate-900 pb-2 text-xs font-bold tracking-wider text-slate-900 uppercase">
           <Calendar className="h-4 w-4 text-slate-950" />
           <span>Informasi Kelas Mengajar Hari Ini & Modul RPS</span>
         </div>
 
-        <div className="overflow-x-auto rounded border border-slate-200 shadow-sm">
+        <div className="overflow-x-auto border border-slate-300">
           <table className="w-full min-w-[700px] border-collapse bg-white text-left">
             <thead>
-              <tr className="border-b border-slate-300 bg-slate-50 text-[10px] font-bold tracking-wider text-slate-600 uppercase">
+              <tr className="border-b border-slate-300 bg-slate-100 text-[10px] font-bold tracking-wider text-slate-700 uppercase">
                 <th className="w-12 p-3 text-center">No.</th>
                 <th className="p-3">Mata Pelajaran / Kelas</th>
                 <th className="w-32 p-3">Ruang</th>
@@ -164,27 +183,31 @@ export default function DasborGuru() {
             </thead>
             <tbody className="divide-y divide-slate-200">
               {jadwalMengajar.map((item) => (
-                <tr key={`${item.classId}-${item.mataPelajaran}-${item.waktu}`} className="transition-colors hover:bg-slate-50/80">
-                  <td className="bg-slate-50/50 p-3 text-center font-semibold text-slate-500">{item.no}</td>
+                <tr key={`${item.classId}-${item.mataPelajaran}-${item.waktu}`}>
+                  <td className="bg-slate-50 p-3 text-center font-semibold text-slate-600">
+                    {item.no}
+                  </td>
                   <td className="space-y-1 p-3">
-                    <p className="text-sm font-bold tracking-tight text-slate-900">{item.mataPelajaran}</p>
-                    <p className="inline-block rounded border border-blue-100 bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
+                    <p className="text-sm font-bold tracking-tight text-slate-900">
+                      {item.mataPelajaran}
+                    </p>
+                    <p className="inline-block border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
                       Kelas : {item.className}
                     </p>
                   </td>
                   <td className="p-3 font-medium">
                     <div className="flex items-center gap-1 text-slate-700">
-                      <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                      <MapPin className="h-3.5 w-3.5 text-slate-500" />
                       <span>{item.ruang}</span>
                     </div>
                   </td>
                   <td className="p-3 font-semibold text-slate-800">{item.hari}</td>
-                  <td className="p-3 font-mono font-medium tracking-tight text-slate-600">{item.waktu}</td>
+                  <td className="p-3 font-mono font-medium tracking-tight text-slate-700">{item.waktu}</td>
                   <td className="p-3 text-center">
                     <button
                       type="button"
                       onClick={() => setSelectedSchedule(item)}
-                      className="inline-flex cursor-pointer items-center gap-1 rounded bg-slate-900 px-3 py-1.5 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm transition-all hover:bg-slate-800"
+                      className="inline-flex items-center gap-1 border border-slate-900 bg-slate-900 px-3 py-1.5 text-[10px] font-bold tracking-wider text-white uppercase"
                     >
                       <BookOpen className="h-3 w-3" />
                       <span>RPS</span>
@@ -194,7 +217,7 @@ export default function DasborGuru() {
               ))}
               {jadwalMengajar.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-xs text-slate-400">
+                  <td colSpan={6} className="p-8 text-center text-xs text-slate-500">
                     Tidak ada jadwal mengajar hari ini.
                   </td>
                 </tr>
@@ -204,7 +227,11 @@ export default function DasborGuru() {
         </div>
       </section>
 
-      {notice ? <p className="rounded border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-700">{notice}</p> : null}
+      {notice ? (
+        <p className="mt-4 border border-emerald-300 bg-emerald-50 p-2 text-xs text-emerald-700">
+          {notice}
+        </p>
+      ) : null}
     </div>
   );
 }

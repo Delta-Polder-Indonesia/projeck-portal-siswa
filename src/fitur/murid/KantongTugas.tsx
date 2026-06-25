@@ -87,7 +87,7 @@ export default function TaskPouchPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-3 py-4 antialiased text-slate-600 bg-white selection:bg-slate-100">
+    <div className="space-y-4 max-w-[1400px] mx-auto p-2 antialiased text-slate-600 bg-white selection:bg-slate-200">
       
       {/* HEADER HALAMAN */}
       <header className="mb-4 pb-2 border-b border-slate-100">

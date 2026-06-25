@@ -161,8 +161,14 @@ export default function PanelAdminModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/55 sm:p-2 flex items-center justify-center">
-      <div className="flex h-full w-full flex-col overflow-hidden bg-white shadow-2xl sm:h-[98dvh] sm:w-[98vw] sm:max-w-7xl sm:rounded-xl sm:border sm:border-gray-200">
+    // Mengubah penataan luar agar benar-benar menempel ke tepi layar (menghapus sm:p-2)
+    <div className="fixed inset-0 z-50 bg-black/55 flex items-center justify-center">
+      {/* PERUBAHAN UTAMA:
+        - Menggunakan `h-screen w-screen` atau `h-dvh w-screen` agar mutlak memenuhi viewport.
+        - Menghapus batas lebar desktop (`sm:max-w-7xl`), `sm:h-[98dvh]`, `sm:w-[98vw]`.
+        - Menghapus `sm:rounded-xl` dan `sm:border` agar tidak ada lengkungan/border di pinggir.
+      */}
+      <div className="flex h-dvh w-screen flex-col overflow-hidden bg-white shadow-2xl">
 
         {/* COMPACT HEADER */}
         {!authorized ? (
@@ -251,8 +257,9 @@ export default function PanelAdminModal({
 
         {/* CONTENT AREA */}
         {!authorized ? (
-          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-            <div className="max-w-sm mx-auto border border-gray-200 bg-white shadow-sm rounded-xl p-5 space-y-4 mt-10">
+          <div className="flex-1 overflow-y-auto p-6 bg-gray-50 flex items-center justify-center">
+            {/* Form Login diposisikan di tengah layar saat belum ter-autorisasi */}
+            <div className="w-full max-w-sm border border-gray-200 bg-white shadow-sm rounded-xl p-5 space-y-4">
               <div className="flex flex-col items-center gap-1 text-center mb-6">
                 <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-1">
                   <ShieldCheck className="w-5 h-5" />
