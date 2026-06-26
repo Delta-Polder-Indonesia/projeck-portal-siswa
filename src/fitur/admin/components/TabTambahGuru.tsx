@@ -1,10 +1,7 @@
 import { useState, useMemo } from 'react';
 import { UserPlus } from 'lucide-react';
 import { useStoreVersion } from '../../../hooks/useStoreVersion';
-import {
-    getClasses, getTeachers, saveClasses, saveTeachers
-} from '../../../data/store';
-import { Teacher } from '../../../types';
+import { Teacher, getClasses, getTeachers, saveClasses, saveTeachers } from '../../../data/store';
 import { applyExclusiveClassAssignment } from './utils';
 
 export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) => void }) {

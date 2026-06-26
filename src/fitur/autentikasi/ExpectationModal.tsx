@@ -151,7 +151,7 @@ export default function ExpectationModal({ open, onClose }: ExpectationModalProp
                                 <div className="flex gap-4 items-start bg-gray-50 p-3 border border-gray-300">
                                     <div className="w-20 h-24 bg-gray-200 border border-gray-400 flex-shrink-0 overflow-hidden grayscale">
                                         <img
-                                            src={`${import.meta.env.BASE_URL}images/kepala-sekolah.jpg`}
+                                            src={`${import.meta.env.BASE_URL}images/pegawai/kepala-sekolah.jpg`}
                                             alt="Foto Kepala Sekolah"
                                             className="w-full h-full object-cover"
                                             onError={(e) => {

@@ -98,6 +98,42 @@ export type PPDBApplication = {
   tanggalLahir: string;
   jenisKelamin: string;
   alamatLengkap: string;
+};
+
+// ── Perpustakaan (BARU) ──────────────────────────────────────────────────
+export type Book = {
+  id: string;
+  isbn?: string;
+  title: string;
+  author: string;
+  category: string;
+  publisher: string;
+  rack: string;
+  stock: number;
+  available: number;
+  coverImage?: string;
+};
+
+export type LibraryMember = {
+  id: string;
+  name: string;
+  memberType: 'siswa' | 'guru' | 'staf';
+  joinedAt: number;
+};
+
+export type LibraryTransaction = {
+  id: string;
+  bookId: string;
+  memberId: string;
+  memberName: string;
+  borrowDate: string; // YYYY-MM-DD
+  returnDate?: string; // YYYY-MM-DD
+  status: 'dipinjam' | 'dikembalikan' | 'terlambat' | 'menunggu' | 'disetujui' | 'ditolak';
+  dueDate: string; // YYYY-MM-DD
+  note?: string;
+};
+
+export type PPDBApplicationExtended = PPDBApplication & {
   desaKelurahan: string;
   kecamatan: string;
   kabupatenKota: string;
@@ -298,6 +334,10 @@ type Database = {
   classRosters: ClassRoster[];
   classAnnouncements: ClassAnnouncement[];
   onlineAssignments: OnlineAssignment[];
+  // Library
+  books: Book[];
+  libraryMembers: LibraryMember[];
+  libraryTransactions: LibraryTransaction[];
   messages: Message[];
   attendance: AttendanceRecord[];
   tasks: Task[];
@@ -344,6 +384,20 @@ export interface HasilPulihkanCadangan {
 }
 
 // ==================== CORE ====================
+
+// ==================== UTILS ====================
+
+/**
+ * Simulasi hashing password sederhana untuk demo/local storage.
+ * Dalam produksi sesungguhnya, gunakan bcrypt/argon2 di server.
+ */
+export async function hashPassword(plain: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(plain + 'sekolah_salt'); // Simple salt
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 function notifyStoreUpdated() {
   storeVersion += 1;
@@ -428,6 +482,30 @@ const initialData: Database = {
   classRosters: [],
   classAnnouncements: [],
   onlineAssignments: [],
+  books: [
+    {
+      id: 'b1',
+      title: 'Laskar Pelangi',
+      author: 'Andrea Hirata',
+      category: 'Fiksi',
+      publisher: 'Bentang Pustaka',
+      rack: 'A1',
+      stock: 5,
+      available: 5,
+    },
+    {
+      id: 'b2',
+      title: 'Bumi Manusia',
+      author: 'Pramoedya Ananta Toer',
+      category: 'Fiksi Sejarah',
+      publisher: 'Lentera Dipantara',
+      rack: 'A2',
+      stock: 3,
+      available: 2,
+    }
+  ],
+  libraryMembers: [],
+  libraryTransactions: [],
   messages: [
     {
       id: 'm1',
@@ -484,18 +562,15 @@ function readDB(): Database {
     return {
       ...initialData,
       ...parsed,
-      teachers: (parsed.teachers ?? initialData.teachers).map((teacher, index) => ({
-        ...initialData.teachers[index % initialData.teachers.length],
+      teachers: (parsed.teachers ?? initialData.teachers).map((teacher) => ({
         ...teacher,
         classIds: teacher.classIds ?? [],
       })),
-      classes: (parsed.classes ?? initialData.classes).map((classItem, index) => ({
-        ...initialData.classes[index % initialData.classes.length],
+      classes: (parsed.classes ?? initialData.classes).map((classItem) => ({
         ...classItem,
         grade: classItem.grade ?? 'X',
       })),
-      students: (parsed.students ?? initialData.students).map((student, index) => ({
-        ...initialData.students[index % initialData.students.length],
+      students: (parsed.students ?? initialData.students).map((student) => ({
         ...student,
         gender: student.gender === 'P' ? 'P' : 'L',
       })),
@@ -723,6 +798,116 @@ export function getAttendance() {
 export function saveAttendance(nextAttendance: AttendanceEntry[]) {
   const db = readDB();
   db.attendances = nextAttendance;
+  writeDB(db);
+}
+
+// ==================== LIBRARY (ENHANCED) ====================
+
+export function getBooks() {
+  return readDB().books;
+}
+
+export function saveBooks(nextBooks: Book[]) {
+  const db = readDB();
+  db.books = nextBooks;
+  writeDB(db);
+}
+
+export function getLibraryTransactions() {
+  return readDB().libraryTransactions;
+}
+
+export function saveLibraryTransactions(nextTx: LibraryTransaction[]) {
+  const db = readDB();
+  db.libraryTransactions = nextTx;
+  writeDB(db);
+}
+
+export function borrowBook(bookId: string, memberId: string, memberName: string, borrowDate: string, dueDate: string) {
+  const db = readDB();
+  const book = db.books.find(b => b.id === bookId);
+  if (!book) return { ok: false, message: 'Buku tidak ditemukan.' };
+  if (book.available <= 0) return { ok: false, message: 'Stok buku habis.' };
+
+  const tx: LibraryTransaction = {
+    id: `TX-${Date.now()}`,
+    bookId,
+    memberId,
+    memberName,
+    borrowDate,
+    dueDate,
+    status: 'menunggu'
+  };
+
+  db.libraryTransactions.push(tx);
+  writeDB(db);
+  return { ok: true, message: 'Permohonan pinjaman berhasil diajukan. Menunggu konfirmasi admin.' };
+}
+
+export function approveLibraryLoan(txId: string) {
+  const db = readDB();
+  const tx = db.libraryTransactions.find(t => t.id === txId);
+  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
+  if (tx.status !== 'menunggu') return { ok: false, message: 'Buku sudah diproses sebelumnya.' };
+
+  const book = db.books.find(b => b.id === tx.bookId);
+  if (!book) return { ok: false, message: 'Buku tidak ditemukan.' };
+  if (book.available <= 0) return { ok: false, message: 'Stok buku habis.' };
+
+  book.available -= 1;
+  tx.status = 'disetujui';
+  writeDB(db);
+  return { ok: true, message: 'Peminjaman disetujui.' };
+}
+
+export function rejectLibraryLoan(txId: string, note = '') {
+  const db = readDB();
+  const tx = db.libraryTransactions.find(t => t.id === txId);
+  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
+
+  tx.status = 'ditolak';
+  tx.note = note;
+  writeDB(db);
+  return { ok: true, message: 'Peminjaman ditolak.' };
+}
+
+export function returnBook(txId: string, returnDate: string) {
+  const db = readDB();
+  const tx = db.libraryTransactions.find(t => t.id === txId);
+  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
+  if (tx.status === 'dikembalikan') return { ok: false, message: 'Buku sudah dikembalikan.' };
+
+  const book = db.books.find(b => b.id === tx.bookId);
+  if (book) book.available += 1;
+
+  tx.returnDate = returnDate;
+  tx.status = 'dikembalikan';
+  writeDB(db);
+  return { ok: true, message: 'Buku berhasil dikembalikan.' };
+}
+
+export function addOrUpdateBook(book: Book) {
+  const db = readDB();
+  const idx = db.books.findIndex(b => b.id === book.id);
+  if (idx >= 0) {
+    db.books[idx] = book;
+  } else {
+    db.books.push(book);
+  }
+  writeDB(db);
+}
+
+export function deleteBook(id: string) {
+  saveBooks(getBooks().filter(b => b.id !== id));
+}
+
+export function getLibraryMembers(): LibraryMember[] {
+  return readDB().libraryMembers;
+}
+
+export function saveLibraryMembers(nextMembers: LibraryMember[]) {
+  const db = readDB();
+  db.libraryMembers = nextMembers;
   writeDB(db);
 }
 

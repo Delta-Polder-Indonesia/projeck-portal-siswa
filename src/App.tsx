@@ -7,7 +7,6 @@ import Sidebar from './layout/Sidebar';
 import DasborGuru from './fitur/guru/DasborGuru';
 import HalamanAbsensi from './fitur/guru/HalamanAbsensi';
 import HalamanLaporan from './fitur/guru/HalamanLaporan';
-import AturRosterGuru from './fitur/guru/AturRosterGuru';
 import AturPengumumanGuru from './fitur/guru/AturPengumumanGuru';
 import AturTugasOnlineGuru from './fitur/guru/AturTugasOnlineGuru';
 import ProfilGuru from './fitur/guru/ProfilGuru';
@@ -49,7 +48,6 @@ function AppContent() {
     dashboard: DasborGuru,
     attendance: HalamanAbsensi,
     report: HalamanLaporan,
-    'roster-settings': AturRosterGuru,
     'announcement-settings': AturPengumumanGuru,
     'assignment-settings': AturTugasOnlineGuru,
     'letters-teacher': KotakSuratGuru,

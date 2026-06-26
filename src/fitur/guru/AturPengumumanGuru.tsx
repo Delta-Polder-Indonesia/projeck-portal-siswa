@@ -41,6 +41,7 @@ export default function AturPengumumanGuru() {
       classId: selectedClassId,
       title: title.trim(),
       message: message.trim(),
+      content: message.trim(), // alias for compatibility
       createdBy: user.id,
       createdAt: Date.now(),
     });

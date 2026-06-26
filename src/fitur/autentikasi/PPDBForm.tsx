@@ -5,9 +5,12 @@ import { submitPPDBApplication } from '../../data/store';
 
 type PPDBFormProps = {
   onBack: () => void;
+  // Tambahan untuk mode modal langsung
+  isModal?: boolean;
+  onClose?: () => void;
 };
 
-export default function PPDBForm({ onBack }: PPDBFormProps) {
+export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormProps) {
   // 1. STATE MANAGEMENT CONTROL WIZARD
   const [currentStep, setCurrentStep] = useState<number>(1);
 
@@ -151,17 +154,28 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
     alert(
       `Pendaftaran Berhasil Terkirim!\nNomor Registrasi: ${application.registrationNo}\nSilakan cek status di admin/tata usaha.`,
     );
-    onBack();
+    
+    // Jika mode modal, tutup modal setelah submit
+    if (isModal && onClose) {
+      onClose();
+    } else {
+      onBack();
+    }
   };
 
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
-  return (
-    /* KONTROL STRUKTUR GITHUB STYLE LAYOUT:
-      Menghilangkan pembatasan max-width (max-w-none) dan menyamakan padding horizontal (px-4 sm:px-6) 
-      agar pas mentok dan presisi mengikuti layout TutorialModal.
-    */
+  // Handler untuk tombol tutup/kembali
+  const handleClose = () => {
+    if (isModal && onClose) {
+      onClose();
+    } else {
+      onBack();
+    }
+  };
+
+  const formContent = (
     <div className="w-full">
       
       {/* Header Form */}
@@ -173,10 +187,9 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
           </p>
         </div>
         
-        {/* Tombol Tutup disamakan style-nya dengan yang ada pada TutorialModal */}
         <button
           type="button"
-          onClick={onBack}
+          onClick={handleClose}
           className="p-2.5 rounded-xl border-2 border-gray-300 text-gray-500 bg-white font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer hover:bg-gray-50 snap-none"
         >
           <X className="h-3.5 w-3.5" /> Tutup
@@ -624,4 +637,18 @@ export default function PPDBForm({ onBack }: PPDBFormProps) {
       </form>
     </div>
   );
+
+  // Jika mode modal, bungkus dengan container fullscreen
+  if (isModal) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-white font-serif text-gray-900 overflow-y-auto">
+        <div className="relative w-full px-8 py-8 max-[600px]:px-4">
+          {formContent}
+        </div>
+      </div>
+    );
+  }
+
+  // Mode inline (di dalam ExpectationModal)
+  return formContent;
 }

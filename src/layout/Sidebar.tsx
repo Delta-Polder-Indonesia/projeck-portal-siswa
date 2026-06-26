@@ -27,8 +27,8 @@ import { useState } from 'react';
 interface SidebarProps {
   activePage: string;
   onNavigate: (page: string) => void;
-  collapsed: boolean;          
-  onToggleCollapse: () => void; 
+  collapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 export default function Sidebar({ activePage, onNavigate, collapsed: sidebarCollapsed, onToggleCollapse: setSidebarCollapsed }: SidebarProps) {
@@ -42,42 +42,41 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
   const menuSections = [
     {
       title: "MENU UTAMA",
-      items: isTeacher 
+      items: isTeacher
         ? [
-            { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }, 
-            { id: 'attendance', label: 'Input Absensi', icon: ClipboardCheck }
-          ]
+          { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+          { id: 'attendance', label: 'Input Absensi', icon: ClipboardCheck }
+        ]
         : [
-            { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }, 
-            { id: 'roster', label: 'Roster Kelas', icon: ClipboardCheck }, 
-            { id: 'history', label: 'Riwayat Absensi', icon: Calendar }
-          ]
+          { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+          { id: 'roster', label: 'Roster Kelas', icon: ClipboardCheck },
+          { id: 'history', label: 'Riwayat Absensi', icon: Calendar }
+        ]
     },
     {
       title: "AKADEMIK & TUGAS",
       items: isTeacher
         ? [
-            { id: 'roster-settings', label: 'Atur Roster', icon: BookOpen }, 
-            { id: 'assignment-settings', label: 'Atur Tugas Online', icon: Briefcase }, 
-            { id: 'rapot-input', label: 'Input Rapot', icon: BookOpenCheck },
-            { id: 'report', label: 'Laporan', icon: BarChart3 }
-          ]
+          { id: 'assignment-settings', label: 'Atur Tugas Online', icon: Briefcase },
+          { id: 'rapot-input', label: 'Input Rapot', icon: BookOpenCheck },
+          { id: 'report', label: 'Laporan', icon: BarChart3 }
+        ]
         : [
-            { id: 'tasks', label: 'Kantong Tugas', icon: Briefcase }, 
-            { id: 'rapot', label: 'Rapot Saya', icon: BookOpenCheck }, 
-            { id: 'billing', label: 'Tagihan Sekolah', icon: WalletCards }
-          ]
+          { id: 'tasks', label: 'Kantong Tugas', icon: Briefcase },
+          { id: 'rapot', label: 'Rapot Saya', icon: BookOpenCheck },
+          { id: 'billing', label: 'Tagihan Sekolah', icon: WalletCards }
+        ]
     },
     {
       title: "KOMUNIKASI",
-      items: isTeacher 
+      items: isTeacher
         ? [
-            { id: 'letters-teacher', label: 'Kotak Surat', icon: Mail }, 
-            { id: 'announcement-settings', label: 'Atur Pengumuman', icon: Megaphone }
-          ]
+          { id: 'letters-teacher', label: 'Kotak Surat', icon: Mail },
+          { id: 'announcement-settings', label: 'Atur Pengumuman', icon: Megaphone }
+        ]
         : [
-            { id: 'letters-student', label: 'Kirim Surat', icon: Mail }
-          ]
+          { id: 'letters-student', label: 'Kirim Surat', icon: Mail }
+        ]
     }
   ];
 
@@ -115,7 +114,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-2">
             {section.title}
           </p>
-          
+
           {section.items.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
@@ -123,11 +122,10 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
               <button
                 key={item.id}
                 onClick={() => { onNavigate(item.id); setMobileOpen(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  isActive
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
                     ? activeColor
                     : 'text-gray-600 hover:text-sky-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <Icon className="w-5 h-5" />
                 <span className="truncate">{item.label}</span>
@@ -173,8 +171,8 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
                     }
                   }}
                   className={`p-2 rounded-lg transition-all mx-0.5 ${isActive
-                      ? 'bg-white/20 text-white'
-                      : 'text-sky-100 hover:bg-white/15 hover:text-white'
+                    ? 'bg-white/20 text-white'
+                    : 'text-sky-100 hover:bg-white/15 hover:text-white'
                     }`}
                   title={item.label}
                 >
@@ -183,7 +181,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
               );
             })}
           </div>
-        
+
 
           <div className="flex items-center gap-1 ml-auto">
             <button
@@ -286,9 +284,8 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
 
       {/* DESKTOP SIDEBAR */}
       <aside
-        className={`hidden md:flex md:flex-col bg-white border-r border-gray-200 min-h-[calc(100vh-3.5rem)] fixed left-0 top-14 bottom-0 z-30 transition-all duration-300 ${
-          sidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-64 opacity-100'
-        }`}
+        className={`hidden md:flex md:flex-col bg-white border-r border-gray-200 min-h-[calc(100vh-3.5rem)] fixed left-0 top-14 bottom-0 z-30 transition-all duration-300 ${sidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-64 opacity-100'
+          }`}
       >
         {sidebarContent}
       </aside>

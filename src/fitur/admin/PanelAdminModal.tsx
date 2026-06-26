@@ -1,318 +1,288 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ChangeEvent } from 'react';
-import { X, ShieldCheck } from 'lucide-react';
+import { useState, useMemo, Suspense } from 'react';
+import PerpusDashboard from './AdminPerpustakaan/PerpusDashboard';
+import PerpusInventori from './AdminPerpustakaan/PerpusInventori';
+import PerpusMasterData from './AdminPerpustakaan/PerpusMasterData';
+import PerpusTransaksi from './AdminPerpustakaan/PerpusTransaksi';
+import PerpusDetailBuku from './AdminPerpustakaan/PerpusDetailBuku';
 import {
-  getCadanganDataAplikasi,
-  getRingkasanPenyimpananBrowser,
-  hapusSemuaFotoPengumumanAdmin,
-  kompresUlangSemuaFotoTersimpan,
-  pulihkanDataAplikasiDariCadangan,
-} from '../../data/store';
+    Building2,
+    UserPlus,
+    Users,
+    CreditCard,
+    Megaphone,
+    BookOpen,
+    Library,
+    LayoutDashboard,
+    Box,
+    Database,
+    ArrowLeftRight,
+    ChevronRight,
+    UserCheck,
+    CalendarDays
+} from 'lucide-react';
+import TabKelolaKelas from './components/TabKelolaKelas';
+import TabTambahGuru from './components/TabTambahGuru';
+import TabAkunGuru from './components/TabAkunGuru';
+import TabTagihanSekolah from './components/TabTagihanSekolah';
+import TabPengumumanAdmin from './components/TabPengumumanAdmin';
+import TabAkunSiswa from './components/TabAkunSiswa';
+import InboxPPDBAdmin from './InboxPPDBAdmin';
+import TabKelolaRoster from './components/TabKelolaRoster';
+import { getTeachers, getClasses } from '../../data/store';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
-import AdminGuruPanel from './AdminGuruPanel';
-import AdminSiswaPanel from './AdminSiswaPanel';
 
-interface PanelAdminModalProps {
-  open: boolean;
-  onClose: () => void;
-  scope: 'teacher' | 'student';
-  preAuthorized?: boolean;
+// ── Tab IDs ────────────────────────────────────────────────────────────────
+type TeacherAdminTab =
+    | 'kelas'
+    | 'tambah-guru'
+    | 'akun-guru'
+    | 'tagihan'
+    | 'pengumuman-admin'
+    | 'akun-siswa'
+    | 'tambah-siswa'
+    | 'kelola-roster'
+    | 'perpus-dashboard'
+    | 'perpus-inventori'
+    | 'perpus-master-anggota'
+    | 'perpus-master-buku'
+    | 'perpus-master-kategori'
+    | 'perpus-master-penerbit'
+    | 'perpus-master-rak'
+    | 'perpus-transaksi-pinjam'
+    | 'perpus-transaksi-kembali'
+    | 'perpus-detail';
+
+interface AdminGuruPanelProps {
+    setNotice?: (msg: string) => void;
+    scope: 'teacher' | 'student';
+    open?: boolean;
+    onClose?: () => void;
+    preAuthorized?: boolean;
 }
 
-const ADMIN_CREDENTIAL = {
-  teacher: { username: 'adm_guru', password: 'admin123' },
-  student: { username: 'adm_siswa', password: 'admin123' },
-} as const;
+// ── Unified Menu Master ──────────────────────────────────────────────────
+const MENU_MASTER = [
+    { id: 'kelas', label: 'Kelola Kelas', icon: Building2 },
+    { id: 'akun-guru', label: 'Daftar Guru', icon: Users },
+    { id: 'tambah-guru', label: 'Tambah Guru', icon: UserPlus },
+    { id: 'akun-siswa', label: 'Daftar Siswa', icon: UserCheck },
+    { id: 'tambah-siswa', label: 'Inbox PPDB', icon: BookOpen },
+    { id: 'kelola-roster', label: 'Kelola Roster', icon: CalendarDays },
+    { id: 'tagihan', label: 'Tagihan SPP', icon: CreditCard },
+    { id: 'pengumuman-admin', label: 'Pengumuman', icon: Megaphone },
+] as const;
 
-export default function PanelAdminModal({
-  open,
-  onClose,
-  scope,
-  preAuthorized = false,
-}: PanelAdminModalProps) {
-  const storeVersion = useStoreVersion();
-  const [authorized, setAuthorized] = useState(preAuthorized);
-  const [adminUser, setAdminUser] = useState<string>(
-    scope === 'teacher' ? ADMIN_CREDENTIAL.teacher.username : ADMIN_CREDENTIAL.student.username
-  );
-  const [adminPass, setAdminPass] = useState('');
-  const [authError, setAuthError] = useState('');
-  const [notice, setNotice] = useState('');
+const MENU_PERPUS = [
+    { id: 'perpus-dashboard', label: 'Dashboard Perpus', icon: LayoutDashboard },
+    { id: 'perpus-inventori', label: 'Inventori Buku', icon: Box },
+    { id: 'perpus-master-anggota', label: 'Data Anggota', icon: Database },
+    { id: 'perpus-transaksi-pinjam', label: 'Peminjaman', icon: ArrowLeftRight },
+    { id: 'perpus-transaksi-kembali', label: 'Pengembalian', icon: ArrowLeftRight },
+] as const;
 
-  const [sedangKompresFoto, setSedangKompresFoto] = useState(false);
-  const [sedangPulihkanCadangan, setSedangPulihkanCadangan] = useState(false);
-  const inputCadanganRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!open) {
-      setAuthorized(false);
-      setAdminPass('');
-      setAuthError('');
-      setNotice('');
-      return;
-    }
-    setAuthorized(preAuthorized);
-    setAdminUser(
-      scope === 'teacher' ? ADMIN_CREDENTIAL.teacher.username : ADMIN_CREDENTIAL.student.username
+// ── Helper: render grup menu ─────────────────────────────────────────
+function MenuRenderer({
+    items,
+    activeTab,
+    onSelect,
+}: {
+    items: readonly { id: string; label: string; icon: any }[];
+    activeTab: TeacherAdminTab;
+    onSelect: (id: string) => void;
+}) {
+    return (
+        <nav className="space-y-0.5">
+            {items.map((menu) => {
+                const isActive = activeTab === menu.id;
+                return (
+                    <button
+                        key={menu.id}
+                        onClick={() => onSelect(menu.id)}
+                        className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-all ${isActive
+                            ? 'bg-blue-50 text-blue-600 font-bold'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                            }`}
+                    >
+                        <menu.icon
+                            className={`h-4 w-4 shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-400'
+                                }`}
+                        />
+                        <span className="flex-1 truncate text-[11px] tracking-wide">
+                            {menu.label}
+                        </span>
+                    </button>
+                );
+            })}
+        </nav>
     );
-  }, [open, preAuthorized, scope]);
+}
 
-  const handleAdminLogin = () => {
-    const expected = scope === 'teacher' ? ADMIN_CREDENTIAL.teacher : ADMIN_CREDENTIAL.student;
-    if (adminUser.trim() === expected.username && adminPass === expected.password) {
-      setAuthorized(true);
-      setAuthError('');
-      return;
-    }
-    setAuthError('Akun admin tidak valid.');
-  };
+// ── Komponen utama ────────────────────────────────────────────────────────
+export default function AdminMasterPanel({ setNotice, open, onClose, preAuthorized: _preAuthorized }: AdminGuruPanelProps) {
+    const storeVersion = useStoreVersion();
+    const [activeTab, setActiveTab] = useState<TeacherAdminTab>('kelas');
+    const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
-  const handleUnduhCadanganData = () => {
-    try {
-      const payload = getCadanganDataAplikasi();
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = `cadangan-data-absensi-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
-      URL.revokeObjectURL(url);
-      setNotice('Cadangan data berhasil diunduh.');
-    } catch {
-      setNotice('Gagal mengunduh cadangan data. Coba lagi.');
-    }
-  };
+    const teachers = useMemo(() => getTeachers(), [storeVersion]);
+    const classes = useMemo(() => getClasses(), [storeVersion]);
 
-  const handleHapusMassalFotoPengumuman = () => {
-    const confirmed = window.confirm(
-      'Hapus semua foto pada pengumuman admin? Teks pengumuman tetap tersimpan.'
+    const teacherCountByClass = useMemo(() => {
+        const countMap = new Map<string, number>();
+        classes.forEach((item) => {
+            countMap.set(item.id, item.teacherId ? 1 : 0);
+        });
+        return countMap;
+    }, [classes]);
+
+    const filledClassCount = Array.from(teacherCountByClass.values()).filter((v) => v > 0).length;
+
+    const isPerpusTab = activeTab.startsWith('perpus-');
+
+    const handleViewDetail = (bookId: string) => {
+        setSelectedBookId(bookId);
+        setActiveTab('perpus-detail' as TeacherAdminTab);
+    };
+
+    const handleBackToInventori = () => {
+        setSelectedBookId(null);
+        setActiveTab('perpus-inventori');
+    };
+
+    const activeMenu = [...MENU_MASTER, ...MENU_PERPUS].find((m) => m.id === activeTab);
+
+    const [localNotice, setLocalNotice] = useState('');
+    const notice = localNotice;
+    const handleNotice = (msg: string) => { setNotice?.(msg); setLocalNotice(msg); };
+
+    const isModal = open !== undefined;
+    if (isModal && !open) return null;
+
+    const panel = (
+        <section className="flex h-full w-full overflow-hidden bg-white">
+
+            {/* ══ SUB-SIDEBAR ══════════════════════════════════════════════ */}
+            <aside className="scrollbar-hide flex h-full max-h-full w-48 shrink-0 flex-col justify-between overflow-y-auto border-r border-gray-100 bg-white p-4">
+                <div className="space-y-5">
+                    <div className="flex flex-col gap-0.5">
+                        <h2 className="text-sm font-black tracking-tighter text-blue-800 uppercase">
+                            Admin Master
+                        </h2>
+                        <p className="text-[9px] font-bold text-blue-400 tracking-widest uppercase">
+                            Portal Kendali Pusat
+                        </p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <p className="px-3 mb-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Akademik & Master</p>
+                            <div className="px-2">
+                                <MenuRenderer items={MENU_MASTER} activeTab={activeTab} onSelect={(id) => setActiveTab(id as TeacherAdminTab)} />
+                            </div>
+                        </div>
+
+                        <div>
+                            <p className="px-3 mb-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Perpustakaan</p>
+                            <div className="px-2">
+                                <MenuRenderer items={MENU_PERPUS} activeTab={activeTab} onSelect={(id) => setActiveTab(id as TeacherAdminTab)} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* KPI Ringkasan */}
+                    <div className="space-y-1.5 border-t border-gray-100 pt-4">
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            Ringkasan Data
+                        </p>
+                        {[
+                            { label: 'Total Guru', value: teachers.length },
+                            { label: 'Total Kelas', value: classes.length },
+                            { label: 'Kelas Terisi', value: filledClassCount },
+                        ].map((kpi) => (
+                            <div key={kpi.label} className="flex items-center justify-between py-0.5">
+                                <span className="text-[11px] text-gray-500">{kpi.label}</span>
+                                <span className="text-[11px] font-bold tabular-nums text-gray-800">
+                                    {kpi.value}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </aside>
+
+            {/* ══ KONTEN UTAMA ═════════════════════════════════════════════ */}
+            <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-white">
+
+                {/* Breadcrumb */}
+                <div className="flex shrink-0 items-center gap-1.5 border-b border-gray-100 bg-white px-5 py-3">
+                    <span className="text-[11px] font-medium text-gray-400">Panel Admin</span>
+                    <ChevronRight className="h-3 w-3 text-gray-300" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-gray-700">
+                        {isPerpusTab ? 'Perpustakaan' : activeMenu?.label || '—'}
+                    </span>
+                    {isPerpusTab && activeMenu && (
+                        <>
+                            <ChevronRight className="h-3 w-3 text-gray-300" />
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
+                                {activeMenu.label}
+                            </span>
+                        </>
+                    )}
+                </div>
+
+                {/* Tab Content */}
+                <div className="flex-1 w-full overflow-y-auto p-5 bg-[#f4f6f9]">
+                    {activeTab === 'kelas' && <TabKelolaKelas setNotice={handleNotice} />}
+                    {activeTab === 'tambah-guru' && <TabTambahGuru setNotice={handleNotice} />}
+                    {activeTab === 'akun-guru' && <TabAkunGuru setNotice={handleNotice} />}
+                    {activeTab === 'tagihan' && <TabTagihanSekolah setNotice={handleNotice} scope="teacher" />}
+                    {activeTab === 'pengumuman-admin' && <TabPengumumanAdmin setNotice={handleNotice} scope="teacher" />}
+                    {activeTab === 'akun-siswa' && <TabAkunSiswa setNotice={handleNotice} />}
+                    {activeTab === 'tambah-siswa' && <InboxPPDBAdmin setNotice={handleNotice} />}
+                    {activeTab === 'kelola-roster' && <TabKelolaRoster setNotice={handleNotice} />}
+
+                    {/* Menu Perpustakaan (BARU) */}
+                    <Suspense fallback={
+                        <div className="flex items-center justify-center h-64">
+                            <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
+                        </div>
+                    }>
+                        {activeTab === 'perpus-dashboard' && <PerpusDashboard />}
+                        {activeTab === 'perpus-inventori' && <PerpusInventori onViewDetail={handleViewDetail} />}
+                        {(activeTab.startsWith('perpus-master-')) && (
+                            <PerpusMasterData activeSubTab={activeTab.replace('perpus-master-', '')} />
+                        )}
+                        {(activeTab.startsWith('perpus-transaksi-')) && (
+                            <PerpusTransaksi
+                                activeSubTab={activeTab.replace('perpus-transaksi-', '') as 'pinjam' | 'kembali'}
+                            />
+                        )}
+                        {activeTab === 'perpus-detail' && (
+                            <PerpusDetailBuku bookId={selectedBookId} onBack={handleBackToInventori} />
+                        )}
+                    </Suspense>
+                    {notice && (
+                        <div className="fixed bottom-4 right-4 z-50 bg-green-600 text-white text-xs px-4 py-2 rounded shadow-lg">
+                            {notice}
+                        </div>
+                    )}
+                </div>
+            </main>
+        </section>
     );
-    if (!confirmed) return;
 
-    const removedCount = hapusSemuaFotoPengumumanAdmin();
-    setNotice(`Pembersihan selesai. ${removedCount} foto pengumuman dihapus.`);
-  };
-
-  const handleBukaPemulihanCadangan = () => {
-    inputCadanganRef.current?.click();
-  };
-
-  const handlePilihFileCadangan = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const confirmed = window.confirm(
-      'Pemulihan cadangan akan menimpa data saat ini. Pastikan Anda sudah mengunduh cadangan terbaru. Lanjutkan?'
-    );
-
-    if (!confirmed) {
-      event.target.value = '';
-      return;
-    }
-
-    setSedangPulihkanCadangan(true);
-    try {
-      const content = await file.text();
-      const result = pulihkanDataAplikasiDariCadangan(content);
-      setNotice(result.pesan);
-    } catch {
-      setNotice('Gagal membaca file cadangan. Pastikan file dapat diakses.');
-    } finally {
-      setSedangPulihkanCadangan(false);
-      event.target.value = '';
-    }
-  };
-
-  const handleKompresUlangFoto = async () => {
-    if (sedangKompresFoto) return;
-    const confirmed = window.confirm(
-      'Kompres ulang semua foto tersimpan (avatar, lampiran gambar, foto pengumuman)?'
-    );
-    if (!confirmed) return;
-
-    setSedangKompresFoto(true);
-    try {
-      const summary = await kompresUlangSemuaFotoTersimpan();
-      setNotice(
-        `Kompres selesai. Ditemukan ${summary.totalDitemukan} foto, berhasil ${summary.totalBerhasil}, gagal ${summary.totalGagal}.`
-      );
-    } catch {
-      setNotice('Proses kompres gagal. Coba lagi beberapa saat.');
-    } finally {
-      setSedangKompresFoto(false);
-    }
-  };
-
-  const ringkasanPenyimpanan = useMemo(
-    () => getRingkasanPenyimpananBrowser(),
-    [storeVersion, open]
-  );
-
-  const formatMb = (bytes: number) => `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-  const statusPenyimpanan =
-    ringkasanPenyimpanan.usedPercent >= 90
-      ? 'kritis'
-      : ringkasanPenyimpanan.usedPercent >= 75
-        ? 'peringatan'
-        : 'aman';
-
-  if (!open) return null;
-
-  return (
-    // Mengubah penataan luar agar benar-benar menempel ke tepi layar (menghapus sm:p-2)
-    <div className="fixed inset-0 z-50 bg-black/55 flex items-center justify-center">
-      {/* PERUBAHAN UTAMA:
-        - Menggunakan `h-screen w-screen` atau `h-dvh w-screen` agar mutlak memenuhi viewport.
-        - Menghapus batas lebar desktop (`sm:max-w-7xl`), `sm:h-[98dvh]`, `sm:w-[98vw]`.
-        - Menghapus `sm:rounded-xl` dan `sm:border` agar tidak ada lengkungan/border di pinggir.
-      */}
-      <div className="flex h-dvh w-screen flex-col overflow-hidden bg-white shadow-2xl">
-
-        {/* COMPACT HEADER */}
-        {!authorized ? (
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50 shrink-0">
-            <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">
-              {scope === 'teacher' ? 'Admin Guru' : 'Admin Siswa'}
-            </h2>
-            <button onClick={onClose} className="p-1.5 rounded-md text-gray-500 hover:bg-gray-200">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        ) : (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3 py-2 border-b border-gray-200 bg-gray-50 shrink-0 gap-2 sm:gap-0">
-            <div className="flex items-center justify-between sm:justify-start gap-4">
-              <h2 className="text-[13px] font-bold text-gray-800 uppercase tracking-wide">
-                {scope === 'teacher' ? 'Admin Guru' : 'Admin Siswa'}
-              </h2>
-
-              {/* Memori Bar in Header */}
-              <div className="flex items-center gap-2 border-l border-gray-300 pl-3">
-                <span className="text-[10px] font-medium text-gray-500 hidden sm:inline">
-                  Memori: {formatMb(ringkasanPenyimpanan.usedBytes)}
-                </span>
-                <div
-                  className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden"
-                  title={`${ringkasanPenyimpanan.usedPercent}% terpakai`}
+    if (isModal) {
+        return (
+            <div className="fixed inset-0 z-[100] flex items-stretch bg-white">
+                <button
+                    onClick={onClose}
+                    className="absolute top-3 right-4 z-10 text-xs text-gray-500 hover:text-red-600 border border-gray-200 px-3 py-1 rounded-lg bg-white shadow"
                 >
-                  <div
-                    className={`h-full ${statusPenyimpanan === 'kritis' ? 'bg-red-500' : statusPenyimpanan === 'peringatan' ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                    style={{ width: `${ringkasanPenyimpanan.usedPercent}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Close Button Mobile */}
-              <button onClick={onClose} className="p-1 sm:hidden rounded text-red-500 hover:bg-red-50 flex-shrink-0">
-                <X className="w-4 h-4" />
-              </button>
+                    ✕ Tutup Panel Admin
+                </button>
+                {panel}
             </div>
+        );
+    }
 
-            {/* Action Buttons in Header */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
-              <input ref={inputCadanganRef} type="file" accept=".json" onChange={handlePilihFileCadangan} className="hidden" />
-              <button
-                type="button"
-                onClick={handleUnduhCadanganData}
-                className="px-2 py-1 text-[10px] font-medium border border-gray-300 rounded bg-white text-gray-700 hover:bg-gray-50 whitespace-nowrap shadow-sm transition-colors"
-              >
-                Simpan Backup
-              </button>
-              <button
-                type="button"
-                onClick={handleBukaPemulihanCadangan}
-                disabled={sedangPulihkanCadangan}
-                className="px-2 py-1 text-[10px] font-medium border border-emerald-300 rounded bg-white text-emerald-700 hover:bg-emerald-50 whitespace-nowrap shadow-sm transition-colors"
-              >
-                {sedangPulihkanCadangan ? 'Memulihkan...' : 'Restore'}
-              </button>
-              {scope === 'teacher' && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleHapusMassalFotoPengumuman}
-                    className="px-2 py-1 text-[10px] font-medium border border-amber-300 rounded bg-white text-amber-700 hover:bg-amber-50 whitespace-nowrap shadow-sm transition-colors"
-                  >
-                    Clear Foto
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleKompresUlangFoto}
-                    disabled={sedangKompresFoto}
-                    className="px-2 py-1 text-[10px] font-medium border border-blue-300 rounded bg-white text-blue-700 hover:bg-blue-50 whitespace-nowrap shadow-sm transition-colors"
-                  >
-                    {sedangKompresFoto ? 'Kompresi...' : 'Kompres'}
-                  </button>
-                </>
-              )}
-
-              {/* Close Button Desktop */}
-              <button onClick={onClose} className="hidden sm:flex p-1 ml-1 rounded text-red-500 hover:bg-red-50 flex-shrink-0 transition-colors">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* CONTENT AREA */}
-        {!authorized ? (
-          <div className="flex-1 overflow-y-auto p-6 bg-gray-50 flex items-center justify-center">
-            {/* Form Login diposisikan di tengah layar saat belum ter-autorisasi */}
-            <div className="w-full max-w-sm border border-gray-200 bg-white shadow-sm rounded-xl p-5 space-y-4">
-              <div className="flex flex-col items-center gap-1 text-center mb-6">
-                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-1">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-gray-800">Verifikasi Admin</h3>
-                <p className="text-[11px] text-gray-500 leading-tight">
-                  {scope === 'teacher' ? 'Login sebagai admin guru' : 'Login sebagai admin siswa'}
-                </p>
-              </div>
-              <div>
-                <input
-                  type="text"
-                  placeholder="Nama Pengguna"
-                  value={adminUser}
-                  onChange={(e) => setAdminUser(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <input
-                  type="password"
-                  placeholder="Kata Sandi"
-                  value={adminPass}
-                  onChange={(e) => setAdminPass(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              {authError && <p className="text-xs text-red-600 text-center">{authError}</p>}
-              <button
-                onClick={handleAdminLogin}
-                className="w-full py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors mt-2"
-              >
-                Login
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex-1 flex flex-col overflow-hidden bg-white">
-            {notice && (
-              <div className="px-3 py-1.5 bg-emerald-50 border-b border-emerald-100 flex items-center justify-center shrink-0">
-                <p className="text-[11px] text-emerald-700 font-medium">{notice}</p>
-              </div>
-            )}
-            <div className="flex-1 overflow-hidden h-full">
-              {scope === 'teacher' ? (
-                <AdminGuruPanel setNotice={setNotice} scope={scope} />
-              ) : (
-                <AdminSiswaPanel setNotice={setNotice} scope={scope} />
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    return panel;
 }

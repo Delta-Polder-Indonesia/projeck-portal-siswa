@@ -61,7 +61,8 @@ export interface ClassAnnouncement {
   id: string;
   classId: string;
   title: string;
-  message: string;
+  message?: string; // alias for content
+  content?: string; // alias for message
   createdBy: string;
   createdAt: number;
 }
@@ -155,4 +156,36 @@ export interface AuthUser {
   name: string;
   role: UserRole;
   avatar?: string;
+}
+
+// ── Perpustakaan ────────────────────────────────────────────────────────
+export interface Book {
+  id: string;
+  isbn?: string;
+  title: string;
+  author: string;
+  category: string;
+  publisher: string;
+  rack: string;
+  stock: number;
+  available: number;
+  coverImage?: string;
+}
+
+export interface LibraryMember {
+  id: string; // usually maps to student ID or custom ID
+  name: string;
+  memberType: 'siswa' | 'guru' | 'staf';
+  joinedAt: number;
+}
+
+export interface LibraryTransaction {
+  id: string;
+  bookId: string;
+  memberId: string;
+  memberName: string;
+  borrowDate: string; // YYYY-MM-DD
+  returnDate?: string; // YYYY-MM-DD
+  status: 'dipinjam' | 'dikembalikan' | 'terlambat';
+  dueDate: string; // YYYY-MM-DD
 }

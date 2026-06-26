@@ -1,5 +1,5 @@
 // TutorialModal.tsx
-import { BookOpen, GraduationCap, User, AlertCircle, X, Info } from 'lucide-react';
+import { BookOpen, GraduationCap, User, Shield, X, Info } from 'lucide-react';
 
 interface TutorialModalProps {
     open: boolean;
@@ -10,20 +10,15 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
     if (!open) return null;
 
     return (
-        /* Menggunakan w-full, max-w-none, dan menyamakan padding horizontal (px-4 sm:px-6) agar pas mentok kanan-kiri */
         <div className="fixed inset-0 z-[100] flex flex-col bg-white font-serif text-gray-900 w-full max-w-none overflow-hidden">
             {/* Content Area (Scrollable) */}
             <div className="flex-1 overflow-y-auto px-4 pt-2 pb-8 sm:px-6">
-                {/* Memastikan pembungkus dalam bertindak sebagai container penuh tanpa batasan lebar tengah */}
                 <div className="relative w-full max-w-none">
-                    
-                    {/* Banner / Judul Utama Gaya Koran - Menyatu di Paling Atas */}
-                    {/* Ditambahkan kelas 'relative' dan disesuaikan padding agar tombol pas di samping */}
-                    <div className="relative text-center pb-5 mb-6 border-b-4 border-double border-gray-900 pt-14 md:pt-10"> 
-                        
-                        {/* TOMBOL TUTUP (SEJAJAR DENGAN JUDUL UTAMA) */}
+
+                    {/* Banner / Judul Utama */}
+                    <div className="relative text-center pb-5 mb-6 border-b-4 border-double border-gray-900 pt-14 md:pt-10">
                         <div className="absolute top-14 md:top-10 right-0 z-10">
-                            <button 
+                            <button
                                 onClick={onClose}
                                 className="p-2.5 rounded-xl border-2 border-gray-300 text-gray-500 bg-white font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer hover:bg-gray-50"
                                 title="Tutup Halaman"
@@ -62,7 +57,7 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                                 Langkah 1: Penentuan Peran Pengguna
                             </h4>
                             <p className="text-sm leading-relaxed text-gray-700 pl-4 border-l-2 border-gray-900">
-                                Pada halaman muka sistem, Anda diwajibkan untuk memilih salah satu dari dua kategori peran yang tersedia, yaitu <span className="font-bold">Guru</span> atau <span className="font-bold">Siswa</span>. Klik tombol pembagi yang sesuai dengan status keanggotaan aktif Anda di lingkungan sekolah. 
+                                Pada halaman muka sistem, Anda diwajibkan untuk memilih salah satu dari dua kategori peran yang tersedia, yaitu <span className="font-bold">Guru</span> atau <span className="font-bold">Siswa</span>. Klik tombol pembagi yang sesuai dengan status keanggotaan aktif Anda di lingkungan sekolah.
                                 <span className="italic block text-xs text-gray-600 mt-1">*Catatan: Kekeliruan dalam memilih peran akan menyebabkan kegagalan sistem pengenalan identitas.</span>
                             </p>
                         </div>
@@ -73,17 +68,27 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                                 Langkah 2: Pengisian Kredensial Resmi
                             </h4>
                             <p className="text-sm leading-relaxed text-gray-700 mb-2 pl-4 border-l-2 border-gray-900">
-                                Setelah peran ditentukan, isilah kolom kosong yang tersedia dengan nomor identitas resmi. Bagi tenaga pendidik (<span className="font-bold">Guru</span>), gunakan Nomor Induk Pegawai (NIP) masing-masing. Sedangkan bagi seluruh <span className="font-bold">Siswa</span>, diwajibkan menggunakan Nomor Induk Siswa (NIS) yang terdaftar pada lembar administrasi pusat.
+                                Setelah peran ditentukan, isilah kolom kosong yang tersedia dengan nomor identitas resmi. Bagi tenaga pendidik (<span className="font-bold">Guru</span>), gunakan Nomor Induk Pegawai (NIP). Bagi <span className="font-bold">Siswa</span>, gunakan Nomor Induk Siswa (NIS) atau Kode Unik yang terdaftar.
+                            </p>
+                        </div>
+
+                        {/* Langkah Tambahan: Integrasi Perpustakaan */}
+                        <div className="text-justify bg-emerald-50/50 p-2 border border-emerald-100 rounded">
+                            <h4 className="font-bold text-sm uppercase font-sans text-emerald-900 mb-1 flex items-center gap-2">
+                                <BookOpen className="w-4 h-4" /> Integrasi Akun Perpustakaan
+                            </h4>
+                            <p className="text-sm leading-relaxed text-emerald-800 pl-4 border-l-2 border-emerald-900">
+                                Akun perpustakaan kini telah <span className="font-bold">terintegrasi</span> dengan portal utama. Anda tidak perlu mendaftar ulang. Gunakan <span className="font-bold">Password yang sama</span> dengan portal utama untuk mengakses layanan perpustakaan digital.
                             </p>
                         </div>
 
                         {/* Langkah 3 */}
                         <div className="text-justify">
                             <h4 className="font-bold text-sm uppercase font-sans text-gray-900 mb-1">
-                                Langkah 3: Pernyataan Masuk Sistem
+                                Langkah 3: Pernyataan Masuk & Bantuan
                             </h4>
                             <p className="text-sm leading-relaxed text-gray-700 pl-4 border-l-2 border-gray-900">
-                                Pastikan kembali seluruh digit angka dan kombinasi kata sandi terisi dengan benar tanpa spasi tambahan. Tekan tombol <span className="font-bold uppercase font-sans text-xs border border-gray-900 px-1">Masuk</span> untuk mengirimkan perintah validasi data ke server pusat. Jika sesuai, Anda akan langsung dialihkan menuju bilah instrumen utama.
+                                Tekan tombol <span className="font-bold uppercase font-sans text-xs border border-gray-900 px-1">Masuk</span> untuk validasi. Jika Anda mengalami kendala login atau lupa password, silakan hubungi petugas Tata Usaha untuk reset kata sandi.
                             </p>
                         </div>
                     </div>
@@ -96,39 +101,103 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                         <p className="text-xs text-gray-600 italic mb-4">
                             *Tabel di bawah ini memuat data akun percontohan guna keperluan pengujian sistem oleh pihak internal:
                         </p>
-                        
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm border-collapse border-t-2 border-b-2 border-gray-950 font-sans">
-                                <thead>
-                                    <tr className="border-b border-gray-900 uppercase text-xs font-bold text-gray-700">
-                                        <th className="py-2 pr-4">Klasifikasi Peran</th>
-                                        <th className="py-2 pr-4">Nama Pengguna (Username)</th>
-                                        <th className="py-2 text-right">Kata Sandi (Password)</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-300">
-                                    <tr>
-                                        <td className="py-2.5 font-bold text-gray-900">A. Tenaga Pendidik (Guru)</td>
-                                        <td className="py-2.5 font-mono text-xs">198501012010011001</td>
-                                        <td className="py-2.5 font-mono text-xs text-right">guru123</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2.5 font-bold text-gray-900">B. Siswa Aktif</td>
-                                        <td className="py-2.5 font-mono text-xs">2024001</td>
-                                        <td className="py-2.5 font-mono text-xs text-right">siswa123</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2.5 font-bold text-gray-900">C. Administrator Guru</td>
-                                        <td className="py-2.5 font-mono text-xs">adm_guru</td>
-                                        <td className="py-2.5 font-mono text-xs text-right">admin123</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2.5 font-bold text-gray-900">D. Administrator Siswa</td>
-                                        <td className="py-2.5 font-mono text-xs">adm_siswa</td>
-                                        <td className="py-2.5 font-mono text-xs text-right">admin123</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+
+                        {/* A. ADMIN MASTER */}
+                        <div className="mb-5">
+                            <h4 className="text-sm font-bold uppercase font-sans text-amber-800 mb-2 flex items-center gap-2">
+                                <Shield className="w-4 h-4" /> A. Administrator Master
+                            </h4>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm border-collapse border-t-2 border-b-2 border-amber-700 font-sans">
+                                    <thead>
+                                        <tr className="border-b border-amber-700 uppercase text-xs font-bold text-amber-900 bg-amber-50">
+                                            <th className="py-2 pr-4">Peran</th>
+                                            <th className="py-2 pr-4">Username</th>
+                                            <th className="py-2 text-right">Password</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td className="py-2.5 font-bold text-gray-900">Admin Master</td>
+                                            <td className="py-2.5 font-mono text-xs">admin_master</td>
+                                            <td className="py-2.5 font-mono text-xs text-right">admin_master_123</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1 italic">
+                                *Cara login: Pilih peran Guru atau Siswa, lalu masukkan username & password di atas.
+                            </p>
+                        </div>
+
+                        {/* B. GURU */}
+                        <div className="mb-5">
+                            <h4 className="text-sm font-bold uppercase font-sans text-blue-800 mb-2 flex items-center gap-2">
+                                <GraduationCap className="w-4 h-4" /> B. Tenaga Pendidik (Guru)
+                            </h4>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm border-collapse border-t-2 border-b-2 border-blue-700 font-sans">
+                                    <thead>
+                                        <tr className="border-b border-blue-700 uppercase text-xs font-bold text-blue-900 bg-blue-50">
+                                            <th className="py-2 pr-4">Nama</th>
+                                            <th className="py-2 pr-4">NIP (Username)</th>
+                                            <th className="py-2 text-right">Password</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-300">
+                                        <tr>
+                                            <td className="py-2.5 font-bold text-gray-900">Bapak Andi Pratama</td>
+                                            <td className="py-2.5 font-mono text-xs">198501012010011001</td>
+                                            <td className="py-2.5 font-mono text-xs text-right">guru123</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-2.5 font-bold text-gray-900">Ibu Rina Kartika</td>
+                                            <td className="py-2.5 font-mono text-xs">198701022012012002</td>
+                                            <td className="py-2.5 font-mono text-xs text-right">guru123</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-2.5 font-bold text-gray-900">Bapak Dedi Saputra</td>
+                                            <td className="py-2.5 font-mono text-xs">198901032014013003</td>
+                                            <td className="py-2.5 font-mono text-xs text-right">guru123</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* C. SISWA */}
+                        <div className="mb-5">
+                            <h4 className="text-sm font-bold uppercase font-sans text-emerald-800 mb-2 flex items-center gap-2">
+                                <User className="w-4 h-4" /> C. Siswa Aktif
+                            </h4>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm border-collapse border-t-2 border-b-2 border-emerald-700 font-sans">
+                                    <thead>
+                                        <tr className="border-b border-emerald-700 uppercase text-xs font-bold text-emerald-900 bg-emerald-50">
+                                            <th className="py-2 pr-4">Nama</th>
+                                            <th className="py-2 pr-4">NIS (Username)</th>
+                                            <th className="py-2 text-right">Password</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-300">
+                                        <tr>
+                                            <td className="py-2.5 font-bold text-gray-900">Siti Rahma</td>
+                                            <td className="py-2.5 font-mono text-xs">2024001</td>
+                                            <td className="py-2.5 font-mono text-xs text-right">siswa123</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-2.5 font-bold text-gray-900">Budi Santoso</td>
+                                            <td className="py-2.5 font-mono text-xs">2024002</td>
+                                            <td className="py-2.5 font-mono text-xs text-right">siswa123</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="py-2.5 font-bold text-gray-900">Nabila Putri</td>
+                                            <td className="py-2.5 font-mono text-xs">2024003</td>
+                                            <td className="py-2.5 font-mono text-xs text-right">siswa123</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -152,7 +221,7 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                         </div>
                     </div>
 
-                    {/* Catatan Kaki Kecil */}
+                    {/* Catatan Kaki */}
                     <p className="text-center text-[11px] text-gray-500 font-sans italic pt-4">
                         Layanan Bantuan Terintegrasi • Sekretariat SMP Negeri 1 Majenang
                     </p>
