@@ -11,7 +11,6 @@ import {
     CreditCard,
     Megaphone,
     BookOpen,
-    Library,
     LayoutDashboard,
     Box,
     Database,
@@ -72,6 +71,38 @@ const MENU_MASTER = [
     { id: 'pengumuman-admin', label: 'Pengumuman', icon: Megaphone },
 ] as const;
 
+// ── Grup sidebar kiri: hanya untuk tampilan ──────────────────────────────
+const MENU_MASTER_GROUPS = [
+    {
+        title: 'Akademik',
+        items: [
+            { id: 'kelas', label: 'Kelola Kelas', icon: Building2 },
+            { id: 'kelola-roster', label: 'Kelola Roster', icon: CalendarDays },
+        ],
+    },
+    {
+        title: 'Guru',
+        items: [
+            { id: 'akun-guru', label: 'Daftar Guru', icon: Users },
+            { id: 'tambah-guru', label: 'Tambah Guru', icon: UserPlus },
+        ],
+    },
+    {
+        title: 'Siswa',
+        items: [
+            { id: 'akun-siswa', label: 'Daftar Siswa', icon: UserCheck },
+            { id: 'tambah-siswa', label: 'Inbox PPDB', icon: BookOpen },
+        ],
+    },
+    {
+        title: 'Administrasi',
+        items: [
+            { id: 'tagihan', label: 'Tagihan SPP', icon: CreditCard },
+            { id: 'pengumuman-admin', label: 'Pengumuman', icon: Megaphone },
+        ],
+    },
+] as const;
+
 const MENU_PERPUS = [
     { id: 'perpus-dashboard', label: 'Dashboard Perpus', icon: LayoutDashboard },
     { id: 'perpus-inventori', label: 'Inventori Buku', icon: Box },
@@ -80,7 +111,7 @@ const MENU_PERPUS = [
     { id: 'perpus-transaksi-kembali', label: 'Pengembalian', icon: ArrowLeftRight },
 ] as const;
 
-// ── Helper: render grup menu ─────────────────────────────────────────
+// ── Helper: render grup menu ─────────────────────────────────────────────
 function MenuRenderer({
     items,
     activeTab,
@@ -98,14 +129,16 @@ function MenuRenderer({
                     <button
                         key={menu.id}
                         onClick={() => onSelect(menu.id)}
-                        className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-all ${isActive
-                            ? 'bg-blue-50 text-blue-600 font-bold'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                            }`}
+                        className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-all ${
+                            isActive
+                                ? 'bg-blue-50 text-blue-600 font-bold'
+                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
                     >
                         <menu.icon
-                            className={`h-4 w-4 shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-400'
-                                }`}
+                            className={`h-4 w-4 shrink-0 ${
+                                isActive ? 'text-blue-600' : 'text-gray-400'
+                            }`}
                         />
                         <span className="flex-1 truncate text-[11px] tracking-wide">
                             {menu.label}
@@ -118,7 +151,12 @@ function MenuRenderer({
 }
 
 // ── Komponen utama ────────────────────────────────────────────────────────
-export default function AdminMasterPanel({ setNotice, open, onClose, preAuthorized: _preAuthorized }: AdminGuruPanelProps) {
+export default function AdminMasterPanel({
+    setNotice,
+    open,
+    onClose,
+    preAuthorized: _preAuthorized,
+}: AdminGuruPanelProps) {
     const storeVersion = useStoreVersion();
     const [activeTab, setActiveTab] = useState<TeacherAdminTab>('kelas');
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
@@ -152,20 +190,22 @@ export default function AdminMasterPanel({ setNotice, open, onClose, preAuthoriz
 
     const [localNotice, setLocalNotice] = useState('');
     const notice = localNotice;
-    const handleNotice = (msg: string) => { setNotice?.(msg); setLocalNotice(msg); };
+    const handleNotice = (msg: string) => {
+        setNotice?.(msg);
+        setLocalNotice(msg);
+    };
 
     const isModal = open !== undefined;
     if (isModal && !open) return null;
 
     const panel = (
         <section className="flex h-full w-full overflow-hidden bg-white">
-
             {/* ══ SUB-SIDEBAR ══════════════════════════════════════════════ */}
             <aside className="scrollbar-hide flex h-full max-h-full w-48 shrink-0 flex-col justify-between overflow-y-auto border-r border-gray-100 bg-white p-4">
                 <div className="space-y-5">
                     <div className="flex flex-col gap-0.5">
                         <h2 className="text-sm font-black tracking-tighter text-blue-800 uppercase">
-                            Admin Master
+                            Tata usaha
                         </h2>
                         <p className="text-[9px] font-bold text-blue-400 tracking-widest uppercase">
                             Portal Kendali Pusat
@@ -173,17 +213,31 @@ export default function AdminMasterPanel({ setNotice, open, onClose, preAuthoriz
                     </div>
 
                     <div className="space-y-4">
-                        <div>
-                            <p className="px-3 mb-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Akademik & Master</p>
-                            <div className="px-2">
-                                <MenuRenderer items={MENU_MASTER} activeTab={activeTab} onSelect={(id) => setActiveTab(id as TeacherAdminTab)} />
+                        {MENU_MASTER_GROUPS.map((group) => (
+                            <div key={group.title}>
+                                <p className="px-3 mb-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                    {group.title}
+                                </p>
+                                <div className="px-2">
+                                    <MenuRenderer
+                                        items={group.items}
+                                        activeTab={activeTab}
+                                        onSelect={(id) => setActiveTab(id as TeacherAdminTab)}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        ))}
 
                         <div>
-                            <p className="px-3 mb-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Perpustakaan</p>
+                            <p className="px-3 mb-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                Perpustakaan
+                            </p>
                             <div className="px-2">
-                                <MenuRenderer items={MENU_PERPUS} activeTab={activeTab} onSelect={(id) => setActiveTab(id as TeacherAdminTab)} />
+                                <MenuRenderer
+                                    items={MENU_PERPUS}
+                                    activeTab={activeTab}
+                                    onSelect={(id) => setActiveTab(id as TeacherAdminTab)}
+                                />
                             </div>
                         </div>
                     </div>
@@ -211,7 +265,6 @@ export default function AdminMasterPanel({ setNotice, open, onClose, preAuthoriz
 
             {/* ══ KONTEN UTAMA ═════════════════════════════════════════════ */}
             <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-white">
-
                 {/* Breadcrumb */}
                 <div className="flex shrink-0 items-center gap-1.5 border-b border-gray-100 bg-white px-5 py-3">
                     <span className="text-[11px] font-medium text-gray-400">Panel Admin</span>
@@ -230,7 +283,7 @@ export default function AdminMasterPanel({ setNotice, open, onClose, preAuthoriz
                 </div>
 
                 {/* Tab Content */}
-                <div className="flex-1 w-full overflow-y-auto p-5 bg-[#f4f6f9]">
+                <div className="flex-1 w-full overflow-y-auto p-5 bg-white">
                     {activeTab === 'kelas' && <TabKelolaKelas setNotice={handleNotice} />}
                     {activeTab === 'tambah-guru' && <TabTambahGuru setNotice={handleNotice} />}
                     {activeTab === 'akun-guru' && <TabAkunGuru setNotice={handleNotice} />}
@@ -240,28 +293,38 @@ export default function AdminMasterPanel({ setNotice, open, onClose, preAuthoriz
                     {activeTab === 'tambah-siswa' && <InboxPPDBAdmin setNotice={handleNotice} />}
                     {activeTab === 'kelola-roster' && <TabKelolaRoster setNotice={handleNotice} />}
 
-                    {/* Menu Perpustakaan (BARU) */}
-                    <Suspense fallback={
-                        <div className="flex items-center justify-center h-64">
-                            <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
-                        </div>
-                    }>
+                    {/* Menu Perpustakaan */}
+                    <Suspense
+                        fallback={
+                            <div className="flex items-center justify-center h-64">
+                                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
+                            </div>
+                        }
+                    >
                         {activeTab === 'perpus-dashboard' && <PerpusDashboard />}
-                        {activeTab === 'perpus-inventori' && <PerpusInventori onViewDetail={handleViewDetail} />}
-                        {(activeTab.startsWith('perpus-master-')) && (
+                        {activeTab === 'perpus-inventori' && (
+                            <PerpusInventori onViewDetail={handleViewDetail} />
+                        )}
+                        {activeTab.startsWith('perpus-master-') && (
                             <PerpusMasterData activeSubTab={activeTab.replace('perpus-master-', '')} />
                         )}
-                        {(activeTab.startsWith('perpus-transaksi-')) && (
+                        {activeTab.startsWith('perpus-transaksi-') && (
                             <PerpusTransaksi
-                                activeSubTab={activeTab.replace('perpus-transaksi-', '') as 'pinjam' | 'kembali'}
+                                activeSubTab={
+                                    activeTab.replace('perpus-transaksi-', '') as 'pinjam' | 'kembali'
+                                }
                             />
                         )}
                         {activeTab === 'perpus-detail' && (
-                            <PerpusDetailBuku bookId={selectedBookId} onBack={handleBackToInventori} />
+                            <PerpusDetailBuku
+                                bookId={selectedBookId}
+                                onBack={handleBackToInventori}
+                            />
                         )}
                     </Suspense>
+
                     {notice && (
-                        <div className="fixed bottom-4 right-4 z-50 bg-green-600 text-white text-xs px-4 py-2 rounded shadow-lg">
+                        <div className="fixed bottom-4 right-4 z-50 rounded bg-green-600 px-4 py-2 text-xs text-white shadow-lg">
                             {notice}
                         </div>
                     )}
@@ -275,9 +338,9 @@ export default function AdminMasterPanel({ setNotice, open, onClose, preAuthoriz
             <div className="fixed inset-0 z-[100] flex items-stretch bg-white">
                 <button
                     onClick={onClose}
-                    className="absolute top-3 right-4 z-10 text-xs text-gray-500 hover:text-red-600 border border-gray-200 px-3 py-1 rounded-lg bg-white shadow"
+                    className="absolute top-3 right-4 z-10 rounded-lg border border-gray-200 bg-white px-3 py-1 text-xs text-gray-500 shadow hover:text-red-600"
                 >
-                    ✕ Tutup Panel Admin
+                    ✕ Tutup
                 </button>
                 {panel}
             </div>

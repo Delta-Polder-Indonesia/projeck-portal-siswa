@@ -128,7 +128,7 @@ export type LibraryTransaction = {
   memberName: string;
   borrowDate: string; // YYYY-MM-DD
   returnDate?: string; // YYYY-MM-DD
-  status: 'dipinjam' | 'dikembalikan' | 'terlambat' | 'menunggu' | 'disetujui' | 'ditolak';
+  status: 'dipinjam' | 'dikembalikan' | 'terlambat' | 'menunggu' | 'ditolak';
   dueDate: string; // YYYY-MM-DD
   note?: string;
 };
@@ -491,7 +491,7 @@ const initialData: Database = {
       publisher: 'Bentang Pustaka',
       rack: 'A1',
       stock: 5,
-      available: 5,
+      available: 4,
     },
     {
       id: 'b2',
@@ -502,10 +502,58 @@ const initialData: Database = {
       rack: 'A2',
       stock: 3,
       available: 2,
+    },
+    {
+      id: 'b3',
+      title: 'Matematika Dasar Kelas X',
+      author: 'Prof. Budi Santoso',
+      category: 'Pelajaran',
+      publisher: 'Erlangga',
+      rack: 'B1',
+      stock: 10,
+      available: 8,
+    },
+    {
+      id: 'b4',
+      title: 'Fisika untuk SMA',
+      author: 'Dr. Rina Wulandari',
+      category: 'Pelajaran',
+      publisher: 'Yudhistira',
+      rack: 'B2',
+      stock: 7,
+      available: 6,
     }
   ],
   libraryMembers: [],
-  libraryTransactions: [],
+  libraryTransactions: [
+    {
+      id: 'TX-1750924800001',
+      bookId: 'b1',
+      memberId: 's1',
+      memberName: 'Siti Rahma',
+      borrowDate: '2026-06-20',
+      dueDate: '2026-06-27',
+      status: 'dipinjam',
+    },
+    {
+      id: 'TX-1750924800002',
+      bookId: 'b3',
+      memberId: 's2',
+      memberName: 'Budi Santoso',
+      borrowDate: '2026-06-22',
+      dueDate: '2026-06-29',
+      status: 'dipinjam',
+    },
+    {
+      id: 'TX-1750924800003',
+      bookId: 'b1',
+      memberId: 's3',
+      memberName: 'Nabila Putri',
+      borrowDate: '2026-06-25',
+      dueDate: '2026-07-02',
+      status: 'menunggu',
+    }
+  ],
   messages: [
     {
       id: 'm1',
@@ -855,7 +903,7 @@ export function approveLibraryLoan(txId: string) {
   if (book.available <= 0) return { ok: false, message: 'Stok buku habis.' };
 
   book.available -= 1;
-  tx.status = 'disetujui';
+  tx.status = 'dipinjam';
   writeDB(db);
   return { ok: true, message: 'Peminjaman disetujui.' };
 }

@@ -51,47 +51,48 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
     };
 
     return (
-        <div className="mx-auto max-w-5xl rounded-sm border border-gray-200 bg-white p-3">
-            <div className="space-y-3 rounded-sm border border-gray-200 bg-gray-50/50 p-3">
-                <div className="border-b border-gray-200 pb-1.5">
-                    <h3 className="text-xs font-bold uppercase tracking-wide text-gray-800">
+        <div className="w-full border border-gray-200 bg-white p-4 rounded-xl">
+            <div className="space-y-4 rounded-xl border border-gray-100 bg-white p-4">
+                <div className="border-b border-gray-100 pb-2 flex items-center gap-2">
+                    <UserPlus className="w-4 h-4 text-blue-600" />
+                    <h3 className="text-xs font-bold uppercase tracking-tight text-gray-700">
                         Form Penerimaan Siswa Baru (PPDB)
                     </h3>
                 </div>
 
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1">
-                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
                             Nama Lengkap Siswa
                         </label>
                         <input
                             value={newStudentName}
                             onChange={(e) => setNewStudentName(e.target.value)}
                             placeholder="Contoh: Andi Pratama"
-                            className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 outline-none placeholder:text-gray-300 focus:border-blue-500"
                         />
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
                             Nomor Induk Siswa (NIS)
                         </label>
                         <input
                             value={newStudentNis}
                             onChange={(e) => setNewStudentNis(e.target.value)}
                             placeholder="Contoh: 2024001"
-                            className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 outline-none placeholder:text-gray-300 focus:border-blue-500"
                         />
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
                             Jenis Kelamin
                         </label>
                         <select
                             value={newStudentGender}
                             onChange={(e) => setNewStudentGender(e.target.value as 'L' | 'P')}
-                            className="w-full rounded-sm border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                            className="w-full border border-gray-200 bg-white rounded-lg px-2.5 py-2 text-xs text-gray-800 outline-none focus:border-blue-500"
                         >
                             <option value="L">Laki-Laki (L)</option>
                             <option value="P">Perempuan (P)</option>
@@ -99,25 +100,25 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
                             Kata Sandi Awal
                         </label>
                         <input
                             value={newStudentPassword}
                             onChange={(e) => setNewStudentPassword(e.target.value)}
                             placeholder="Minimal 6 karakter"
-                            className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 outline-none placeholder:text-gray-300 focus:border-blue-500"
                         />
                     </div>
 
                     <div className="space-y-1 sm:col-span-2">
-                        <label className="text-[10px] font-medium uppercase tracking-wide text-gray-600">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
                             Pilih Kelas
                         </label>
                         <select
                             value={newStudentClassId}
                             onChange={(e) => setNewStudentClassId(e.target.value)}
-                            className="w-full rounded-sm border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
+                            className="w-full border border-gray-200 bg-white rounded-lg px-2.5 py-2 text-xs text-gray-800 outline-none focus:border-blue-500"
                         >
                             <option value="">-- Pilih Kelas --</option>
                             {classes.map((c) => (
@@ -129,12 +130,12 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
                     </div>
                 </div>
 
-                <div className="flex w-full justify-end border-t border-gray-200 pt-2">
+                <div className="flex w-full justify-end border-t border-gray-100 pt-3">
                     <button
                         onClick={handleAddStudent}
-                        className="inline-flex items-center gap-1.5 rounded-sm bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-emerald-700 active:bg-emerald-800"
                     >
-                        <UserPlus className="h-3.5 w-3.5" />
+                        <UserPlus className="h-4 w-4" />
                         Daftarkan Siswa Baru
                     </button>
                 </div>

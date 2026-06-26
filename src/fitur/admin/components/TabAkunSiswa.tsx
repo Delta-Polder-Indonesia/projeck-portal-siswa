@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { History, Trash2 } from 'lucide-react';
+import { History, Trash2, Users, Search, UserPlus } from 'lucide-react';
 import {
   addStudentClassMutation,
   getClasses,
@@ -20,7 +20,7 @@ type StudentEditMap = Record<
   }
 >;
 
-export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) => void }) {
+export default function TabAkunSiswa() {
   const storeVersion = useStoreVersion();
   const students = useMemo(() => getStudents(), [storeVersion]);
   const classes = useMemo(() => getClasses(), [storeVersion]);
@@ -58,25 +58,27 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
   const handleSaveStudent = (studentId: string) => {
     const edit = studentEdits[studentId];
     const currentStudent = students.find((item) => item.id === studentId);
-    if (!edit) return;
-    if (!currentStudent) return;
+    if (!edit || !currentStudent) return;
 
     if (!edit.name.trim()) {
-      setNotice('Nama siswa tidak boleh kosong.');
+      alert('⚠️ Nama siswa tidak boleh kosong.');
       return;
     }
 
     const nisUsed = students.find((item) => item.nis === edit.nis.trim() && item.id !== studentId);
     if (nisUsed) {
-      setNotice('NIS sudah digunakan siswa lain.');
+      alert('⚠️ NIS sudah digunakan siswa lain.');
       return;
     }
 
     const classExists = classes.some((item) => item.id === edit.classId);
     if (!classExists) {
-      setNotice('Kelas siswa tidak valid.');
+      alert('⚠️ Kelas siswa tidak valid.');
       return;
     }
+
+    const confirmed = window.confirm(`Apakah Anda yakin ingin menyimpan perubahan data untuk siswa ${edit.name.trim()}?`);
+    if (!confirmed) return;
 
     const nextStudents = students.map((item) => {
       if (item.id !== studentId) return item;
@@ -101,18 +103,19 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
     }
 
     saveStudents(nextStudents);
-    setNotice('Data siswa berhasil diperbarui.');
+    alert('✅ Data siswa berhasil diperbarui.');
   };
 
   const handleDeleteStudent = (studentId: string) => {
     const student = students.find((item) => item.id === studentId);
     if (!student) return;
-    const confirmed = window.confirm(`Hapus siswa ${student.name} dari portal?`);
+    
+    const confirmed = window.confirm(`Hapus siswa ${student.name} dari portal sistem secara permanen?`);
     if (!confirmed) return;
 
     const nextStudents = students.filter((item) => item.id !== studentId);
     saveStudents(nextStudents);
-    setNotice(`Siswa ${student.name} berhasil dihapus dari portal.`);
+    alert(`✅ Siswa ${student.name} berhasil dihapus.`);
     if (historyStudentId === studentId) {
       setHistoryStudentId('');
     }
@@ -123,15 +126,18 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
     const nis = newStudent.nis.trim();
 
     if (!name || !nis || !newStudent.classId) {
-      setNotice('Lengkapi nama, NIS, dan kelas siswa baru.');
+      alert('⚠️ Lengkapi nama, NIS, dan kelas siswa baru sebelum mendaftar.');
       return;
     }
 
     const nisUsed = students.some((item) => item.nis === nis);
     if (nisUsed) {
-      setNotice('NIS siswa baru sudah digunakan.');
+      alert('⚠️ Gagal: NIS siswa baru sudah terdaftar di database.');
       return;
     }
+
+    const confirmed = window.confirm(`Daftarkan siswa baru atas nama ${name}?`);
+    if (!confirmed) return;
 
     const nextStudents = [
       {
@@ -153,7 +159,7 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
       classId: classes[0]?.id ?? '',
       gender: 'L',
     });
-    setNotice('Siswa baru berhasil ditambahkan ke kelas.');
+    alert('✅ Siswa baru berhasil ditambahkan.');
   };
 
   const filteredStudents = students.filter((item) => {
@@ -172,249 +178,294 @@ export default function TabAkunSiswa({ setNotice }: { setNotice: (msg: string) =
   const resolveClassName = (classId: string) => classes.find((item) => item.id === classId)?.name || '-';
 
   return (
-    <div className="mx-auto max-w-5xl space-y-2">
-      <div className="grid gap-2 rounded-sm border border-gray-200 bg-gray-50/50 p-2.5 md:grid-cols-6">
-        <input
-          value={newStudent.name}
-          onChange={(event) => setNewStudent((prev) => ({ ...prev, name: event.target.value }))}
-          placeholder="Nama siswa baru"
-          className="rounded-sm border border-gray-300 px-2 py-1.5 text-xs md:col-span-2"
-        />
-        <input
-          value={newStudent.nis}
-          onChange={(event) => setNewStudent((prev) => ({ ...prev, nis: event.target.value }))}
-          placeholder="NIS"
-          className="rounded-sm border border-gray-300 px-2 py-1.5 text-xs"
-        />
-        <select
-          value={newStudent.classId}
-          onChange={(event) => setNewStudent((prev) => ({ ...prev, classId: event.target.value }))}
-          className="rounded-sm border border-gray-300 px-2 py-1.5 text-xs"
-        >
-          {classes.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={newStudent.gender}
-          onChange={(event) =>
-            setNewStudent((prev) => ({
-              ...prev,
-              gender: event.target.value === 'P' ? 'P' : 'L',
-            }))
-          }
-          className="rounded-sm border border-gray-300 px-2 py-1.5 text-xs"
-        >
-          <option value="L">Laki-laki</option>
-          <option value="P">Perempuan</option>
-        </select>
-        <button
-          type="button"
-          onClick={handleAddStudent}
-          className="rounded-sm bg-gray-900 px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-white uppercase hover:bg-gray-800"
-        >
-          Tambah Siswa
-        </button>
-      </div>
+    <div className="w-full border border-black bg-white p-5 text-xs text-black rounded-xl space-y-6">
+      
+      {/* HEADER UTAMA */}
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-black pb-4 gap-3">
+        <div>
+          <h1 className="text-base font-black tracking-tight uppercase">
+            Sistem Administrasi Data Siswa
+          </h1>
+          <p className="text-[10px] text-neutral-500 uppercase font-medium mt-0.5 tracking-wide">
+            Panel ringkas untuk melihat, mengedit akun, memproses mutasi, dan menghapus data siswa.
+          </p>
+        </div>
+        <div className="sm:border-l border-black sm:pl-4 text-left sm:text-right shrink-0">
+          <p className="text-[9px] font-bold tracking-wider text-neutral-400 uppercase">
+            Database Terdaftar
+          </p>
+          <p className="text-sm font-black text-black font-mono">
+            {students.length} SISWA
+          </p>
+        </div>
+      </header>
 
-      <div className="flex flex-col gap-2 border-b border-gray-200 pb-2 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-xs font-bold tracking-wide text-gray-800 uppercase">
-          Pengaturan Akun Siswa - Nama, Kelas, NIS & Kata Sandi
-        </h3>
-        <input
-          value={searchStudent}
-          onChange={(e) => setSearchStudent(e.target.value)}
-          placeholder="Cari nama, NIS, atau kelas..."
-          className="w-full rounded-sm border border-gray-300 px-2.5 py-1.5 text-xs text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-500 sm:w-64"
-        />
-      </div>
+      {/* FORM TAMBAH SISWA BARU */}
+      <section className="space-y-2">
+        <div className="flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase">
+          <UserPlus className="h-3.5 w-3.5 text-black" />
+          <span>Registrasi Siswa Baru</span>
+        </div>
+        <div className="grid gap-2 border border-black bg-neutral-50 p-3 rounded-md md:grid-cols-6">
+          <input
+            value={newStudent.name}
+            onChange={(event) => setNewStudent((prev) => ({ ...prev, name: event.target.value }))}
+            placeholder="Nama siswa baru"
+            className="rounded-md border border-black bg-white px-3 py-1.5 text-xs text-black font-bold outline-none placeholder:text-neutral-400 md:col-span-2"
+          />
+          <input
+            value={newStudent.nis}
+            onChange={(event) => setNewStudent((prev) => ({ ...prev, nis: event.target.value }))}
+            placeholder="NIS Siswa"
+            className="rounded-md border border-black bg-white px-3 py-1.5 font-mono text-xs text-black outline-none placeholder:text-neutral-400"
+          />
+          <select
+            value={newStudent.classId}
+            onChange={(event) => setNewStudent((prev) => ({ ...prev, classId: event.target.value }))}
+            className="rounded-md border border-black bg-white px-2 py-1.5 text-xs text-black font-bold outline-none cursor-pointer"
+          >
+            {classes.map((item) => (
+              <option key={item.id} value={item.id}>
+                Kelas: {item.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={newStudent.gender}
+            onChange={(event) =>
+              setNewStudent((prev) => ({
+                ...prev,
+                gender: event.target.value === 'P' ? 'P' : 'L',
+              }))
+            }
+            className="rounded-md border border-black bg-white px-2 py-1.5 text-xs text-black font-bold outline-none cursor-pointer"
+          >
+            <option value="L">Laki-laki</option>
+            <option value="P">Perempuan</option>
+          </select>
+          <button
+            type="button"
+            onClick={handleAddStudent}
+            className="rounded-md border border-black bg-white px-3 py-1.5 text-xs font-bold tracking-wider text-black uppercase hover:bg-black hover:text-white transition-colors"
+          >
+            <span>Tambah</span>
+          </button>
+        </div>
+      </section>
 
-      <div className="overflow-x-auto rounded-sm border border-gray-200">
-        <table className="w-full min-w-[620px] border-collapse">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50 text-left">
-              <th className="px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">Nama Siswa</th>
-              <th className="px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">JK</th>
-              <th className="px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">Kelas</th>
-              <th className="px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">NIS</th>
-              <th className="px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">Kata Sandi</th>
-              <th className="px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filteredStudents.map((student) => {
-              const edit = studentEdits[student.id];
-              if (!edit) return null;
-              const className = classes.find((item) => item.id === student.classId)?.name || '-';
-              return (
-                <tr key={student.id} className="transition-colors hover:bg-gray-50/70">
-                  <td className="px-2.5 py-1.5">
-                    <input
-                      value={edit.name}
-                      onChange={(e) =>
-                        setStudentEdits((prev) => ({
-                          ...prev,
-                          [student.id]: {
-                            ...prev[student.id],
-                            name: e.target.value,
-                          },
-                        }))
-                      }
-                      className="w-44 rounded-sm border border-gray-300 px-2 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
-                    />
-                  </td>
-                  <td className="px-2.5 py-1.5">
-                    <select
-                      value={edit.gender}
-                      onChange={(e) =>
-                        setStudentEdits((prev) => ({
-                          ...prev,
-                          [student.id]: {
-                            ...prev[student.id],
-                            gender: e.target.value === 'P' ? 'P' : 'L',
-                          },
-                        }))
-                      }
-                      className="w-20 rounded-sm border border-gray-300 px-2 py-1 text-xs"
-                    >
-                      <option value="L">L</option>
-                      <option value="P">P</option>
-                    </select>
-                  </td>
-                  <td className="px-2.5 py-1.5">
-                    <select
-                      value={edit.classId}
-                      onChange={(e) =>
-                        setStudentEdits((prev) => ({
-                          ...prev,
-                          [student.id]: {
-                            ...prev[student.id],
-                            classId: e.target.value,
-                          },
-                        }))
-                      }
-                      className="w-32 rounded-sm border border-gray-300 px-2 py-1 text-xs"
-                    >
-                      {classes.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="mt-1 text-[10px] text-gray-400">Saat ini: {className}</p>
-                  </td>
-                  <td className="px-2.5 py-1.5">
-                    <input
-                      value={edit.nis}
-                      onChange={(e) =>
-                        setStudentEdits((prev) => ({
-                          ...prev,
-                          [student.id]: {
-                            ...prev[student.id],
-                            nis: e.target.value,
-                          },
-                        }))
-                      }
-                      className="w-32 rounded-sm border border-gray-300 px-2 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
-                    />
-                  </td>
-                  <td className="px-2.5 py-1.5">
-                    <input
-                      value={edit.password}
-                      onChange={(e) =>
-                        setStudentEdits((prev) => ({
-                          ...prev,
-                          [student.id]: {
-                            ...prev[student.id],
-                            password: e.target.value,
-                          },
-                        }))
-                      }
-                      className="w-32 rounded-sm border border-gray-300 px-2 py-1 text-xs text-gray-800 outline-none transition-colors focus:border-gray-500"
-                    />
-                  </td>
-                  <td className="px-2.5 py-1.5">
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleSaveStudent(student.id)}
-                        className="rounded-sm bg-blue-600 px-2 py-1 text-[10px] font-bold tracking-wide text-white uppercase transition-colors hover:bg-blue-700"
+      {/* FILTER & TABEL UTAMA */}
+      <section className="space-y-3">
+        <div className="flex flex-col gap-2 border-b border-black pb-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase">
+            <Users className="h-3.5 w-3.5 text-black" />
+            <span>Informasi Akun & Penempatan Kelas</span>
+          </div>
+          <div className="relative w-full sm:w-72">
+            <input
+              value={searchStudent}
+              onChange={(e) => setSearchStudent(e.target.value)}
+              placeholder="Cari nama, NIS, atau kelas..."
+              className="w-full rounded-md border border-black px-3 py-1.5 pl-8 text-xs text-black outline-none placeholder:text-neutral-400"
+            />
+            <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-black" />
+          </div>
+        </div>
+
+        {/* CUSTOM SCROLL CONTAINER & TABLE */}
+        <div className="overflow-x-auto rounded-md border border-black scrollbar-thin">
+          <table className="w-full min-w-[850px] border-collapse bg-white text-left">
+            <thead>
+              <tr className="border-b border-black bg-neutral-100 text-[10px] font-bold tracking-wide text-black uppercase">
+                <th className="p-3 w-52">Nama Siswa</th>
+                <th className="p-3 w-16 text-center">JK</th>
+                <th className="p-3 w-52">Kelas Tujuan (Mutasi)</th>
+                <th className="p-3 w-36">NIS (Username)</th>
+                <th className="p-3 w-36">Kata Sandi</th>
+                <th className="p-3 text-center">Aksi Administrasi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/20">
+              {filteredStudents.map((student) => {
+                const edit = studentEdits[student.id];
+                if (!edit) return null;
+                const className = classes.find((item) => item.id === student.classId)?.name || '-';
+                return (
+                  <tr key={student.id} className="hover:bg-neutral-50 transition-colors">
+                    <td className="p-2.5">
+                      <input
+                        value={edit.name}
+                        onChange={(e) =>
+                          setStudentEdits((prev) => ({
+                            ...prev,
+                            [student.id]: {
+                              ...prev[student.id],
+                              name: e.target.value,
+                            },
+                          }))
+                        }
+                        className="w-full rounded border border-black px-2 py-1 text-xs font-bold text-black outline-none bg-white"
+                      />
+                    </td>
+                    <td className="p-2.5 text-center">
+                      <select
+                        value={edit.gender}
+                        onChange={(e) =>
+                          setStudentEdits((prev) => ({
+                            ...prev,
+                            [student.id]: {
+                              ...prev[student.id],
+                              gender: e.target.value === 'P' ? 'P' : 'L',
+                            },
+                          }))
+                        }
+                        className="w-14 rounded border border-black px-1 py-1 text-xs text-center font-bold outline-none cursor-pointer"
                       >
-                        Simpan
-                      </button>
-                      <button
-                        onClick={() => setHistoryStudentId(student.id)}
-                        className="inline-flex items-center gap-1 rounded-sm border border-gray-300 px-2 py-1 text-[10px] font-bold text-gray-600 hover:bg-gray-50"
-                        title="Lihat riwayat mutasi"
+                        <option value="L">L</option>
+                        <option value="P">P</option>
+                      </select>
+                    </td>
+                    <td className="p-2.5 space-y-1">
+                      <select
+                        value={edit.classId}
+                        onChange={(e) =>
+                          setStudentEdits((prev) => ({
+                            ...prev,
+                            [student.id]: {
+                              ...prev[student.id],
+                              classId: e.target.value,
+                            },
+                          }))
+                        }
+                        className="w-full rounded border border-black px-2 py-1 text-xs font-bold outline-none cursor-pointer"
                       >
-                        <History className="h-3 w-3" /> Riwayat
-                      </button>
-                      <button
-                        onClick={() => handleDeleteStudent(student.id)}
-                        className="inline-flex items-center gap-1 rounded-sm border border-rose-200 px-2 py-1 text-[10px] font-bold text-rose-700 hover:bg-rose-50"
-                        title="Hapus siswa"
-                      >
-                        <Trash2 className="h-3 w-3" /> Hapus
-                      </button>
-                    </div>
+                        {classes.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            Kelas {item.name}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="inline-block rounded border border-black bg-neutral-100 px-2 py-0.5 text-[9px] font-bold text-black uppercase tracking-tight">
+                        Aktif: {className}
+                      </div>
+                    </td>
+                    <td className="p-2.5">
+                      <input
+                        value={edit.nis}
+                        onChange={(e) =>
+                          setStudentEdits((prev) => ({
+                            ...prev,
+                            [student.id]: {
+                              ...prev[student.id],
+                              nis: e.target.value,
+                            },
+                          }))
+                        }
+                        className="w-full rounded border border-black px-2 py-1 font-mono text-xs text-black outline-none bg-white"
+                      />
+                    </td>
+                    <td className="p-2.5">
+                      <input
+                        value={edit.password}
+                        onChange={(e) =>
+                          setStudentEdits((prev) => ({
+                            ...prev,
+                            [student.id]: {
+                              ...prev[student.id],
+                              password: e.target.value,
+                            },
+                          }))
+                        }
+                        className="w-full rounded border border-black px-2 py-1 font-mono text-xs text-black outline-none bg-white"
+                      />
+                    </td>
+                    <td className="p-2.5 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => handleSaveStudent(student.id)}
+                          className="rounded border border-black bg-black px-2.5 py-1 text-[10px] font-bold tracking-wide text-white uppercase hover:bg-neutral-800 transition-colors"
+                        >
+                          Simpan
+                        </button>
+                        <button
+                          onClick={() => setHistoryStudentId(student.id)}
+                          className="rounded border border-black bg-white px-2 py-1 text-[10px] font-bold tracking-wide text-black uppercase hover:bg-neutral-100 transition-colors inline-flex items-center gap-1"
+                        >
+                          <History className="h-3 w-3" />
+                          <span>Log</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteStudent(student.id)}
+                          className="rounded border border-black bg-white px-2 py-1 text-[10px] font-bold tracking-wide text-black uppercase hover:bg-neutral-100 transition-colors inline-flex items-center gap-1"
+                        >
+                          <Trash2 className="h-3 w-3 text-neutral-600" />
+                          <span>Hapus</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {filteredStudents.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-12 text-center text-xs text-neutral-400 font-bold uppercase tracking-wider">
+                    — Tidak ada data registrasi siswa ditemukan —
                   </td>
                 </tr>
-              );
-            })}
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-            {filteredStudents.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-3 py-8 text-center text-[10px] tracking-widest text-gray-400 uppercase">
-                  - Siswa tidak ditemukan -
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
-      </div>
-
+      {/* LOG PANEL RIWAYAT MUTASI */}
       {selectedHistoryStudent ? (
-        <div className="rounded-sm border border-gray-200 bg-gray-50/60 p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <h4 className="text-xs font-bold tracking-wide text-gray-800 uppercase">
-              Riwayat Mutasi Kelas - {selectedHistoryStudent.name}
-            </h4>
+        <section className="space-y-3 pt-2 border-t border-black/30">
+          <div className="flex items-center justify-between border-b border-black pb-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-black uppercase">
+              <History className="h-3.5 w-3.5" />
+              <span>Log Mutasi Kelas: <span className="font-black">{selectedHistoryStudent.name.toUpperCase()}</span></span>
+            </div>
             <button
               type="button"
               onClick={() => setHistoryStudentId('')}
-              className="text-[10px] font-semibold text-gray-500 hover:text-gray-700"
+              className="rounded-md border border-black bg-white px-3 py-1 text-[10px] font-bold tracking-wide text-black uppercase hover:bg-black hover:text-white transition-colors"
             >
-              Tutup
+              Tutup Log
             </button>
           </div>
+          
           {classMutations.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[520px] border-collapse text-xs">
+            <div className="overflow-x-auto rounded-md border border-black">
+              <table className="w-full min-w-[550px] border-collapse bg-white text-left text-xs">
                 <thead>
-                  <tr className="border-b border-gray-200 text-left text-[10px] font-bold tracking-wide text-gray-500 uppercase">
-                    <th className="px-2 py-1.5">Waktu</th>
-                    <th className="px-2 py-1.5">Dari</th>
-                    <th className="px-2 py-1.5">Ke</th>
-                    <th className="px-2 py-1.5">Catatan</th>
+                  <tr className="border-b border-black bg-neutral-100 text-[10px] font-bold tracking-wide text-black uppercase">
+                    <th className="p-3 w-44">Waktu Mutasi</th>
+                    <th className="p-3">Dari Kelas</th>
+                    <th className="p-3">Ke Kelas</th>
+                    <th className="p-3">Catatan Administrasi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-black/20">
                   {classMutations.map((item) => (
-                    <tr key={item.id}>
-                      <td className="px-2 py-1.5 text-gray-500">{new Date(item.movedAt).toLocaleString('id-ID')}</td>
-                      <td className="px-2 py-1.5">{resolveClassName(item.fromClassId)}</td>
-                      <td className="px-2 py-1.5">{resolveClassName(item.toClassId)}</td>
-                      <td className="px-2 py-1.5 text-gray-600">{item.note}</td>
+                    <tr key={item.id} className="hover:bg-neutral-50 transition-colors">
+                      <td className="p-3 font-mono text-neutral-600">
+                        {new Date(item.movedAt).toLocaleString('id-ID')}
+                      </td>
+                      <td className="p-3 font-bold text-black">{resolveClassName(item.fromClassId)}</td>
+                      <td className="p-3 font-black text-black">{resolveClassName(item.toClassId)}</td>
+                      <td className="p-3 text-neutral-700 font-medium">{item.note}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="text-xs text-gray-500">Belum ada riwayat perpindahan kelas untuk siswa ini.</p>
+            <div className="rounded-md border border-dashed border-black bg-white p-6 text-center text-neutral-400 font-bold uppercase tracking-wider">
+              Belum ada log mutasi penempatan kelas untuk siswa ini.
+            </div>
           )}
-        </div>
+        </section>
       ) : null}
     </div>
   );

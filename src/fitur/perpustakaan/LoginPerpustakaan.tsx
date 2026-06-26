@@ -1,7 +1,9 @@
+// src/fitur/perpustakaan/LoginPerpustakaan.tsx
 import { useState } from 'react';
 import { BookOpen, Eye, EyeOff, X, Library, AlertTriangle, HelpCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getStudents } from '../../data/store';
+import BantuanPerpustakaan from './BantuanPerpustakaan';
 
 interface LoginPerpustakaanProps {
   onLoginSuccess: (studentData: {
@@ -19,6 +21,7 @@ export default function LoginPerpustakaan({ onLoginSuccess, onBackToPortal }: Lo
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showBantuan, setShowBantuan] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,22 +51,34 @@ export default function LoginPerpustakaan({ onLoginSuccess, onBackToPortal }: Lo
     onLoginSuccess({
       nisn: trimmedNisn,
       nama: student.name,
-      kelas: 'Siswa', // Kelas bisa dipertajam jika ada data class di store
+      kelas: 'Siswa',
     });
 
     setIsLoading(false);
   };
+
+  // Jika halaman bantuan aktif, tampilkan komponen BantuanPerpustakaan
+  if (showBantuan) {
+    return (
+      <BantuanPerpustakaan
+        onClose={() => setShowBantuan(false)}
+        onBackToLogin={() => setShowBantuan(false)}
+      />
+    );
+  }
 
   return (
     <div className="relative min-h-[100dvh] w-screen flex flex-col items-center justify-between bg-slate-950 font-sans antialiased overflow-x-hidden p-4">
 
       {/* Background Gambar Alam / Estetik Bersih */}
       <div
-        className="fixed inset-0 bg-cover bg-center z-0 scale-105"
-        style={{ backgroundImage: `url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1600&auto=format&fit=crop')` }}
-      />
+  className="fixed inset-0 bg-cover bg-center z-0 scale-105"
+  style={{
+    backgroundImage: `url(${import.meta.env.BASE_URL}images/Dashboard/perpustakaan.jpg)`
+  }}
+/>
       {/* Overlay Gelap Halus untuk kontras */}
-      <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-[2px] z-0" />
+      <div className="fixed inset-0 bg-black/10 z-0" />
 
       {/* Spacer Atas */}
       <div className="h-4 w-full relative z-10" />
@@ -148,12 +163,12 @@ export default function LoginPerpustakaan({ onLoginSuccess, onBackToPortal }: Lo
             {isLoading ? 'Memverifikasi...' : 'Login'}
           </button>
 
-          {/* Link Butuh Bantuan */}
+          {/* Link Butuh Bantuan — TERHUBUNG KE HALAMAN BANTUAN */}
           <div className="flex justify-center pt-2">
             <button
               type="button"
               className="flex items-center gap-1.5 text-[10px] text-white/50 hover:text-white transition-colors cursor-pointer group"
-              onClick={() => alert('Silakan hubungi petugas perpustakaan atau ruang Tata Usaha jika Anda lupa password portal.')}
+              onClick={() => setShowBantuan(true)}
             >
               <HelpCircle className="w-3 h-3 text-white/30 group-hover:text-white/60" />
               <span>Butuh bantuan ?</span>

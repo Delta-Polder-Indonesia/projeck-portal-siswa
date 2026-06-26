@@ -2,9 +2,8 @@ import { useState, lazy, Suspense } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import {
-  GraduationCap, BookOpen, Eye, EyeOff, LogIn, ArrowLeft,
-  School, User, AlertCircle, Info, MapPin, Phone, ArrowRight, HelpCircle,
-  BookMarked
+  GraduationCap, BookOpen, Eye, EyeOff, ArrowLeft,
+  User, HelpCircle, BookMarked
 } from 'lucide-react';
 import AdminMasterPanel from '../admin/PanelAdminModal';
 import TutorialModal from './TutorialModal';
@@ -15,10 +14,9 @@ const PerpustakaanApp = lazy(() => import('../../fitur/perpustakaan/Perpustakaan
 
 const BG_IMAGE = `${import.meta.env.BASE_URL}images/login-bg.jpg`;
 const LOGO_SMP = `${import.meta.env.BASE_URL}images/smp.png`;
-const IS_VIDEO_BG = BG_IMAGE.match(/\.(mp4|webm|ogg)$/i);
 
 const ADMIN_LOGIN = {
-  master: { username: 'admin_master', password: 'admin_master_123' },
+  master: { username: 'admin', password: 'admin' },
 } as const;
 
 export default function LoginPage() {
@@ -34,8 +32,6 @@ export default function LoginPage() {
   const [showExpectation, setShowExpectation] = useState(false);
   const [showPPDB, setShowPPDB] = useState(false);
   const [showPerpustakaan, setShowPerpustakaan] = useState(false);
-  const [mainLogoError, setMainLogoError] = useState(false);
-  const [bgError, setBgError] = useState(false);
 
   const handleSelectRole = (selectedRole: UserRole) => {
     setRole(selectedRole);
@@ -69,57 +65,61 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-[100dvh] flex flex-col bg-slate-950 font-sans antialiased selection:bg-cyan-500 selection:text-slate-900 overflow-hidden">
 
-      {/* Background Layer Fix */}
+      {/* Background Layer */}
       <div
         className="fixed inset-0 bg-cover bg-center bg-no-repeat scale-105 transition-all duration-1000 z-0"
         style={{ backgroundImage: `url(${BG_IMAGE})` }}
       />
-      <div className="fixed inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-900/40 z-0" />
+      <div className="fixed inset-0 bg-black/0 z-0" />
       <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-0" />
 
-      {/* STICKY HEADER - Menempel di paling atas seperti portal */}
+      {/* STICKY HEADER */}
       <header className="fixed top-0 left-0 right-0 z-50 w-full bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 w-full">
 
-            {/* Sisi Kiri: Identitas Sekolah */}
-            <div className="flex items-center gap-3">
+            {/* Sisi Kiri: Identitas Sekolah - Mentok Kiri */}
+            <div className="flex items-center gap-3 justify-start pl-0">
               <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/20 bg-white/10 flex items-center justify-center p-1 shrink-0">
                 <img src={LOGO_SMP} alt="Logo" className="w-full h-full object-contain" />
               </div>
-              <div className="flex flex-col">
-                <p className="text-cyan-400 text-[10px] uppercase tracking-[0.2em] font-extrabold leading-none">Sistem Informasi Academic</p>
-                <h3 className="text-white font-black text-base uppercase tracking-tight leading-none mt-0.5">SMP Negeri 1 Majenang</h3>
+              <div className="flex flex-col items-start justify-center text-left">
+                <p className="text-cyan-400 text-[10px] uppercase tracking-[0.2em] font-extrabold leading-none block w-full m-0 p-0">
+                  Sistem Informasi Academic
+                </p>
+                <h3 className="text-white font-black text-base uppercase tracking-tight leading-none mt-1 block w-full p-0">
+                  SMP Negeri 1 Majenang
+                </h3>
               </div>
             </div>
 
-            {/* Sisi Kanan: Menu Navigasi */}
-            <nav className="flex items-center gap-1 bg-white/5 border border-white/10 p-1 rounded-xl">
+            {/* Sisi Kanan: Menu Navigasi - Hanya Teks & Logo/Ikon Tanpa Container */}
+            <nav className="flex items-center gap-4 bg-transparent p-0 border-none rounded-none">
               <button
                 type="button"
                 onClick={() => setShowExpectation(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-white/10"
+                className="flex items-center gap-2 p-1 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white bg-transparent border-none"
               >
-                <User className="w-3.5 h-3.5" />
+                <User className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Profil</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowPPDB(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-white/10"
+                className="flex items-center gap-2 p-1 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white bg-transparent border-none"
               >
-                <GraduationCap className="w-4 h-4" />
-                <span>Daftar Siswa</span>
+                <GraduationCap className="w-4 h-4 text-cyan-400" />
+                <span>Pendaftaran</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowPerpustakaan(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-white/10"
+                className="flex items-center gap-2 p-1 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white bg-transparent border-none"
                 title="Sistem Informasi Perpustakaan"
               >
-                <BookMarked className="w-3.5 h-3.5" />
+                <BookMarked className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Perpustakaan</span>
               </button>
             </nav>
@@ -131,43 +131,7 @@ export default function LoginPage() {
       <div className="h-16" />
 
       {/* MAIN CONTENT WORKSPACE */}
-      <main className="relative z-10 flex-1 flex w-full max-w-6xl items-center justify-between gap-12 lg:gap-20 mx-auto px-4 sm:px-6 lg:px-8 py-8 max-[900px]:flex-col max-[900px]:gap-12 max-[900px]:justify-center">
-
-        {/* LEFT SIDE - Informasi PPDB */}
-        <div className="flex-1 max-w-xl text-left max-[900px]:text-center max-[900px]:px-4 space-y-6">
-          <div className="inline-flex items-center gap-2.5 text-cyan-400 max-[900px]:justify-center">
-            <School className="w-5 h-5 stroke-[2.5]" />
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-cyan-400 drop-shadow-md">
-              Penerimaan Siswa Baru (PPDB)
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            <h1 className="text-white font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.15] tracking-tight drop-shadow-xl">
-              Pendaftaran Tahun Ajaran Baru <br className="hidden lg:inline" />Telah Resmi Dibuka!
-            </h1>
-            <p className="text-slate-200/90 text-sm md:text-base leading-relaxed font-normal max-w-lg drop-shadow-md">
-              Bergabunglah bersama kompartemen pendidikan terbaik di SMP Negeri 1 Majenang. Proses seleksi dilakukan secara transparan, akuntabel, dan sistematis daring.
-            </p>
-          </div>
-
-          {/* SEJAJAR: Status Badge & Tombol Baca Selengkapnya */}
-          <div className="flex flex-wrap items-center gap-5 pt-2 max-[900px]:justify-center">
-            <div className="flex items-center gap-2 bg-emerald-500/20 text-emerald-300 px-4 py-2 rounded-xl text-xs font-bold border border-emerald-500/30 backdrop-blur-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              STATUS: GELOMBANG I AKTIF
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowExpectation(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white hover:text-cyan-400 transition-colors group cursor-pointer py-2"
-            >
-              <span>Baca Selengkapnya</span>
-              <ArrowRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        </div>
+      <main className="relative z-10 flex-1 flex w-full max-w-7xl items-center justify-end gap-12 lg:gap-20 mx-auto px-4 sm:px-6 lg:px-8 py-8 max-[900px]:justify-center">
 
         {/* RIGHT SIDE - Login Card */}
         <div className="flex-shrink-0 w-full max-w-[420px]">
@@ -179,15 +143,21 @@ export default function LoginPage() {
             }}
           >
 
-            {/* Jika sudah pilih role, munculkan tombol Back di dalam card */}
+            {/* Jika sudah pilih role, munculkan tombol Back */}
             {role !== null && (
               <button
                 onClick={handleBack}
-                className="flex items-center gap-2 text-white/60 hover:text-white mb-4 transition-all text-sm"
+                className="flex items-center gap-2 text-white/60 hover:text-white mb-4 transition-all text-sm cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Kembali ke Pilihan Peran</span>
+                <span>Kembali</span>
               </button>
+            )}
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-xs font-medium">
+                {error}
+              </div>
             )}
 
             {role === null ? (
@@ -202,7 +172,6 @@ export default function LoginPage() {
                   </button>
                 </div>
 
-                {/* Tombol bantuan di kanan bawah */}
                 <div className="pt-1 flex justify-end">
                   <button
                     type="button"
@@ -244,7 +213,6 @@ export default function LoginPage() {
                 </div>
                 <button type="submit" className="w-full py-4 rounded-xl bg-cyan-500 text-slate-900 font-bold hover:bg-cyan-400 cursor-pointer transition-colors shadow-lg shadow-cyan-500/10">Masuk</button>
 
-                {/* Tombol Cara Login dipindahkan ke kanan bawah agar sejajar & sama bentuknya */}
                 <div className="pt-1 flex justify-end">
                   <button
                     type="button"
@@ -265,7 +233,7 @@ export default function LoginPage() {
       <TutorialModal open={showTutorial} onClose={() => setShowTutorial(false)} />
       <ExpectationModal open={showExpectation} onClose={() => setShowExpectation(false)} />
 
-      {/* PPDB Form Modal - Langsung dari tombol Daftar Siswa */}
+      {/* PPDB Form Modal */}
       {showPPDB && (
         <PPDBForm
           isModal={true}
@@ -274,13 +242,13 @@ export default function LoginPage() {
         />
       )}
 
-      {/* PERPUSTAKAAN - Fullscreen App */}
+      {/* PERPUSTAKAAN - Loading Container */}
       {showPerpustakaan && (
         <Suspense fallback={
-          <div className="fixed inset-0 z-[200] bg-slate-950 flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin w-10 h-10 border-3 border-amber-500 border-t-transparent rounded-full mx-auto mb-4" />
-              <p className="text-amber-400 text-sm font-bold">Memuat Perpustakaan...</p>
+          <div className="fixed inset-0 z-[200] bg-slate-950 flex flex-col items-center justify-center min-h-screen w-full">
+            <div className="flex flex-col items-center justify-center p-6 bg-slate-900/50 backdrop-blur-md rounded-2xl border border-white/5 shadow-2xl">
+              <div className="animate-spin w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full mb-4" />
+              <p className="text-amber-400 text-sm font-bold tracking-wider uppercase animate-pulse">Memuat Perpustakaan...</p>
             </div>
           </div>
         }>
@@ -289,12 +257,14 @@ export default function LoginPage() {
           </div>
         </Suspense>
       )}
+
       {openAdminPanel && (
         <AdminMasterPanel
           open={openAdminPanel}
           onClose={() => setOpenAdminPanel(false)}
           scope={adminScope}
         />
-      )}</div>
+      )}
+    </div>
   );
 }
