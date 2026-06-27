@@ -113,7 +113,7 @@ export default function TabPengumumanAdmin({ setNotice, scope }: TabPengumumanAd
     };
 
     return (
-        <div className="w-full border border-black bg-white p-4 rounded-xl">
+        <div className="w-full bg-white p-4 rounded-xl space-y-4">
 
             {/* TWO-COLUMN LAYOUT */}
             <div className="grid gap-6 lg:grid-cols-[1fr_340px]">

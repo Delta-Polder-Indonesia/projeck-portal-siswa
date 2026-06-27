@@ -57,7 +57,7 @@ export default function TabTagihanSekolah({ setNotice, scope }: TabTagihanSekola
     };
 
     return (
-        <div className="w-full border border-black bg-white p-4 rounded-xl space-y-4">
+        <div className="w-full bg-white p-4 rounded-xl space-y-4">
 
             {/* STRIP HEADER */}
             <div className="border-b border-black pb-2">

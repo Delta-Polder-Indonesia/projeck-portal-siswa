@@ -187,7 +187,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
         <div className="w-full space-y-6">
 
             {/* ======== FORM INPUT ROSTER ======== */}
-            <div className="w-full border border-black bg-white p-4 rounded-xl space-y-4">
+            <div className="w-full bg-white p-4 rounded-xl space-y-4">
 
                 {/* STRIP HEADER */}
                 <div className="flex items-center justify-between border-b border-black pb-2">
@@ -418,7 +418,7 @@ export default function TabKelolaRoster({ setNotice }: { setNotice: (msg: string
             </div>
 
             {/* ======== TABEL DAFTAR ROSTER ======== */}
-            <div className="w-full border border-black bg-white p-4 rounded-xl space-y-4">
+            <div className="w-full bg-white p-4 rounded-xl space-y-4">
 
                 {/* HEADER TABEL */}
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-black pb-2">

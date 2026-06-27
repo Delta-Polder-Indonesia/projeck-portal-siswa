@@ -51,7 +51,7 @@ export default function TabTambahSiswa({ setNotice }: { setNotice: (msg: string)
     };
 
     return (
-        <div className="w-full border border-gray-200 bg-white p-4 rounded-xl">
+        <div className="w-full bg-white p-4 rounded-xl space-y-4">
             <div className="space-y-4 rounded-xl border border-gray-100 bg-white p-4">
                 <div className="border-b border-gray-100 pb-2 flex items-center gap-2">
                     <UserPlus className="w-4 h-4 text-blue-600" />

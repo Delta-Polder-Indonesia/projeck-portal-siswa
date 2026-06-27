@@ -178,7 +178,7 @@ export default function TabAkunSiswa() {
   const resolveClassName = (classId: string) => classes.find((item) => item.id === classId)?.name || '-';
 
   return (
-    <div className="w-full border border-black bg-white p-5 text-xs text-black rounded-xl space-y-6">
+    <div className="w-full bg-white p-4 rounded-xl space-y-4">
       
       {/* HEADER UTAMA */}
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-black pb-4 gap-3">

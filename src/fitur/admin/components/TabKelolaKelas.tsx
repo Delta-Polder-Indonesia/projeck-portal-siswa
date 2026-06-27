@@ -205,7 +205,7 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
     };
 
     return (
-        <div className="w-full border border-black bg-white p-4 rounded-xl space-y-4">
+        <div className="w-full bg-white p-4 rounded-xl space-y-4">
 
             {/* ── FORM TAMBAH KELAS ── */}
             <div className="border-b border-black pb-4 space-y-3">
@@ -219,6 +219,8 @@ export default function TabKelolaKelas({ setNotice }: TabKelolaKelasProps) {
                         Daftarkan kelas baru ke dalam sistem dengan nama dan tingkat yang unik.
                     </p>
                 </div>
+				
+				<div className="h-px w-full bg-black"></div>
 
                 {/* Input Row */}
                 <div className="flex flex-wrap items-end gap-3">

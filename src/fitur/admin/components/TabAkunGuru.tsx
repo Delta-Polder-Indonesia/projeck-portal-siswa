@@ -138,7 +138,7 @@ export default function TabAkunGuru({ setNotice }: { setNotice: (msg: string) =>
         : null;
 
     return (
-        <div className="w-full border border-black bg-white p-4 rounded-xl">
+        <div className="w-full bg-white p-4">
             {/* TWO-COLUMN LAYOUT */}
             <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
 
