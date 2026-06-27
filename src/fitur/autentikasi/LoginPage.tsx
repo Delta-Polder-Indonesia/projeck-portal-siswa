@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import AdminMasterPanel from '../admin/PanelAdminModal';
 import TutorialModal from './TutorialModal';
-import ExpectationModal from './ExpectationModal';
-import PPDBForm from './PPDBForm';
+import ExpectationModal from '../ppdb/ExpectationModal';
+import PPDBForm from '../ppdb/PPDBForm';
 
 const PerpustakaanApp = lazy(() => import('../../fitur/perpustakaan/PerpustakaanApp'));
 
