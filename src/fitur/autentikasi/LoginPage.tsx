@@ -190,6 +190,9 @@ export default function LoginPage() {
                 </div>
                 <input
                   type="text"
+                  id="login-id"
+                  name="username"
+                  autoComplete="username"
                   value={id}
                   onChange={e => setId(e.target.value)}
                   className="w-full px-4 py-4 rounded-xl text-white text-[16px] border border-white/20 bg-white/10 outline-none focus:border-cyan-500/50 transition-all"
@@ -198,6 +201,9 @@ export default function LoginPage() {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    id="login-password"
+                    name="password"
+                    autoComplete="current-password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     className="w-full px-4 py-4 rounded-xl text-white text-[16px] border border-white/20 bg-white/10 outline-none focus:border-cyan-500/50 transition-all"
