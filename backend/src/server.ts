@@ -11,6 +11,9 @@ app.use(
   cors({
     origin: env.CLIENT_ORIGIN,
     credentials: true,
+    // --- PERBAIKAN DI SINI ---
+    // Menentukan secara spesifik header yang diizinkan agar token Authorization aman dari blokir browser
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   }),
 );
 app.use(express.json({ limit: '2mb' }));
