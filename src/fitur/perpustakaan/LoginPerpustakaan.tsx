@@ -74,7 +74,7 @@ export default function LoginPerpustakaan({ onLoginSuccess, onBackToPortal }: Lo
       <div
   className="fixed inset-0 bg-cover bg-center z-0 scale-105"
   style={{
-    backgroundImage: `url(${import.meta.env.BASE_URL}images/Dashboard/perpustakaan.jpg)`
+    backgroundImage: `url(${import.meta.env.BASE_URL}public/images/Dashboard/perpustakaan.jpg)`
   }}
 />
       {/* Overlay Gelap Halus untuk kontras */}

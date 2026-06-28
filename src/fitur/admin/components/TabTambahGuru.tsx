@@ -83,7 +83,7 @@ export default function TabTambahGuru({ setNotice }: { setNotice: (msg: string) 
     };
 
     return (
-        <div className="w-full space-y-5">
+        <div className="w-full space-y-5 p-4">
 
             {/* TWO-COLUMN LAYOUT */}
             <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">

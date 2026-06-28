@@ -31,7 +31,7 @@ export default function BerandaPage({ onRegister }: BerandaPageProps) {
 
         <div className="relative z-10 ml-4 max-w-lg rounded-r-3xl border-l-8 border-amber-500 bg-white/95 p-7 text-left shadow-2xl shadow-slate-900/25 sm:ml-12 sm:rounded-r-full">
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-700">Penerimaan Peserta Didik Baru</p>
-          <h2 className="pt-1 text-xl font-black uppercase tracking-tight text-blue-900 sm:text-3xl">PPDB SMK Negeri 1 Cimahi</h2>
+          <h1 className="text-xl md:text-2xl font-bold leading-tight tracking-tight text-blue-900">PPDB SMP Negeri 1 Majenang</h1>
           <p className="mt-2 max-w-[400px] text-sm leading-relaxed text-gray-700">
             Silahkan anda bisa akses <span className="font-bold text-blue-700">ppdb.smkn1-cimahi.sch.id</span> untuk
             mendapatkan semua informasi pendaftaran PPDB tahun 2026 di SMK Negeri 1 Cimahi.

@@ -10,7 +10,6 @@ import {
     Users,
     CreditCard,
     Megaphone,
-    BookOpen,
     LayoutDashboard,
     Box,
     Database,
@@ -25,8 +24,8 @@ import TabAkunGuru from './components/TabAkunGuru';
 import TabTagihanSekolah from './components/TabTagihanSekolah';
 import TabPengumumanAdmin from './components/TabPengumumanAdmin';
 import TabAkunSiswa from './components/TabAkunSiswa';
-import InboxPPDBAdmin from './InboxPPDBAdmin';
 import TabKelolaRoster from './components/TabKelolaRoster';
+import AdminPanel from '../penerimaan-siswa-baru/AdminPanel';
 import { getTeachers, getClasses } from '../../data/store';
 import { useStoreVersion } from '../../hooks/useStoreVersion';
 
@@ -38,8 +37,8 @@ type TeacherAdminTab =
     | 'tagihan'
     | 'pengumuman-admin'
     | 'akun-siswa'
-    | 'tambah-siswa'
     | 'kelola-roster'
+    | 'ppdb-admin'
     | 'perpus-dashboard'
     | 'perpus-inventori'
     | 'perpus-master-anggota'
@@ -65,7 +64,7 @@ const MENU_MASTER = [
     { id: 'akun-guru', label: 'Daftar Guru', icon: Users },
     { id: 'tambah-guru', label: 'Tambah Guru', icon: UserPlus },
     { id: 'akun-siswa', label: 'Daftar Siswa', icon: UserCheck },
-    { id: 'tambah-siswa', label: 'Inbox PPDB', icon: BookOpen },
+    { id: 'ppdb-admin', label: 'Kelola PPDB', icon: Users },
     { id: 'kelola-roster', label: 'Kelola Roster', icon: CalendarDays },
     { id: 'tagihan', label: 'Tagihan SPP', icon: CreditCard },
     { id: 'pengumuman-admin', label: 'Pengumuman', icon: Megaphone },
@@ -91,7 +90,7 @@ const MENU_MASTER_GROUPS = [
         title: 'Siswa',
         items: [
             { id: 'akun-siswa', label: 'Daftar Siswa', icon: UserCheck },
-            { id: 'tambah-siswa', label: 'Inbox PPDB', icon: BookOpen },
+            { id: 'ppdb-admin', label: 'Kelola PPDB', icon: Users },
         ],
     },
     {
@@ -129,16 +128,14 @@ function MenuRenderer({
                     <button
                         key={menu.id}
                         onClick={() => onSelect(menu.id)}
-                        className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-all ${
-                            isActive
+                        className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-all ${isActive
                                 ? 'bg-blue-50 text-blue-600 font-bold'
                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
+                            }`}
                     >
                         <menu.icon
-                            className={`h-4 w-4 shrink-0 ${
-                                isActive ? 'text-blue-600' : 'text-gray-400'
-                            }`}
+                            className={`h-4 w-4 shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-400'
+                                }`}
                         />
                         <span className="flex-1 truncate text-[11px] tracking-wide">
                             {menu.label}
@@ -290,7 +287,7 @@ export default function AdminMasterPanel({
                     {activeTab === 'tagihan' && <TabTagihanSekolah setNotice={handleNotice} scope="teacher" />}
                     {activeTab === 'pengumuman-admin' && <TabPengumumanAdmin setNotice={handleNotice} scope="teacher" />}
                     {activeTab === 'akun-siswa' && <TabAkunSiswa setNotice={handleNotice} />}
-                    {activeTab === 'tambah-siswa' && <InboxPPDBAdmin setNotice={handleNotice} />}
+                    {activeTab === 'ppdb-admin' && <AdminPanel onClose={() => setActiveTab('akun-siswa')} embedded />}
                     {activeTab === 'kelola-roster' && <TabKelolaRoster setNotice={handleNotice} />}
 
                     {/* Menu Perpustakaan */}

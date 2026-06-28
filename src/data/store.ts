@@ -80,26 +80,6 @@ export type Student = {
   avatar?: string;
 };
 
-export type PPDBApplicationStatus = 'pending' | 'approved' | 'rejected';
-
-export type PPDBApplication = {
-  id: string;
-  registrationNo: string;
-  submittedAt: string;
-  processedAt?: string;
-  status: PPDBApplicationStatus;
-  jenjangTujuan: string;
-  sekolahTujuan: string;
-  jalurPendaftaran: string;
-  namaLengkap: string;
-  nisn: string;
-  nik: string;
-  tempatLahir: string;
-  tanggalLahir: string;
-  jenisKelamin: string;
-  alamatLengkap: string;
-};
-
 // ── Perpustakaan (BARU) ──────────────────────────────────────────────────
 export type Book = {
   id: string;
@@ -133,36 +113,90 @@ export type LibraryTransaction = {
   note?: string;
 };
 
-export type PPDBApplicationExtended = PPDBApplication & {
+// ── PPDB (ENHANCED) ─────────────────────────────────────────────────────────
+export type PPDBApplicationStatus = 'PENDING' | 'VERIFIED' | 'ACCEPTED' | 'REJECTED';
+
+export type PPDBDocumentFile = {
+  name: string;
+  data: string;
+};
+
+export interface PPDBApplication {
+  id: string;
+  registrationNo: string;
+  submittedAt: string;
+  status: PPDBApplicationStatus;
+  jenjangTujuan: string;
+  sekolahTujuan: string;
+  jalurPendaftaran: string;
+  majorId?: string;
+  namaLengkap: string;
+  nisn: string;
+  nik: string;
+  tempatLahir: string;
+  tanggalLahir: string;
+  jenisKelamin: string;
+  agama: string;
+  kewenangnegaraan: string;
+  anakKe: string;
+  jumlahSaudara: string;
+  golonganDarah: string;
+  alamatLengkap: string;
+  rt: string;
+  rw: string;
+  dusun: string;
   desaKelurahan: string;
   kecamatan: string;
   kabupatenKota: string;
+  provinsi: string;
+  kodePos: string;
   nomorHp: string;
+  whatsApp?: string;
   email: string;
   sekolahAsal: string;
+  npsnSekolahAsal: string;
+  alasanPindah?: string;
   namaAyah: string;
+  nikAyah?: string;
+  pendidikanAyah?: string;
+  pekerjaanAyah?: string;
+  penghasilanAyah?: string;
   namaIbu: string;
-  agama?: string;
-  kewenangnegaraan?: string;
-  anakKe?: string;
-  jumlahSaudara?: string;
-  golonganDarah?: string;
-  rt?: string;
-  rw?: string;
-  dusun?: string;
-  provinsi?: string;
-  kodePos?: string;
+  nikIbu?: string;
+  pendidikanIbu?: string;
+  pekerjaanIbu?: string;
+  penghasilanIbu?: string;
   namaWali?: string;
   hubunganWali?: string;
+  pendidikanWali?: string;
+  pekerjaanWali?: string;
+  penghasilanWali?: string;
   nomorHpWali?: string;
-  majorId?: string;
-  npsnSekolahAsal?: string;
-  alasanPindah?: string;
   pasFotoDataUrl?: string;
-  dokumen: string[];
-  assignedNis?: string;
-  assignedClassId?: string;
-  note?: string;
+  dokumen?: string[];
+  documents?: Record<string, PPDBDocumentFile | null>;
+  documentValidation?: Record<string, 'PENDING' | 'VALID' | 'INVALID'>;
+  adminNotes?: string;
+  verifiedBy?: string;
+  verifiedAt?: string;
+}
+
+export type PPDBAuditAction =
+  | 'SUBMIT_APPLICATION'
+  | 'UPDATE_STATUS'
+  | 'UPDATE_DOCUMENT_VALIDATION'
+  | 'DELETE_APPLICATION'
+  | 'IMPORT_BACKUP'
+  | 'ADMIN_LOGIN_SUCCESS'
+  | 'ADMIN_LOGIN_FAILED'
+  | 'ADMIN_LOGOUT';
+
+export type PPDBAuditLog = {
+  id: string;
+  action: PPDBAuditAction;
+  actor: string;
+  occurredAt: string;
+  metadata?: Record<string, string>;
 };
 
 export type Message = {
@@ -356,10 +390,16 @@ const PENGUMUMAN_ADMIN_KEY = 'portal-siswa-pengumuman-admin';
 const SUBMISSION_KEY = 'portal-siswa-submissions';
 const RAPOT_KEY = 'portal-siswa-rapot';
 const STUDENT_CLASS_MUTATION_KEY = 'portal-siswa-class-mutations';
-const LESSON_NOTE_KEY = 'portal-siswa-lesson-notes';
-const RPS_DOCUMENT_KEY = 'portal-siswa-rps-documents';
+const PPDB_AUDIT_KEY = 'portal-siswa-ppdb-audit';
+const PPDB_ADMIN_SESSION_KEY = 'portal-siswa-ppdb-admin-session';
+const PPDB_ADMIN_LOCK_KEY = 'portal-siswa-ppdb-admin-lock';
 const STORE_UPDATED_EVENT = 'absensi_store_updated';
 const APPROX_LOCAL_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024;
+
+const ADMIN_MAX_ATTEMPTS = Number((import.meta as any).env.VITE_ADMIN_MAX_ATTEMPTS || '5');
+const ADMIN_LOCK_MINUTES = Number((import.meta as any).env.VITE_ADMIN_LOCK_MINUTES || '15');
+const ADMIN_SESSION_MINUTES = Number((import.meta as any).env.VITE_ADMIN_SESSION_MINUTES || '480');
+const ADMIN_PIN = (import.meta as any).env.VITE_ADMIN_PIN || '26012026';
 
 let storeVersion = 0;
 
@@ -383,8 +423,6 @@ export interface HasilPulihkanCadangan {
   pesan: string;
 }
 
-// ==================== CORE ====================
-
 // ==================== UTILS ====================
 
 /**
@@ -396,7 +434,7 @@ export async function hashPassword(plain: string): Promise<string> {
   const data = encoder.encode(plain + 'sekolah_salt'); // Simple salt
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 function notifyStoreUpdated() {
@@ -417,6 +455,48 @@ export const store = {
   getSnapshot: () => storeVersion,
   subscribe: (listener: () => void) => subscribeStore(listener),
 };
+
+export function getStorageSummary(): RingkasanPenyimpananBrowser {
+  let usedBytes = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key) {
+      const value = localStorage.getItem(key);
+      if (value) {
+        // approximate size in bytes for a string in JS (UTF-16 mostly, but we can do simple char count * 2)
+        usedBytes += (key.length + value.length) * 2;
+      }
+    }
+  }
+  return {
+    usedBytes,
+    limitBytes: APPROX_LOCAL_STORAGE_LIMIT_BYTES,
+    usedPercent: Number(((usedBytes / APPROX_LOCAL_STORAGE_LIMIT_BYTES) * 100).toFixed(2)),
+    remainingBytes: Math.max(0, APPROX_LOCAL_STORAGE_LIMIT_BYTES - usedBytes),
+  };
+}
+
+const createId = () => {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+const createRegistrationNo = (): string => {
+  const year = new Date().getFullYear();
+  const yearCode = String(year).slice(-2);
+  const regionCode = ((import.meta as any).env.VITE_REGION_CODE || 'NAS').toUpperCase();
+  const applications = getPPDBApplications();
+  const maxSeq = applications.reduce((acc, item) => {
+    const matched = item.registrationNo.match(/PPDB-\d{2}-[A-Z]+-(\d{6})/);
+    const value = matched ? Number(matched[1]) : 0;
+    return value > acc ? value : acc;
+  }, 0);
+  return `PPDB-${yearCode}-${regionCode}-${String(maxSeq + 1).padStart(6, '0')}`;
+};
+
+
 
 // ==================== INITIAL DATA ====================
 
@@ -522,7 +602,7 @@ const initialData: Database = {
       rack: 'B2',
       stock: 7,
       available: 6,
-    }
+    },
   ],
   libraryMembers: [],
   libraryTransactions: [
@@ -552,7 +632,7 @@ const initialData: Database = {
       borrowDate: '2026-06-25',
       dueDate: '2026-07-02',
       status: 'menunggu',
-    }
+    },
   ],
   messages: [
     {
@@ -646,6 +726,39 @@ function readLocalKey<T>(key: string, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+function saveLocalKey<T>(key: string, value: T) {
+  localStorage.setItem(key, JSON.stringify(value));
+  notifyStoreUpdated();
+}
+
+function createAuditId() {
+  return `ppdb-audit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function getPPDBAuditLogsRaw(): PPDBAuditLog[] {
+  return readLocalKey<PPDBAuditLog[]>(PPDB_AUDIT_KEY, []);
+}
+
+function savePPDBAuditLogs(logs: PPDBAuditLog[]) {
+  saveLocalKey(PPDB_AUDIT_KEY, logs.slice(0, 1000));
+}
+
+function appendPPDBAuditLog(
+  action: PPDBAuditAction,
+  actor: string,
+  metadata?: Record<string, string>
+) {
+  const logs = getPPDBAuditLogsRaw();
+  logs.unshift({
+    id: createAuditId(),
+    action,
+    actor,
+    occurredAt: new Date().toISOString(),
+    metadata,
+  });
+  savePPDBAuditLogs(logs);
 }
 
 // ==================== INIT ====================
@@ -755,13 +868,7 @@ export function addStudentClassMutation(payload: Omit<StudentClassMutation, 'id'
   notifyStoreUpdated();
 }
 
-// ==================== PPDB ====================
-
-function generateRegistrationNo() {
-  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const random = Math.floor(Math.random() * 900 + 100);
-  return `PPDB-${stamp}-${random}`;
-}
+// ==================== PPDB (ENHANCED) ====================
 
 function generateStudentNis(students: Student[]) {
   const year = new Date().getFullYear();
@@ -772,70 +879,287 @@ function generateStudentNis(students: Student[]) {
   return `${year}${String(maxSerial + 1).padStart(3, '0')}`;
 }
 
-export function submitPPDBApplication(payload: Omit<PPDBApplication, 'id' | 'registrationNo' | 'submittedAt' | 'status'>) {
+export const getPPDBApplications = (): PPDBApplication[] => readDB().ppdbApplications;
+
+const savePPDBApplications = (applications: PPDBApplication[]): void => {
   const db = readDB();
-  const application: PPDBApplication = {
-    ...payload,
-    id: `ppdb-${Date.now()}`,
-    registrationNo: generateRegistrationNo(),
-    submittedAt: new Date().toISOString(),
-    status: 'pending',
-  };
-  db.ppdbApplications = [application, ...db.ppdbApplications];
+  db.ppdbApplications = applications;
   writeDB(db);
-  return application;
-}
+};
 
-export function getPPDBApplications() {
-  return readDB().ppdbApplications;
-}
+export const submitPPDBApplication = (
+  data: Omit<PPDBApplication, 'id' | 'registrationNo' | 'submittedAt' | 'status'>
+): PPDBApplication => {
+  const applications = getPPDBApplications();
+  const documentValidation = (data.dokumen || []).reduce<Record<string, 'PENDING'>>((acc, item) => {
+    const key = item.split(':')[0];
+    if (key) acc[key] = 'PENDING';
+    return acc;
+  }, {});
 
-export function approvePPDBApplication(applicationId: string, classId: string) {
-  const db = readDB();
-  const target = db.ppdbApplications.find((item) => item.id === applicationId);
-  if (!target) return { ok: false, message: 'Data pendaftar tidak ditemukan.' };
-  if (target.status !== 'pending') return { ok: false, message: 'Pendaftar sudah diproses sebelumnya.' };
-  const targetClass = db.classes.find((item) => item.id === classId);
-  if (!targetClass) return { ok: false, message: 'Kelas tujuan tidak ditemukan.' };
+  const created: PPDBApplication = {
+    ...data,
+    id: createId(),
+    registrationNo: createRegistrationNo(),
+    submittedAt: new Date().toISOString(),
+    status: 'PENDING',
+    documentValidation,
+  };
 
-  const newNis = target.nisn.trim() || generateStudentNis(db.students);
-  if (db.students.some((item) => item.nis === newNis)) {
-    return { ok: false, message: 'NIS/NISN bentrok dengan data siswa aktif.' };
+  applications.push(created);
+  savePPDBApplications(applications);
+  appendPPDBAuditLog('SUBMIT_APPLICATION', 'PUBLIC_FORM', {
+    registrationNo: created.registrationNo,
+    namaLengkap: created.namaLengkap,
+  });
+  return created;
+};
+
+export const updateApplicationStatus = (
+  id: string,
+  status: PPDBApplicationStatus,
+  adminNotes?: string,
+  verifiedBy?: string
+): PPDBApplication | null => {
+  const applications = getPPDBApplications();
+  const index = applications.findIndex((item) => item.id === id);
+  if (index === -1) return null;
+
+  const updated: PPDBApplication = {
+    ...applications[index],
+    status,
+    adminNotes: adminNotes || applications[index].adminNotes,
+    verifiedBy: verifiedBy || applications[index].verifiedBy,
+    verifiedAt: new Date().toISOString(),
+  };
+
+  applications[index] = updated;
+  savePPDBApplications(applications);
+  appendPPDBAuditLog('UPDATE_STATUS', verifiedBy || getAdminProfileName(), {
+    registrationNo: updated.registrationNo,
+    status,
+  });
+
+  // If accepted, add to students
+  if (status === 'ACCEPTED') {
+    const db = readDB();
+    const newNis = updated.nisn.trim() || generateStudentNis(db.students);
+    if (!db.students.some((s) => s.nis === newNis)) {
+      addStudent({
+        id: `s-${Date.now()}`,
+        name: updated.namaLengkap,
+        nis: newNis,
+        password: 'siswa123',
+        classId: db.classes[0]?.id || '',
+        gender: updated.jenisKelamin.toLowerCase().startsWith('p') ? 'P' : 'L',
+      });
+    }
   }
 
-  db.students = [
-    {
-      id: `s-${Date.now()}`,
-      name: target.namaLengkap,
-      nis: newNis,
-      password: 'siswa123',
-      classId,
-      gender: target.jenisKelamin?.toLowerCase().startsWith('p') ? 'P' : 'L',
+  return updated;
+};
+
+export const updateDocumentValidation = (
+  id: string,
+  documentKey: string,
+  status: 'PENDING' | 'VALID' | 'INVALID'
+): PPDBApplication | null => {
+  const applications = getPPDBApplications();
+  const index = applications.findIndex((item) => item.id === id);
+  if (index === -1) return null;
+
+  const app = applications[index];
+  const nextValidation = {
+    ...(app.documentValidation || {}),
+    [documentKey]: status,
+  };
+
+  const updated: PPDBApplication = {
+    ...app,
+    documentValidation: nextValidation,
+    verifiedAt: new Date().toISOString(),
+  };
+
+  applications[index] = updated;
+  savePPDBApplications(applications);
+  appendPPDBAuditLog('UPDATE_DOCUMENT_VALIDATION', getAdminProfileName(), {
+    registrationNo: updated.registrationNo,
+    documentKey,
+    status,
+  });
+  return updated;
+};
+
+export const getPPDBApplicationById = (id: string): PPDBApplication | null => {
+  return getPPDBApplications().find((item) => item.id === id) || null;
+};
+
+export const getPPDBApplicationByRegNo = (regNo: string): PPDBApplication | null => {
+  return getPPDBApplications().find((item) => item.registrationNo === regNo) || null;
+};
+
+export const deletePPDBApplication = (id: string): boolean => {
+  const applications = getPPDBApplications();
+  const target = applications.find((item) => item.id === id);
+  const filtered = applications.filter((item) => item.id !== id);
+  if (filtered.length === applications.length) return false;
+  savePPDBApplications(filtered);
+  appendPPDBAuditLog('DELETE_APPLICATION', getAdminProfileName(), {
+    registrationNo: target?.registrationNo || '-',
+  });
+  return true;
+};
+
+export const getPPDBStatistics = () => {
+  const applications = getPPDBApplications();
+  return {
+    total: applications.length,
+    pending: applications.filter((a) => a.status === 'PENDING').length,
+    verified: applications.filter((a) => a.status === 'VERIFIED').length,
+    accepted: applications.filter((a) => a.status === 'ACCEPTED').length,
+    rejected: applications.filter((a) => a.status === 'REJECTED').length,
+    byJenjang: {
+      SD: applications.filter((a) => a.jenjangTujuan === 'SD').length,
+      SMP: applications.filter((a) => a.jenjangTujuan === 'SMP').length,
+      SMA: applications.filter((a) => a.jenjangTujuan === 'SMA').length,
+      SMK: applications.filter((a) => a.jenjangTujuan === 'SMK').length,
     },
-    ...db.students,
-  ];
+    byJalur: {
+      REGULER: applications.filter((a) => a.jalurPendaftaran === 'REGULER').length,
+      ZONASI: applications.filter((a) => a.jalurPendaftaran === 'ZONASI').length,
+      PRESTASI: applications.filter((a) => a.jalurPendaftaran === 'PRESTASI').length,
+      AFIRMASI: applications.filter((a) => a.jalurPendaftaran === 'AFIRMASI').length,
+      PINDAHAN: applications.filter((a) => a.jalurPendaftaran === 'PINDAHAN').length,
+    },
+  };
+};
 
-  db.ppdbApplications = db.ppdbApplications.map((item) =>
-    item.id === applicationId
-      ? { ...item, status: 'approved', processedAt: new Date().toISOString(), assignedNis: newNis, assignedClassId: classId }
-      : item,
+export const getPPDBAuditLogs = (): PPDBAuditLog[] => getPPDBAuditLogsRaw();
+
+export const exportPPDBBackupJson = (): string => {
+  return JSON.stringify(
+    {
+      exportedAt: new Date().toISOString(),
+      applications: getPPDBApplications(),
+      auditLogs: getPPDBAuditLogs(),
+    },
+    null,
+    2
   );
+};
 
-  writeDB(db);
-  return { ok: true, message: `Pendaftar ${target.namaLengkap} diterima ke kelas ${targetClass.name}.` };
-}
+export const importPPDBBackupJson = (rawJson: string): { ok: boolean; message: string } => {
+  try {
+    const parsed = JSON.parse(rawJson) as {
+      applications?: PPDBApplication[];
+      auditLogs?: PPDBAuditLog[];
+    };
+    if (!Array.isArray(parsed.applications)) {
+      return { ok: false, message: 'Format backup tidak valid.' };
+    }
+    const db = readDB();
+    db.ppdbApplications = parsed.applications;
+    writeDB(db);
+    if (Array.isArray(parsed.auditLogs)) {
+      savePPDBAuditLogs(parsed.auditLogs);
+    }
+    appendPPDBAuditLog('IMPORT_BACKUP', 'admin');
+    return { ok: true, message: 'Backup berhasil diimpor.' };
+  } catch {
+    return { ok: false, message: 'File backup tidak dapat dibaca.' };
+  }
+};
 
-export function rejectPPDBApplication(applicationId: string, note = '') {
-  const db = readDB();
-  const target = db.ppdbApplications.find((item) => item.id === applicationId);
-  if (!target) return { ok: false, message: 'Data pendaftar tidak ditemukan.' };
-  if (target.status !== 'pending') return { ok: false, message: 'Pendaftar sudah diproses sebelumnya.' };
-  db.ppdbApplications = db.ppdbApplications.map((item) =>
-    item.id === applicationId ? { ...item, status: 'rejected', processedAt: new Date().toISOString(), note } : item,
-  );
-  writeDB(db);
-  return { ok: true, message: `Pendaftar ${target.namaLengkap} ditandai tidak lolos seleksi.` };
-}
+// PPDB Admin Session & Security
+type AdminSession = {
+  username: string;
+  issuedAt: string;
+  expiresAt: string;
+};
+
+type AdminLockState = {
+  failedCount: number;
+  lockedUntil: string | null;
+};
+
+const getAdminLockState = (): AdminLockState =>
+  readLocalKey<AdminLockState>(PPDB_ADMIN_LOCK_KEY, {
+    failedCount: 0,
+    lockedUntil: null,
+  });
+
+const setAdminLockState = (state: AdminLockState) => {
+  saveLocalKey(PPDB_ADMIN_LOCK_KEY, state);
+};
+
+const isLockActive = (lockedUntil: string | null) => {
+  if (!lockedUntil) return false;
+  return new Date(lockedUntil).getTime() > Date.now();
+};
+
+export const getAdminSecurityState = () => {
+  const lock = getAdminLockState();
+  return {
+    isLocked: isLockActive(lock.lockedUntil),
+    failedCount: lock.failedCount,
+    lockedUntil: lock.lockedUntil,
+  };
+};
+
+export const adminLogin = (username: string, pin: string): boolean => {
+  const lock = getAdminLockState();
+  if (isLockActive(lock.lockedUntil)) {
+    appendPPDBAuditLog('ADMIN_LOGIN_FAILED', username || 'UNKNOWN', { reason: 'LOCKED' });
+    return false;
+  }
+
+  const normalized = username.trim();
+  if (!normalized || pin !== ADMIN_PIN) {
+    const nextFailed = lock.failedCount + 1;
+    const shouldLock = nextFailed >= ADMIN_MAX_ATTEMPTS;
+    const lockedUntil = shouldLock ? new Date(Date.now() + ADMIN_LOCK_MINUTES * 60 * 1000).toISOString() : null;
+    setAdminLockState({
+      failedCount: shouldLock ? 0 : nextFailed,
+      lockedUntil,
+    });
+    appendPPDBAuditLog('ADMIN_LOGIN_FAILED', normalized || 'UNKNOWN', {
+      reason: shouldLock ? 'MAX_ATTEMPTS' : 'INVALID_CREDENTIALS',
+    });
+    return false;
+  }
+
+  const session: AdminSession = {
+    username: normalized,
+    issuedAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + ADMIN_SESSION_MINUTES * 60 * 1000).toISOString(),
+  };
+  saveLocalKey(PPDB_ADMIN_SESSION_KEY, session);
+  setAdminLockState({ failedCount: 0, lockedUntil: null });
+  appendPPDBAuditLog('ADMIN_LOGIN_SUCCESS', normalized);
+  return true;
+};
+
+export const adminLogout = (): void => {
+  const actor = getAdminProfileName();
+  localStorage.removeItem(PPDB_ADMIN_SESSION_KEY);
+  appendPPDBAuditLog('ADMIN_LOGOUT', actor);
+};
+
+export const isAdminAuthenticated = (): boolean => {
+  const session = readLocalKey<AdminSession | null>(PPDB_ADMIN_SESSION_KEY, null);
+  if (!session) return false;
+  const isValid = new Date(session.expiresAt).getTime() > Date.now();
+  if (!isValid) {
+    localStorage.removeItem(PPDB_ADMIN_SESSION_KEY);
+    return false;
+  }
+  return true;
+};
+
+export const getAdminProfileName = (): string => {
+  const session = readLocalKey<AdminSession | null>(PPDB_ADMIN_SESSION_KEY, null);
+  return session?.username || 'Admin PPDB';
+};
 
 // ==================== ATTENDANCE ====================
 
@@ -846,116 +1170,6 @@ export function getAttendance() {
 export function saveAttendance(nextAttendance: AttendanceEntry[]) {
   const db = readDB();
   db.attendances = nextAttendance;
-  writeDB(db);
-}
-
-// ==================== LIBRARY (ENHANCED) ====================
-
-export function getBooks() {
-  return readDB().books;
-}
-
-export function saveBooks(nextBooks: Book[]) {
-  const db = readDB();
-  db.books = nextBooks;
-  writeDB(db);
-}
-
-export function getLibraryTransactions() {
-  return readDB().libraryTransactions;
-}
-
-export function saveLibraryTransactions(nextTx: LibraryTransaction[]) {
-  const db = readDB();
-  db.libraryTransactions = nextTx;
-  writeDB(db);
-}
-
-export function borrowBook(bookId: string, memberId: string, memberName: string, borrowDate: string, dueDate: string) {
-  const db = readDB();
-  const book = db.books.find(b => b.id === bookId);
-  if (!book) return { ok: false, message: 'Buku tidak ditemukan.' };
-  if (book.available <= 0) return { ok: false, message: 'Stok buku habis.' };
-
-  const tx: LibraryTransaction = {
-    id: `TX-${Date.now()}`,
-    bookId,
-    memberId,
-    memberName,
-    borrowDate,
-    dueDate,
-    status: 'menunggu'
-  };
-
-  db.libraryTransactions.push(tx);
-  writeDB(db);
-  return { ok: true, message: 'Permohonan pinjaman berhasil diajukan. Menunggu konfirmasi admin.' };
-}
-
-export function approveLibraryLoan(txId: string) {
-  const db = readDB();
-  const tx = db.libraryTransactions.find(t => t.id === txId);
-  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
-  if (tx.status !== 'menunggu') return { ok: false, message: 'Buku sudah diproses sebelumnya.' };
-
-  const book = db.books.find(b => b.id === tx.bookId);
-  if (!book) return { ok: false, message: 'Buku tidak ditemukan.' };
-  if (book.available <= 0) return { ok: false, message: 'Stok buku habis.' };
-
-  book.available -= 1;
-  tx.status = 'dipinjam';
-  writeDB(db);
-  return { ok: true, message: 'Peminjaman disetujui.' };
-}
-
-export function rejectLibraryLoan(txId: string, note = '') {
-  const db = readDB();
-  const tx = db.libraryTransactions.find(t => t.id === txId);
-  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
-
-  tx.status = 'ditolak';
-  tx.note = note;
-  writeDB(db);
-  return { ok: true, message: 'Peminjaman ditolak.' };
-}
-
-export function returnBook(txId: string, returnDate: string) {
-  const db = readDB();
-  const tx = db.libraryTransactions.find(t => t.id === txId);
-  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
-  if (tx.status === 'dikembalikan') return { ok: false, message: 'Buku sudah dikembalikan.' };
-
-  const book = db.books.find(b => b.id === tx.bookId);
-  if (book) book.available += 1;
-
-  tx.returnDate = returnDate;
-  tx.status = 'dikembalikan';
-  writeDB(db);
-  return { ok: true, message: 'Buku berhasil dikembalikan.' };
-}
-
-export function addOrUpdateBook(book: Book) {
-  const db = readDB();
-  const idx = db.books.findIndex(b => b.id === book.id);
-  if (idx >= 0) {
-    db.books[idx] = book;
-  } else {
-    db.books.push(book);
-  }
-  writeDB(db);
-}
-
-export function deleteBook(id: string) {
-  saveBooks(getBooks().filter(b => b.id !== id));
-}
-
-export function getLibraryMembers(): LibraryMember[] {
-  return readDB().libraryMembers;
-}
-
-export function saveLibraryMembers(nextMembers: LibraryMember[]) {
-  const db = readDB();
-  db.libraryMembers = nextMembers;
   writeDB(db);
 }
 
@@ -985,6 +1199,116 @@ export function addAttendanceRecords(records: AttendanceEntry[]) {
 
 export function getAttendanceRecords() {
   return readDB().attendance;
+}
+
+// ==================== LIBRARY (ENHANCED) ====================
+
+export function getBooks() {
+  return readDB().books;
+}
+
+export function saveBooks(nextBooks: Book[]) {
+  const db = readDB();
+  db.books = nextBooks;
+  writeDB(db);
+}
+
+export function getLibraryTransactions() {
+  return readDB().libraryTransactions;
+}
+
+export function saveLibraryTransactions(nextTx: LibraryTransaction[]) {
+  const db = readDB();
+  db.libraryTransactions = nextTx;
+  writeDB(db);
+}
+
+export function borrowBook(bookId: string, memberId: string, memberName: string, borrowDate: string, dueDate: string) {
+  const db = readDB();
+  const book = db.books.find((b) => b.id === bookId);
+  if (!book) return { ok: false, message: 'Buku tidak ditemukan.' };
+  if (book.available <= 0) return { ok: false, message: 'Stok buku habis.' };
+
+  const tx: LibraryTransaction = {
+    id: `TX-${Date.now()}`,
+    bookId,
+    memberId,
+    memberName,
+    borrowDate,
+    dueDate,
+    status: 'menunggu',
+  };
+
+  db.libraryTransactions.push(tx);
+  writeDB(db);
+  return { ok: true, message: 'Permohonan pinjaman berhasil diajukan. Menunggu konfirmasi admin.' };
+}
+
+export function approveLibraryLoan(txId: string) {
+  const db = readDB();
+  const tx = db.libraryTransactions.find((t) => t.id === txId);
+  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
+  if (tx.status !== 'menunggu') return { ok: false, message: 'Buku sudah diproses sebelumnya.' };
+
+  const book = db.books.find((b) => b.id === tx.bookId);
+  if (!book) return { ok: false, message: 'Buku tidak ditemukan.' };
+  if (book.available <= 0) return { ok: false, message: 'Stok buku habis.' };
+
+  book.available -= 1;
+  tx.status = 'dipinjam';
+  writeDB(db);
+  return { ok: true, message: 'Peminjaman disetujui.' };
+}
+
+export function rejectLibraryLoan(txId: string, note = '') {
+  const db = readDB();
+  const tx = db.libraryTransactions.find((t) => t.id === txId);
+  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
+
+  tx.status = 'ditolak';
+  tx.note = note;
+  writeDB(db);
+  return { ok: true, message: 'Peminjaman ditolak.' };
+}
+
+export function returnBook(txId: string, returnDate: string) {
+  const db = readDB();
+  const tx = db.libraryTransactions.find((t) => t.id === txId);
+  if (!tx) return { ok: false, message: 'Transaksi tidak ditemukan.' };
+  if (tx.status === 'dikembalikan') return { ok: false, message: 'Buku sudah dikembalikan.' };
+
+  const book = db.books.find((b) => b.id === tx.bookId);
+  if (book) book.available += 1;
+
+  tx.returnDate = returnDate;
+  tx.status = 'dikembalikan';
+  writeDB(db);
+  return { ok: true, message: 'Buku berhasil dikembalikan.' };
+}
+
+export function addOrUpdateBook(book: Book) {
+  const db = readDB();
+  const idx = db.books.findIndex((b) => b.id === book.id);
+  if (idx >= 0) {
+    db.books[idx] = book;
+  } else {
+    db.books.push(book);
+  }
+  writeDB(db);
+}
+
+export function deleteBook(id: string) {
+  saveBooks(getBooks().filter((b) => b.id !== id));
+}
+
+export function getLibraryMembers(): LibraryMember[] {
+  return readDB().libraryMembers;
+}
+
+export function saveLibraryMembers(nextMembers: LibraryMember[]) {
+  const db = readDB();
+  db.libraryMembers = nextMembers;
+  writeDB(db);
 }
 
 // ==================== CLASS ROSTERS ====================
@@ -1246,135 +1570,54 @@ export function getNilaiRapotBySiswa(studentId: string, tahunAjaran?: string, se
   });
 }
 
-export function getNilaiRapotByKelas(classId: string, tahunAjaran: string, semester: string): NilaiRapot[] {
-  return getNilaiRapot().filter((item) => item.classId === classId && item.tahunAjaran === tahunAjaran && item.semester === semester);
+export function getTahunAjaranRapotSiswa(studentId: string): string[] {
+  const all = getNilaiRapotBySiswa(studentId);
+  const ta = Array.from(new Set(all.map((item) => item.tahunAjaran)));
+  return ta.sort((a, b) => b.localeCompare(a));
 }
 
-export function upsertNilaiRapot(item: NilaiRapot) {
-  const all = getNilaiRapot();
-  const idx = all.findIndex(
-    (existing) =>
-      existing.studentId === item.studentId &&
-      existing.classId === item.classId &&
-      existing.tahunAjaran === item.tahunAjaran &&
-      existing.semester === item.semester &&
-      existing.mataPelajaran === item.mataPelajaran,
-  );
-  if (idx >= 0) all[idx] = item;
-  else all.push(item);
-  localStorage.setItem(RAPOT_KEY, JSON.stringify(all));
+export function saveNilaiRapot(nilai: NilaiRapot[]) {
+  localStorage.setItem(RAPOT_KEY, JSON.stringify(nilai));
   notifyStoreUpdated();
+}
+
+export function getNilaiRapotByKelas(classId: string, tahunAjaran?: string, semester?: string): NilaiRapot[] {
+  return getNilaiRapot().filter((item) => {
+    if (item.classId !== classId) return false;
+    if (tahunAjaran && item.tahunAjaran !== tahunAjaran) return false;
+    if (semester && item.semester !== semester) return false;
+    return true;
+  });
+}
+
+export function upsertNilaiRapot(nilai: NilaiRapot) {
+  const all = getNilaiRapot();
+  const idx = all.findIndex((item) => item.id === nilai.id);
+  if (idx >= 0) all[idx] = nilai;
+  else all.push(nilai);
+  saveNilaiRapot(all);
 }
 
 export function deleteNilaiRapot(id: string) {
-  const all = getNilaiRapot().filter((item) => item.id !== id);
-  localStorage.setItem(RAPOT_KEY, JSON.stringify(all));
-  notifyStoreUpdated();
+  saveNilaiRapot(getNilaiRapot().filter((item) => item.id !== id));
 }
 
-export function getTahunAjaranRapotSiswa(studentId: string): string[] {
-  const set = new Set(getNilaiRapot().filter((item) => item.studentId === studentId).map((item) => item.tahunAjaran));
-  return Array.from(set).sort((a, b) => b.localeCompare(a));
+// ==================== RPS DOCUMENT ====================
+
+const RPS_DOCUMENT_KEY = 'portal-siswa-rps-documents';
+
+export function getRpsDocument(classId: string, subject: string): RpsDocument | null {
+  const allDocs = readLocalKey<RpsDocument[]>(RPS_DOCUMENT_KEY, []);
+  return allDocs.find((d) => d.classId === classId && d.subject === subject) || null;
 }
 
-// ==================== CATATAN RPS GURU ====================
-
-export function getTeacherLessonNotes(teacherId: string, classId?: string, subject?: string): TeacherLessonNote[] {
-  const all = readLocalKey<TeacherLessonNote[]>(LESSON_NOTE_KEY, []);
-  return all
-    .filter((item) => {
-      if (item.teacherId !== teacherId) return false;
-      if (classId && item.classId !== classId) return false;
-      if (subject && item.subject !== subject) return false;
-      return true;
-    })
-    .sort((a, b) => b.updatedAt - a.updatedAt);
-}
-
-export function upsertTeacherLessonNote(
-  payload: Omit<TeacherLessonNote, 'id' | 'updatedAt'> & { id?: string },
-) {
-  const all = readLocalKey<TeacherLessonNote[]>(LESSON_NOTE_KEY, []);
-  const note: TeacherLessonNote = {
-    ...payload,
-    id: payload.id || `note-${Date.now()}`,
-    updatedAt: Date.now(),
-  };
-
-  const index = all.findIndex((item) => item.id === note.id);
-  if (index >= 0) {
-    all[index] = note;
+export function saveRpsDocument(doc: RpsDocument) {
+  const allDocs = readLocalKey<RpsDocument[]>(RPS_DOCUMENT_KEY, []);
+  const idx = allDocs.findIndex((d) => d.classId === doc.classId && d.subject === doc.subject);
+  if (idx >= 0) {
+    allDocs[idx] = { ...doc, updatedAt: Date.now() };
   } else {
-    all.push(note);
+    allDocs.push({ ...doc, id: createId(), updatedAt: Date.now() });
   }
-
-  localStorage.setItem(LESSON_NOTE_KEY, JSON.stringify(all));
-  notifyStoreUpdated();
-  return note;
-}
-
-// ==================== DOKUMEN RPS GURU ====================
-
-export function getRpsDocument(teacherId: string, classId: string, subject: string): RpsDocument | null {
-  const all = readLocalKey<RpsDocument[]>(RPS_DOCUMENT_KEY, []);
-  return all.find((item) => item.teacherId === teacherId && item.classId === classId && item.subject === subject) || null;
-}
-
-export function saveRpsDocument(payload: Omit<RpsDocument, 'id' | 'updatedAt'> & { id?: string }) {
-  const all = readLocalKey<RpsDocument[]>(RPS_DOCUMENT_KEY, []);
-  const id = payload.id || `rps-${Date.now()}`;
-  const next: RpsDocument = {
-    ...payload,
-    id,
-    updatedAt: Date.now(),
-  };
-  const index = all.findIndex((item) => item.id === id || (item.teacherId === next.teacherId && item.classId === next.classId && item.subject === next.subject));
-  if (index >= 0) all[index] = next;
-  else all.push(next);
-  localStorage.setItem(RPS_DOCUMENT_KEY, JSON.stringify(all));
-  notifyStoreUpdated();
-  return next;
-}
-
-// ==================== BACKUP & RESTORE ====================
-
-export function getCadanganDataAplikasi() {
-  return {
-    metadata: { exportedAt: new Date().toISOString(), storageKey: STORAGE_KEY },
-    data: readDB(),
-  };
-}
-
-export function pulihkanDataAplikasiDariCadangan(content: string): HasilPulihkanCadangan {
-  try {
-    const parsed = JSON.parse(content) as { data?: Database } | Database;
-    const restoredData = 'data' in parsed && parsed.data ? parsed.data : (parsed as Database);
-    writeDB(restoredData);
-    return { berhasil: true, pesan: 'Pemulihan data cadangan berhasil.' };
-  } catch {
-    return { berhasil: false, pesan: 'Format file cadangan tidak valid.' };
-  }
-}
-
-// ==================== STORAGE INFO ====================
-
-export function getRingkasanPenyimpananBrowser(): RingkasanPenyimpananBrowser {
-  let usedBytes = 0;
-  for (let index = 0; index < localStorage.length; index += 1) {
-    const key = localStorage.key(index);
-    if (!key) continue;
-    const value = localStorage.getItem(key) ?? '';
-    usedBytes += (key.length + value.length) * 2;
-  }
-  const usedPercent = Math.min(100, Math.round((usedBytes / APPROX_LOCAL_STORAGE_LIMIT_BYTES) * 100));
-  return {
-    usedBytes,
-    limitBytes: APPROX_LOCAL_STORAGE_LIMIT_BYTES,
-    usedPercent,
-    remainingBytes: Math.max(0, APPROX_LOCAL_STORAGE_LIMIT_BYTES - usedBytes),
-  };
-}
-
-export async function kompresUlangSemuaFotoTersimpan(): Promise<RingkasanKompresFoto> {
-  return { totalDitemukan: 0, totalBerhasil: 0, totalGagal: 0 };
+  saveLocalKey(RPS_DOCUMENT_KEY, allDocs);
 }

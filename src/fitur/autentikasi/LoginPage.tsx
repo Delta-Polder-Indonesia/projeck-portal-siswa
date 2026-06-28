@@ -7,8 +7,9 @@ import {
 } from 'lucide-react';
 import AdminMasterPanel from '../admin/PanelAdminModal';
 import TutorialModal from './TutorialModal';
-import ExpectationModal from '../ppdb/ExpectationModal';
-import PPDBForm from '../ppdb/PPDBForm';
+import ExpectationModal from '../halaman/ExpectationModal';
+import PPDBForm from '../penerimaan-siswa-baru/PPDBForm';
+import LandingPage from '../penerimaan-siswa-baru/LandingPage';
 
 const PerpustakaanApp = lazy(() => import('../../fitur/perpustakaan/PerpustakaanApp'));
 
@@ -31,6 +32,7 @@ export default function LoginPage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showExpectation, setShowExpectation] = useState(false);
   const [showPPDB, setShowPPDB] = useState(false);
+  const [ppdbView, setPpdbView] = useState<'landing' | 'form'>('landing');
   const [showPerpustakaan, setShowPerpustakaan] = useState(false);
 
   const handleSelectRole = (selectedRole: UserRole) => {
@@ -241,11 +243,23 @@ export default function LoginPage() {
 
       {/* PPDB Form Modal */}
       {showPPDB && (
-        <PPDBForm
-          isModal={true}
-          onClose={() => setShowPPDB(false)}
-          onBack={() => setShowPPDB(false)}
-        />
+        <div className="fixed inset-0 z-[150] bg-white overflow-y-auto">
+          {ppdbView === 'landing' ? (
+            <LandingPage
+              onOpenForm={() => setPpdbView('form')}
+              onClose={() => setShowPPDB(false)}
+            />
+          ) : (
+            <PPDBForm
+              isModal={false}
+              onBack={() => setPpdbView('landing')}
+              onClose={() => {
+                setShowPPDB(false);
+                setPpdbView('landing');
+              }}
+            />
+          )}
+        </div>
       )}
 
       {/* PERPUSTAKAAN - Loading Container */}

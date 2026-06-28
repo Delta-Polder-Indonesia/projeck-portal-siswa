@@ -20,7 +20,11 @@ type StudentEditMap = Record<
   }
 >;
 
-export default function TabAkunSiswa() {
+interface TabAkunSiswaProps {
+  setNotice?: (msg: string) => void;
+}
+
+export default function TabAkunSiswa({ setNotice }: TabAkunSiswaProps) {
   const storeVersion = useStoreVersion();
   const students = useMemo(() => getStudents(), [storeVersion]);
   const classes = useMemo(() => getClasses(), [storeVersion]);
@@ -109,7 +113,7 @@ export default function TabAkunSiswa() {
   const handleDeleteStudent = (studentId: string) => {
     const student = students.find((item) => item.id === studentId);
     if (!student) return;
-    
+
     const confirmed = window.confirm(`Hapus siswa ${student.name} dari portal sistem secara permanen?`);
     if (!confirmed) return;
 
@@ -179,7 +183,7 @@ export default function TabAkunSiswa() {
 
   return (
     <div className="w-full bg-white p-4 rounded-xl space-y-4">
-      
+
       {/* HEADER UTAMA */}
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-black pb-4 gap-3">
         <div>
@@ -434,7 +438,7 @@ export default function TabAkunSiswa() {
               Tutup Log
             </button>
           </div>
-          
+
           {classMutations.length > 0 ? (
             <div className="overflow-x-auto rounded-md border border-black">
               <table className="w-full min-w-[550px] border-collapse bg-white text-left text-xs">
