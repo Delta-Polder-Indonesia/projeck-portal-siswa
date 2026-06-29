@@ -72,10 +72,12 @@ export default function LoginPerpustakaan({ onLoginSuccess, onBackToPortal }: Lo
 
       {/* Background Gambar Alam / Estetik Bersih */}
       <div
-  className="fixed inset-0 bg-cover bg-center z-0 scale-105"
- style={{
-  backgroundImage: `url('${import.meta.env.BASE_URL}images/Dashboard/perpustakaan.jpg')`
-}}
+        className="fixed inset-0 bg-cover bg-center z-0 scale-105"
+        style={{
+          backgroundImage: `url('${import.meta.env.BASE_URL}images/Dashboard/perpustakaan.jpg')`
+        }}
+      />
+
       {/* Overlay Gelap Halus untuk kontras */}
       <div className="fixed inset-0 bg-black/10 z-0" />
 
@@ -121,21 +123,23 @@ export default function LoginPerpustakaan({ onLoginSuccess, onBackToPortal }: Lo
               value={nisn}
               onChange={(e) => setNisn(e.target.value)}
               placeholder="NISN / Username Siswa"
+              autoComplete="username"
               className="w-full px-4 py-3 rounded-xl text-white text-xs border border-white/20 bg-black/10 outline-none focus:border-white/50 focus:bg-black/20 transition-all placeholder:text-white/40"
               required
             />
           </div>
 
           {/* Input Password */}
-          <input
-  type={showPassword ? 'text' : 'password'}
-  value={password}
-  onChange={(e) => setPassword(e.target.value)}
-  placeholder="Kata Sandi Portal"
-  autoComplete="current-password"  // ← TAMBAHKAN INI
-  className="w-full px-4 py-3 rounded-xl text-white text-xs border border-white/20 bg-black/10 outline-none focus:border-white/50 focus:bg-black/20 transition-all placeholder:text-white/40"
-  required
-/>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Kata Sandi Portal"
+              autoComplete="current-password"
+              className="w-full px-4 py-3 rounded-xl text-white text-xs border border-white/20 bg-black/10 outline-none focus:border-white/50 focus:bg-black/20 transition-all placeholder:text-white/40"
+              required
+            />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
