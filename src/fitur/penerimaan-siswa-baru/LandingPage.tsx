@@ -297,7 +297,8 @@ export default function LandingPage({ onOpenForm, onClose }: LandingPageProps) {
         className="relative flex min-h-screen items-end border-b border-slate-200 pt-16"
         style={{
           backgroundImage:
-            `linear-gradient(to top, rgba(15,23,42,0.70), rgba(15,23,42,0.35)), url('${import.meta.env.BASE_URL}images/siswa%20baru/f-1.jpg')`,
+            `linear-gradient(to top, rgba(15,23,42,0.70), rgba(15,23,42,0.35)), url('${import.meta.env.BASE_URL}images/siswa%20baru/f-2.jpg')`,
+			backgroundSize: 'contain',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           width: '100%',

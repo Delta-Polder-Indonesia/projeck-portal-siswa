@@ -32,3 +32,8 @@ export interface ActivityItem {
   desc: string;
   image: string;
 }
+
+// ⬇️ TAMBAHAN: Props navigasi untuk semua halaman
+export interface PageProps {
+  onNavigate?: (menu: NavItem) => void;
+}

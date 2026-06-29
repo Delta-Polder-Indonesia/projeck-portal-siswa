@@ -1,3 +1,5 @@
+import type { PageProps } from '../types';
+
 export default function ProfilPage() {
   const formattedDate = new Date().toLocaleDateString('id-ID', {
     weekday: 'long',

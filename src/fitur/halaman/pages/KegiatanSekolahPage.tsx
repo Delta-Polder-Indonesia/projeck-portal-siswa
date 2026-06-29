@@ -1,30 +1,100 @@
+import type { PageProps } from '../types';
+
 const events = [
   {
     title: "Masa Pengenalan Lingkungan Sekolah",
     time: "Juli 2026",
+    desc: "Kegiatan orientasi bagi siswa baru untuk mengenal lingkungan sekolah, tata tertib, program kegiatan, dan membangun rasa kekeluargaan antar siswa.",
+    type: "Orientasi",
+    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-1.jpg`,
   },
   {
     title: "Class Meeting dan Expo Karya Siswa",
     time: "Desember 2026",
+    desc: "Pameran karya siswa dari berbagai program keahlian, lomba antar kelas, dan pentas seni yang menampilkan bakat dan kreativitas siswa.",
+    type: "Pameran",
+    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-2.jpg`,
   },
   {
     title: "Lomba Kompetensi Siswa Tingkat Kota",
     time: "Maret 2027",
+    desc: "Seleksi dan pelatihan siswa berprestasi untuk mengikuti kompetisi keahlian tingkat kota dan provinsi.",
+    type: "Kompetisi",
+    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-3.jpg`,
+  },
+  {
+    title: "Kunjungan Industri Kelas XI",
+    time: "September 2026",
+    desc: "Kunjungan ke perusahaan mitra untuk memperkenalkan siswa pada lingkungan kerja nyata dan memperkuat pemahaman industri.",
+    type: "Kunjungan",
+    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-4.jpg`,
+  },
+  {
+    title: "Seminar Karir dan Beasiswa",
+    time: "November 2026",
+    desc: "Pemberian informasi jalur karir, beasiswa pendidikan lanjut, dan motivasi dari alumni sukses.",
+    type: "Seminar",
+    image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-5.jpg`,
   },
 ];
 
-export default function KegiatanSekolahPage() {
+const extracurriculars = [
+  { name: "Pramuka", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-6.jpg` },
+  { name: "OSIS & MPK", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-7.jpg` },
+  { name: "Rohis (Rohani Islam)", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-8.jpg` },
+  { name: "Paskibra", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-9.jpg` },
+  { name: "Futsal", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-10.jpg` },
+  { name: "Basket", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-11.jpg` },
+  { name: "Voli", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-12.jpg` },
+  { name: "Tari Tradisional", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-13.jpg` },
+  { name: "Paduan Suara", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-14.jpg` },
+  { name: "Jurnalistik", image: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-15.jpg` },
+];
+
+export default function KegiatanSekolahPage({ onNavigate }: PageProps) {
   return (
     <section className="px-6 py-8">
       <div className="border-b-2 border-amber-500 pb-3">
         <h2 className="text-2xl font-bold text-blue-900">Kegiatan Sekolah</h2>
         <p className="text-sm text-slate-600">Agenda tahunan dan kegiatan pengembangan minat bakat siswa.</p>
       </div>
-      <div className="mt-6 space-y-3">
+
+      <div className="mt-6 space-y-4">
         {events.map((event) => (
-          <div key={event.title} className="border-l-4 border-amber-500 bg-[#f8f9fc] px-4 py-3">
-            <h3 className="text-base font-bold text-blue-950">{event.title}</h3>
-            <p className="text-sm text-gray-600">Pelaksanaan: {event.time}</p>
+          <div key={event.title} className="border border-gray-200 bg-[#f8f9fc] overflow-hidden hover:shadow-md transition-shadow">
+            <div className="h-40 w-full overflow-hidden">
+              <img
+                src={event.image}
+                alt={event.title}
+                className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="px-5 py-4 border-l-4 border-amber-500">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-bold uppercase bg-amber-100 text-amber-700 px-2 py-0.5 rounded">{event.type}</span>
+                <span className="text-[11px] text-gray-400">{event.time}</span>
+              </div>
+              <h3 className="text-base font-bold text-blue-950">{event.title}</h3>
+              <p className="text-sm text-gray-600 mt-1 leading-relaxed">{event.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mt-8 mb-3 text-base font-bold text-blue-950 border-b border-gray-200 pb-2">Ekstrakurikuler</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+        {extracurriculars.map((ex) => (
+          <div key={ex.name} className="border border-gray-200 bg-white overflow-hidden hover:shadow-md transition-shadow">
+            <div className="h-24 w-full overflow-hidden">
+              <img
+                src={ex.image}
+                alt={ex.name}
+                className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="px-3 py-2 text-center">
+              <p className="text-xs font-semibold text-gray-700">{ex.name}</p>
+            </div>
           </div>
         ))}
       </div>
