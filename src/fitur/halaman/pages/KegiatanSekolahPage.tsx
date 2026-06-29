@@ -59,26 +59,33 @@ export default function KegiatanSekolahPage({ onNavigate }: PageProps) {
         <p className="text-sm text-slate-600">Agenda tahunan dan kegiatan pengembangan minat bakat siswa.</p>
       </div>
 
-      <div className="mt-6 space-y-4">
-        {events.map((event) => (
-          <div key={event.title} className="border border-gray-200 bg-[#f8f9fc] overflow-hidden hover:shadow-md transition-shadow">
-            <div className="h-40 w-full overflow-hidden">
-              <img
-                src={event.image}
-                alt={event.title}
-                className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="px-5 py-4 border-l-4 border-amber-500">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-bold uppercase bg-amber-100 text-amber-700 px-2 py-0.5 rounded">{event.type}</span>
-                <span className="text-[11px] text-gray-400">{event.time}</span>
+      <div className="pt-6">
+        {/* Agenda Utama dalam susunan grid kesamping */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {events.map((event) => (
+            <div key={event.title} className="border border-gray-200 bg-[#f8f9fc] overflow-hidden hover:shadow-md transition-shadow flex flex-col justify-between">
+              <div>
+                <div className="h-36 w-full overflow-hidden">
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-4 border-t-4 border-amber-500">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span className="text-[9px] font-bold uppercase bg-amber-100 text-amber-700 px-2 py-0.5 rounded">
+                      {event.type}
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-medium">{event.time}</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-blue-950 leading-snug">{event.title}</h4>
+                  <p className="text-xs text-gray-500 mt-2 leading-relaxed text-justify">{event.desc}</p>
+                </div>
               </div>
-              <h3 className="text-base font-bold text-blue-950">{event.title}</h3>
-              <p className="text-sm text-gray-600 mt-1 leading-relaxed">{event.desc}</p>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <h3 className="mt-8 mb-3 text-base font-bold text-blue-950 border-b border-gray-200 pb-2">Ekstrakurikuler</h3>

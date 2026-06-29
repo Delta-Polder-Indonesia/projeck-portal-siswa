@@ -39,29 +39,38 @@ export default function BeritaPage({ onNavigate }: PageProps) {
         <p className="text-sm text-slate-600">Update terbaru seputar prestasi, kegiatan, dan pengumuman sekolah.</p>
       </div>
 
-      <div className="mt-6 space-y-4">
-        {news.map((item) => (
-          <article key={item.title} className="border border-gray-200 bg-[#f8f9fc] overflow-hidden hover:shadow-md transition-shadow">
-            <div className="h-44 w-full overflow-hidden">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-bold uppercase bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{item.category}</span>
-                <span className="text-[11px] text-gray-400">{item.date}</span>
+      <div className="pt-6">
+        {/* Grid layout kesamping konsisten dengan halaman sebelumnya */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {news.map((item) => (
+            <article key={item.title} className="border border-gray-200 bg-[#f8f9fc] overflow-hidden hover:shadow-md transition-shadow flex flex-col justify-between">
+              <div>
+                <div className="h-36 w-full overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span className="text-[9px] font-bold uppercase bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                      {item.category}
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-medium">{item.date}</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-blue-950 leading-snug line-clamp-2 min-h-[40px]">{item.title}</h4>
+                  <p className="text-xs text-gray-500 mt-2 leading-relaxed text-justify line-clamp-4">{item.excerpt}</p>
+                </div>
               </div>
-              <h3 className="text-base font-bold text-blue-950">{item.title}</h3>
-              <p className="pt-2 text-sm text-gray-600 leading-relaxed text-justify">{item.excerpt}</p>
-              <button className="mt-3 text-xs font-semibold text-blue-700 hover:underline cursor-pointer">
-                Baca Selengkapnya →
-              </button>
-            </div>
-          </article>
-        ))}
+              <div className="px-4 pb-4 pt-0">
+                <button className="text-xs font-semibold text-blue-700 hover:underline cursor-pointer">
+                  Baca Selengkapnya →
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

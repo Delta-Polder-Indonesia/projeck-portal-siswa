@@ -20,22 +20,31 @@ export default function GaleriPage({ onNavigate }: PageProps) {
         <p className="text-sm text-slate-600">Dokumentasi visual aktivitas siswa, guru, dan kegiatan sekolah.</p>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-        {galleryItems.map((item) => (
-          <div key={item.title} className="border border-gray-200 bg-[#f8f9fc] overflow-hidden group cursor-pointer hover:shadow-md transition-all">
-            <div className="h-44 w-full overflow-hidden">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+      <div className="pt-6">
+        {/* Grid layout 4 kolom yang konsisten dengan halaman sebelumnya */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {galleryItems.map((item) => (
+            <div key={item.title} className="border border-gray-200 bg-[#f8f9fc] overflow-hidden hover:shadow-md transition-shadow flex flex-col justify-between cursor-pointer">
+              <div>
+                <div className="h-36 w-full overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-4">
+                  <span className="text-[10px] font-semibold uppercase text-amber-600 tracking-wide">
+                    {item.category}
+                  </span>
+                  <h4 className="text-sm font-bold text-blue-950 mt-1 leading-snug line-clamp-2 min-h-[40px]">
+                    {item.title}
+                  </h4>
+                </div>
+              </div>
             </div>
-            <div className="p-3">
-              <span className="text-[10px] font-semibold uppercase text-amber-600">{item.category}</span>
-              <p className="text-sm text-gray-700 font-medium mt-0.5">{item.title}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
