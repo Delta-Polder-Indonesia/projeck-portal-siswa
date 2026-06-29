@@ -1,9 +1,9 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import {
   GraduationCap, BookOpen, Eye, EyeOff, ArrowLeft,
-  User, HelpCircle, BookMarked
+  User, HelpCircle, BookMarked, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import AdminMasterPanel from '../admin/PanelAdminModal';
 import TutorialModal from './TutorialModal';
@@ -20,6 +20,28 @@ const ADMIN_LOGIN = {
   master: { username: 'admin', password: 'admin' },
 } as const;
 
+// ============================================
+// GANTI FOTO DI SINI BUNG
+// ============================================
+const CAROUSEL_IMAGES = [
+  {
+    src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-1.jpg`,
+    caption: 'Fasilitas Pembelajaran Modern'
+  },
+  {
+    src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-2.jpg`,
+    caption: 'Kegiatan Ekstrakurikuler'
+  },
+  {
+    src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-3.jpg`,
+    caption: 'Prestasi Siswa Berprestasi'
+  },
+  {
+    src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-4.jpg`,
+    caption: 'Lingkungan Belajar Nyaman'
+  },
+];
+
 export default function LoginPage() {
   const { login } = useAuth();
   const [role, setRole] = useState<UserRole | null>(null);
@@ -34,6 +56,32 @@ export default function LoginPage() {
   const [showPPDB, setShowPPDB] = useState(false);
   const [ppdbView, setPpdbView] = useState<'landing' | 'form'>('landing');
   const [showPerpustakaan, setShowPerpustakaan] = useState(false);
+
+  // Carousel state
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + CAROUSEL_IMAGES.length) % CAROUSEL_IMAGES.length);
+  }, []);
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+    setIsAutoPlaying(false);
+    // Resume autoplay after 5 seconds
+    setTimeout(() => setIsAutoPlaying(true), 5000);
+  };
+
+  // Auto-slide setiap 5 detik
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    const interval = setInterval(nextSlide, 5000);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, nextSlide]);
 
   const handleSelectRole = (selectedRole: UserRole) => {
     setRole(selectedRole);
@@ -95,7 +143,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Sisi Kanan: Menu Navigasi - Hanya Teks & Logo/Ikon Tanpa Container */}
+            {/* Sisi Kanan: Menu Navigasi */}
             <nav className="flex items-center gap-4 bg-transparent p-0 border-none rounded-none">
               <button
                 type="button"
@@ -103,7 +151,7 @@ export default function LoginPage() {
                 className="flex items-center gap-2 p-1 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white bg-transparent border-none"
               >
                 <User className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Profil</span>
+                <span>Halaman</span>
               </button>
 
               <button
@@ -134,6 +182,79 @@ export default function LoginPage() {
 
       {/* MAIN CONTENT WORKSPACE */}
       <main className="relative z-10 flex-1 flex w-full max-w-7xl items-center justify-end gap-12 lg:gap-20 mx-auto px-4 sm:px-6 lg:px-8 py-8 max-[900px]:justify-center">
+
+        {/* LEFT SIDE - Image Carousel */}
+        <div className="hidden lg:flex flex-1 max-w-[700px] h-[420px] relative rounded-3xl overflow-hidden group">
+          
+          {/* Images dengan fade transition */}
+          {CAROUSEL_IMAGES.map((image, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
+            >
+              <img
+                src={image.src}
+                alt={image.caption}
+                className="w-full h-full object-cover"
+              />
+              {/* Gradient overlay dari bawah */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            </div>
+          ))}
+
+          {/* Caption */}
+          <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
+            <div className="transform transition-all duration-500 translate-y-0">
+              <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">
+                {CAROUSEL_IMAGES[currentSlide].caption}
+              </h3>
+              <p className="text-white/70 text-sm">
+                SMP Negeri 1 Majenang
+              </p>
+            </div>
+          </div>
+
+          {/* Navigation Arrows (muncul saat hover) */}
+          <button
+            onClick={() => {
+              prevSlide();
+              setIsAutoPlaying(false);
+              setTimeout(() => setIsAutoPlaying(true), 5000);
+            }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60 cursor-pointer"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => {
+              nextSlide();
+              setIsAutoPlaying(false);
+              setTimeout(() => setIsAutoPlaying(true), 5000);
+            }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60 cursor-pointer"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          {/* Dots Indicator */}
+          <div className="absolute bottom-8 right-8 z-20 flex items-center gap-2">
+            {CAROUSEL_IMAGES.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`transition-all duration-300 rounded-full cursor-pointer ${
+                  index === currentSlide
+                    ? 'w-8 h-2 bg-cyan-400'
+                    : 'w-2 h-2 bg-white/40 hover:bg-white/60'
+                }`}
+              />
+            ))}
+          </div>
+
+         
+        </div>
 
         {/* RIGHT SIDE - Login Card */}
         <div className="flex-shrink-0 w-full max-w-[420px]">

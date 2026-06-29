@@ -73,11 +73,11 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
                 </div>
                 {/* Input Search dibuat lebih slim dengan py-1 */}
                   <button
-                    onClick={onClose}
-                    className="p-2.5 rounded-xl border-2 border-gray-300 text-gray-900 bg-white font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer hover:bg-gray-50"
-                  >
-                    <X className="h-2.5 w-2.5" /> Tutup
-                  </button>
+  onClick={onClose}
+  className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
+>
+  Tutup
+</button>
                 </div>
 
               {/* Navigation Bar (Tinggi menu disesuaikan dari py-3 ke py-2) */}
