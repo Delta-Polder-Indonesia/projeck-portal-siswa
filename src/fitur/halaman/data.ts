@@ -51,13 +51,16 @@ export const activityItems: ActivityItem[] = [
   {
     title: 'Apel Pagi memperingati HUT PRAMUKA ke-55 di SMK Negeri 1 Cimahi',
     desc: 'Kegiatan apel pagi dan pembinaan karakter siswa dilaksanakan bersama seluruh civitas sekolah.',
+    image: 'images/Dashboard/sekolah-1.jpg',
   },
   {
     title: 'Upacara Hari Senin Pagi Tanggal 22 Agustus 2016 memperingati HUT RI ke-71',
     desc: 'Kegiatan upacara dilaksanakan dengan tertib, khidmat, dan diikuti seluruh warga sekolah.',
+    image: 'images/Dashboard/sekolah-2.jpg',
   },
   {
     title: 'Pameran Produk Inovasi Anak Bangsa RITECH EXPO 2016 di Gor Manahan SOLO',
     desc: 'SMK Negeri 1 Cimahi berpartisipasi melalui program keahlian unggulan dan karya inovatif siswa.',
+    image: 'images/Dashboard/sekolah-3.jpg',
   },
 ];

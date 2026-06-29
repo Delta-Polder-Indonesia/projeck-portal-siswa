@@ -21,24 +21,28 @@ const ADMIN_LOGIN = {
 } as const;
 
 // ============================================
-// GANTI FOTO DI SINI BUNG
+// GANTI ATAU TAMBAH FOTO DI SINI BUNG (BISA 10 - 20 FOTO)
 // ============================================
 const CAROUSEL_IMAGES = [
   {
     src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-1.jpg`,
-    caption: 'Fasilitas Pembelajaran Modern'
+    caption: 'Fasilitas Pembelajaran Modern ( DEMO )'
   },
   {
     src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-2.jpg`,
-    caption: 'Kegiatan Ekstrakurikuler'
+    caption: 'Kegiatan Ekstrakurikuler ( DEMO )'
   },
   {
     src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-3.jpg`,
-    caption: 'Prestasi Siswa Berprestasi'
+    caption: 'Prestasi Siswa Berprestasi ( DEMO )'
   },
   {
     src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-4.jpg`,
-    caption: 'Lingkungan Belajar Nyaman'
+    caption: 'Lingkungan Belajar Nyaman ( DEMO )'
+  },
+  {
+    src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-5.jpeg`,
+    caption: 'Alumni Siswa Tahun Ajaran 2024/2025 ( DEMO )'
   },
 ];
 
@@ -72,7 +76,7 @@ export default function LoginPage() {
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
     setIsAutoPlaying(false);
-    // Resume autoplay after 5 seconds
+    // Resume autoplay setelah 5 detik jika user klik manual
     setTimeout(() => setIsAutoPlaying(true), 5000);
   };
 
@@ -128,7 +132,7 @@ export default function LoginPage() {
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 w-full">
 
-            {/* Sisi Kiri: Identitas Sekolah - Mentok Kiri */}
+            {/* Sisi Kiri: Identitas Sekolah */}
             <div className="flex items-center gap-3 justify-start pl-0">
               <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/20 bg-white/10 flex items-center justify-center p-1 shrink-0">
                 <img src={LOGO_SMP} alt="Logo" className="w-full h-full object-contain" />
@@ -199,15 +203,14 @@ export default function LoginPage() {
                 alt={image.caption}
                 className="w-full h-full object-cover"
               />
-              {/* Gradient overlay dari bawah */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             </div>
           ))}
 
           {/* Caption */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
+          <div className="absolute bottom-4 left-0 right-0 z-20 px-8 pb-6">
             <div className="transform transition-all duration-500 translate-y-0">
-              <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-lg">
+              <h3 className="text-white text-2xl font-bold mb-1 drop-shadow-lg">
                 {CAROUSEL_IMAGES[currentSlide].caption}
               </h3>
               <p className="text-white/70 text-sm">
@@ -216,7 +219,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Navigation Arrows (muncul saat hover) */}
+          {/* Navigation Arrows */}
           <button
             onClick={() => {
               prevSlide();
@@ -238,22 +241,62 @@ export default function LoginPage() {
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          {/* Dots Indicator */}
-          <div className="absolute bottom-8 right-8 z-20 flex items-center gap-2">
-            {CAROUSEL_IMAGES.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`transition-all duration-300 rounded-full cursor-pointer ${
-                  index === currentSlide
-                    ? 'w-8 h-2 bg-cyan-400'
-                    : 'w-2 h-2 bg-white/40 hover:bg-white/60'
-                }`}
-              />
-            ))}
-          </div>
+          {/* Indikator Dot Dinamis - Maksimal Terkunci 5 Titik Saja */}
+          <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2">
+            {CAROUSEL_IMAGES.map((_, index) => {
+              const totalDots = CAROUSEL_IMAGES.length;
+              
+              // Jika foto <= 5, tampilkan semua titik normal
+              if (totalDots <= 5) {
+                return (
+                  <button
+                    key={index}
+                    type="button"
+              onClick={() => goToSlide(index)}
+              className={`h-2 w-2 rounded-full transition-all ${
+                index === currentSlide
+                  ? "bg-white"
+                  : "bg-white/70 hover:bg-white"
+              }`}
+            />
+                );
+              }
 
-         
+              // Hitung rentang jendela (window) 5 titik aktif di sekitar slide saat ini
+              let start = currentSlide - 2;
+              let end = currentSlide + 2;
+
+              if (start < 0) {
+                end = end - start;
+                start = 0;
+              }
+              if (end >= totalDots) {
+                start = start - (end - totalDots + 1);
+                end = totalDots - 1;
+              }
+
+              start = Math.max(0, start);
+
+              // Sembunyikan titik yang berada di luar rentang jendela 5 titik
+              if (index < start || index > end) return null;
+
+              // Efek visual mengecil untuk titik paling ujung (indikasi masih ada slide selanjutnya)
+              const isEdge = (index === start && start > 0) || (index === end && end < totalDots - 1);
+
+              return (
+                <button
+                  key={index}
+                  type="button"
+              onClick={() => goToSlide(index)}
+              className={`h-2 w-2 rounded-full transition-all ${
+                index === currentSlide
+                  ? "bg-white"
+                  : "bg-white/70 hover:bg-white"
+              }`}
+            />
+              );
+            })}
+          </div>
         </div>
 
         {/* RIGHT SIDE - Login Card */}
@@ -266,7 +309,6 @@ export default function LoginPage() {
             }}
           >
 
-            {/* Jika sudah pilih role, munculkan tombol Back */}
             {role !== null && (
               <button
                 onClick={handleBack}
@@ -399,6 +441,7 @@ export default function LoginPage() {
         </Suspense>
       )}
 
+      {/* Admin Panel */}
       {openAdminPanel && (
         <AdminMasterPanel
           open={openAdminPanel}

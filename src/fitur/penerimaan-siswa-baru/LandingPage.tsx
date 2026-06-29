@@ -261,10 +261,13 @@ export default function LandingPage({ onOpenForm, onClose }: LandingPageProps) {
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
     <header className="fixed left-0 right-0 top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:px-8">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Portal Resmi</p>
-            <p className="text-base font-semibold">PPDB Nasional</p>
-          </div>
+          <div className="flex items-center gap-3">
+  <img
+    src={`${import.meta.env.BASE_URL}images/siswa%20baru/unique_id.png`}
+    alt="Logo PPDB"
+    className="h-10 w-auto object-contain"
+  />
+</div>
 
           <nav className="flex items-center gap-3 md:gap-5">
             <button

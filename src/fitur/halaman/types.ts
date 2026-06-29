@@ -30,4 +30,5 @@ export interface NewsItem {
 export interface ActivityItem {
   title: string;
   desc: string;
+  image: string;
 }

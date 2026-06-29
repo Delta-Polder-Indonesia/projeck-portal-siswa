@@ -331,7 +331,17 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
     <div className="mx-auto w-full max-w-6xl bg-white p-6 rounded-2xl border border-slate-200 shadow-sm animate-in fade-in duration-200">
       <header className="mb-8 border-b border-slate-200 pb-5">
         <div className="mb-3 border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 rounded">
-          Kementerian Pendidikan Republik Indonesia - Sistem Penerimaan Peserta Didik Baru Terpadu
+         <div className="flex items-center gap-3">
+<img
+    src={`${import.meta.env.BASE_URL}images/siswa%20baru/unique_id.png`}
+    alt="Logo PPDB"
+    className="h-10 w-auto object-contain"
+  />
+  <div>
+    <p className="text-base font-semibold"> Kementerian Pendidikan Republik Indonesia - Sistem Penerimaan Peserta Didik Baru Terpadu</p>
+  </div>
+  
+</div>
         </div>
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -344,10 +354,10 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
           <button
             type="button"
             onClick={handleClose}
-            className="inline-flex items-center gap-1 rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 cursor-pointer"
+            className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
           >
-            <X className="h-4 w-4" /> Tutup
-          </button>
+              Tutup
+            </button>
         </div>
       </header>
 
@@ -596,7 +606,7 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
             type="button"
             onClick={prevStep}
             disabled={currentStep === 1}
-            className="rounded-full border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
           >
             Kembali
           </button>
@@ -605,7 +615,7 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
             <button
               type="button"
               onClick={nextStep}
-              className="rounded-full bg-slate-900 border border-slate-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 cursor-pointer"
+              className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
             >
               Lanjutkan
             </button>

@@ -56,9 +56,9 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
               <div className="relative flex flex-col items-center justify-between gap-3 border-b border-slate-200 bg-white px-6 py-2.5 md:flex-row">
                 <div className="flex flex-col items-center gap-3 text-center sm:flex-row md:text-left">
                   {/* Ukuran logo disesuaikan sedikit menjadi h-12 w-12 */}
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full shadow-md shadow-blue-900/10">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full shadow-md shadow-blue-900/10">
   <img
-    src={`${import.meta.env.BASE_URL}images/logo/gambar-1.jpg`}
+    src={`${import.meta.env.BASE_URL}images/logo/gambar-2.svg`}
     alt="Logo Sekolah"
     className="h-full w-full object-cover"
   />
