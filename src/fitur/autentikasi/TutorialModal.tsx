@@ -19,12 +19,11 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                     <div className="relative text-center pb-5 mb-6 border-b-4 border-double border-gray-900 pt-14 md:pt-10">
                         <div className="absolute top-14 md:top-10 right-0 z-10">
                             <button
-                                onClick={onClose}
-                                className="p-2.5 rounded-xl border-2 border-gray-300 text-gray-900 bg-white font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer hover:bg-gray-50"
-                                title="Tutup Halaman"
-                            >
-                                <X className="w-3.5 h-3.5" /> Tutup
-                            </button>
+            onClick={onClose}
+            className="mr-0 text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
+        >
+            Tutup
+        </button>
                         </div>
 
                         <p className="text-xs uppercase tracking-widest font-sans font-bold text-gray-900 mb-1">

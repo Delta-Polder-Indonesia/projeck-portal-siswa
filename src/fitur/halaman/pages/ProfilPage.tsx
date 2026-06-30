@@ -1,6 +1,10 @@
+import { useState } from 'react';
 import type { PageProps } from '../types';
 
 export default function ProfilPage() {
+  // State untuk mengontrol status tombol baca selengkapnya
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const formattedDate = new Date().toLocaleDateString('id-ID', {
     weekday: 'long',
     year: 'numeric',
@@ -10,8 +14,7 @@ export default function ProfilPage() {
 
   return (
     <section className="px-6 py-8 font-serif text-gray-900">
-     
-
+      
       {/* Banner / Header Utama Koran */}
       <div className="mb-6">
         <div className="text-center md:text-left">
@@ -100,35 +103,70 @@ export default function ProfilPage() {
           </div>
         </div>
 
-        <div className="md:col-span-5 space-y-4">
-          <h3 className="text-base font-bold uppercase font-serif tracking-tight border-b-2 border-gray-950 pb-1 mb-3">
-            Bagian II: Pengantar Kepala Sekolah
-          </h3>
-          <div className="flex gap-4 items-start bg-gray-50 p-3 border border-gray-300">
-            <div className="w-20 h-24 bg-gray-200 border border-gray-400 flex-shrink-0 overflow-hidden grayscale">
-              <img
-                src={`${import.meta.env.BASE_URL}images/pegawai/kepala-sekolah.jpg`}
-                alt="Foto Kepala Sekolah"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  if (target.parentElement) {
-                    target.parentElement.innerHTML = '<div class="text-[10px] text-center text-gray-400 pt-8 font-sans">Foto Kepala Sekolah</div>';
-                  }
-                }}
-              />
+        <div className="md:col-span-5 space-y-4 flex flex-col justify-between">
+          <div>
+            <h3 className="text-base font-bold uppercase font-serif tracking-tight border-b-2 border-gray-950 pb-1 mb-3">
+              Bagian II: Pengantar Kepala Sekolah
+            </h3>
+            <div className="flex gap-4 items-start bg-gray-50 p-3 border border-gray-300 mb-3">
+              <div className="w-20 h-24 bg-gray-200 border border-gray-400 flex-shrink-0 overflow-hidden grayscale">
+                <img
+                  src={`${import.meta.env.BASE_URL}images/pegawai/profile-photo.jpg`}
+                  alt="Foto Kepala Sekolah"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    if (target.parentElement) {
+                      target.parentElement.innerHTML = '<div class="text-[10px] text-center text-gray-400 pt-8 font-sans">Foto Kepala Sekolah</div>';
+                    }
+                  }}
+                />
+              </div>
+              <div className="text-xs font-sans">
+                <p className="font-bold text-sm text-gray-900 font-serif">Drs. H. Mulyono, M.Pd.</p>
+                <p className="text-gray-600 italic mb-1">Kepala Sekolah</p>
+                <p className="text-gray-700"><span className="font-semibold">Masa Bakti:</span> 2020 - Sekarang</p>
+                <p className="text-gray-700"><span className="font-semibold">Lulusan:</span> Universitas Negeri Yogyakarta</p>
+              </div>
             </div>
-            <div className="text-xs font-sans">
-              <p className="font-bold text-sm text-gray-900 font-serif">Drs. H. Mulyono, M.Pd.</p>
-              <p className="text-gray-600 italic mb-1">Kepala Sekolah</p>
-              <p className="text-gray-700"><span className="font-semibold">Masa Bakti:</span> 2020 - Sekarang</p>
-              <p className="text-gray-700"><span className="font-semibold">Lulusan:</span> Universitas Negeri Yogyakarta</p>
+
+            {/* Container Teks Terpotong dengan Efek Animasi */}
+            <div className="relative">
+              <div 
+                className={`text-xs font-serif leading-relaxed text-justify text-gray-800 transition-all duration-500 ease-in-out overflow-hidden ${
+                  isExpanded ? 'max-h-[2000px]' : 'max-h-40'
+                }`}
+              >
+                <p className="italic pt-1 border-t border-gray-200 whitespace-pre-line">
+                  "Portal informasi resmi ini hadir sebagai sebuah ruang digital yang secara fundamental mengubah cara sekolah berdialog dengan lingkungannya. Dalam konteks pendidikan kontemporer, di mana komunikasi tidak lagi terbatas pada ruang fisik dan waktu pertemuan konvensional, keberadaan platform semacam ini bukan sekadar tambahan teknis, melainkan representasi dari komitmen institusi pendidikan terhadap prinsip keterbukaan dan inklusi. Portal ini dirancang dengan mempertimbangkan bahwa wali murid, siswa, dan masyarakat luas memerlukan akses yang terstruktur, dapat diandalkan, dan berkelanjutan terhadap informasi yang berkaitan langsung dengan proses pembelajaran dan tata kelola sekolah.
+                  {"\n\n"}
+                  Secara fungsional, media komunikasi digital ini menyatukan beragam alur informasi yang sebelumnya mungkin tersebar dan tidak terintegrasi. Kegiatan belajar yang sedang berlangsung, program pendidikan yang sedang atau akan dijalankan, serta aspek administrasi sekolah kini dapat diakses dalam satu kesatuan antarmuka. Integrasi semacam ini memiliki implikasi yang lebih dalam daripada sekadar efisiensi teknis; ia mencerminkan pemahaman bahwa transparansi dalam pendidikan bukan hanya hak, melainkan juga prasyarat bagi terbangunnya kepercayaan dan partisipasi aktif dari seluruh pemangku kepentingan. Ketika wali murid dapat memantau perkembangan akademik dan kegiatan anaknya secara langsung, dan ketika masyarakat dapat mengamati program-program yang dijalankan oleh sekolah, maka terbentuklah sebuah ekosistem di mana akuntabilitas institusi pendidikan tidak lagi bersifat abstrak, melainkan dapat diverifikasi secara konkret.
+                  {"\n\n"}
+                  Lebih jauh lagi, sifat terbuka dari portal ini menandakan sebuah pergeseran paradigmatik dalam hubungan sekolah dengan publik. Tradisionalnya, informasi sekolah seringkali bersifat reaktif—disampaikan hanya ketika diperlukan atau diminta. Namun, dengan adanya portal yang secara proaktif mempublikasikan data dan informasi, sekolah menempatkan dirinya dalam posisi yang lebih demokratis, di mana akses terhadap pengetahuan tentang operasional pendidikan tidak lagi diprivilegikan kepada kelompok tertentu. Hal ini secara tidak langsung juga mengedukasi publik tentang kompleksitas pengelolaan pendidikan, mulai dari perencanaan kurikulum, pelaksanaan kegiatan, hingga aspek administrasi yang seringkali tidak terlihat namun menjadi tulang punggung kelancaran operasional sekolah.
+                  {"\n\n"}
+                  Dalam perspektif yang lebih luas, kehadiran portal semacam ini juga dapat dipahami sebagai respons terhadap tuntutan masyarakat informasi yang semakin menuntut kejelasan dan keterlibatan. Di era di mana data dan informasi menjadi sumber daya yang bernilai tinggi, kemampuan sebuah institusi pendidikan untuk mengelola dan menyebarkan informasinya dengan baik menjadi indikator penting dari kualitas tata kelolanya. Portal ini, dengan demikian, bukan hanya alat komunikasi, melainkan juga cerminan dari visi sekolah dalam membangun hubungan yang lebih transparan, responsif, dan bermakna dengan semua pihak yang memiliki kepentingan dalam dunia pendidikan.
+                  {"\n\n"}
+                  Melalui pendekatan semacam ini, sekolah tidak lagi berdiri sebagai institusi yang terpisah dari komunitasnya, melainkan menjadi bagian integral dari jaringan sosial yang saling terhubung melalui aliran informasi yang jelas, terbuka, dan saling menguntungkan."
+                </p>
+              </div>
+
+              {/* Efek Gradasi Pudar di bagian bawah teks saat terpotong */}
+              {!isExpanded && (
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+              )}
             </div>
           </div>
-          <p className="text-xs font-serif leading-relaxed text-justify text-gray-800 italic pt-1 border-t border-gray-200">
-            "Selamat datang di portal informasi resmi kami. Media komunikasi digital ini dirancang khusus untuk memudahkan seluruh wali murid, siswa, dan masyarakat luas dalam mengakses info kegiatan belajar, program pendidikan, serta administrasi sekolah secara terbuka."
-          </p>
+
+          {/* Tombol Interaktif */}
+          <div className="pt-2">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-xs font-sans font-bold uppercase tracking-wider text-gray-900 hover:text-gray-600 transition-colors duration-200 border-b border-gray-900 pb-0.5"
+            >
+              {isExpanded ? 'Sembunyikan ↑' : 'Baca Selengkapnya →'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -214,7 +252,7 @@ export default function ProfilPage() {
           </div>
         </div>
       </div>
-     
+      
       <p className="text-center text-[10px] text-gray-500 font-sans italic pt-6">
         Dokumentasi Resmi Publikasi Pendidikan • Tata Usaha SMP Negeri 1 Majenang
       </p>

@@ -263,21 +263,26 @@ export default function AdminMasterPanel({
             {/* ══ KONTEN UTAMA ═════════════════════════════════════════════ */}
             <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-white">
                 {/* Breadcrumb */}
-                <div className="flex shrink-0 items-center gap-1.5 border-b border-gray-100 bg-white px-5 py-3">
-                    <span className="text-[11px] font-medium text-gray-400">Panel Admin</span>
-                    <ChevronRight className="h-3 w-3 text-gray-300" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-gray-700">
-                        {isPerpusTab ? 'Perpustakaan' : activeMenu?.label || '—'}
-                    </span>
-                    {isPerpusTab && activeMenu && (
-                        <>
-                            <ChevronRight className="h-3 w-3 text-gray-300" />
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
-                                {activeMenu.label}
-                            </span>
-                        </>
-                    )}
-                </div>
+                <div className="flex shrink-0 items-center justify-between border-b border-gray-100 bg-white px-5 py-3">
+    <div className="flex items-center gap-1.5">
+        <span className="text-[11px] font-medium text-gray-400">
+            Panel Admin
+        </span>
+        <ChevronRight className="h-3 w-3 text-gray-300" />
+        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-700">
+            {isPerpusTab ? 'Perpustakaan' : activeMenu?.label || '—'}
+        </span>
+    </div>
+
+    {isModal && (
+        <button
+            onClick={onClose}
+            className="mr-4 text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
+        >
+            Tutup
+        </button>
+    )}
+</div>
 
                 {/* Tab Content */}
                 <div className="flex-1 w-full overflow-y-auto p-5 bg-white">
@@ -333,12 +338,7 @@ export default function AdminMasterPanel({
     if (isModal) {
         return (
             <div className="fixed inset-0 z-[100] flex items-stretch bg-white">
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-4 z-10 rounded-lg border border-gray-200 bg-white px-3 py-1 text-xs text-gray-500 shadow hover:text-red-600"
-                >
-                    ✕ Tutup
-                </button>
+               
                 {panel}
             </div>
         );
