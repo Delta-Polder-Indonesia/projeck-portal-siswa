@@ -699,12 +699,17 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
 
         {/* Right Section - Fills remaining width completely */}
         <section className="flex-1 bg-white px-5 py-5 flex flex-col overflow-hidden min-w-0">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div>
+          {/* Header Bar: Breadcrumb + Folder Chips + View Toggle + Download — all in one row */}
+          <div className="mb-4 flex items-center justify-between gap-3">
+            {/* Left: Breadcrumb */}
+            <div className="flex items-center gap-2 shrink-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black">Data Pendaftar</p>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="flex items-center gap-1.5 ml-2">
                 <button 
-                  onClick={() => setCurrentFolder(null)}
+                  onClick={() => {
+                    setCurrentFolder(null);
+                    setFilterJenjang('ALL');
+                  }}
                   className={cn(
                     "text-[11px] font-bold transition-colors",
                     !currentFolder ? "text-black border-b border-black" : "text-neutral-400 hover:text-black"
@@ -723,7 +728,30 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Center: Small Folder Chips (only when no active filter) */}
+            {!currentFolder && !search && filterStatus === 'ALL' && filterJenjang === 'ALL' && filterJalur === 'ALL' && (
+              <div className="flex items-center gap-1.5">
+                {['SD', 'SMP', 'SMA', 'SMK'].map((jenjang) => (
+                  <button
+                    key={jenjang}
+                    onClick={() => {
+                      setCurrentFolder(jenjang);
+                      setFilterJenjang(jenjang);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-black bg-neutral-50 px-2.5 py-1 text-[10px] font-bold text-black transition-all hover:bg-black hover:text-white group"
+                  >
+                    <Folder className="h-3 w-3 text-neutral-400 group-hover:text-white transition-colors" fill="currentColor" />
+                    <span>{jenjang}</span>
+                    <span className="text-[9px] text-neutral-400 group-hover:text-neutral-300">
+                      {apps.filter(a => a.jenjangTujuan === jenjang).length}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Right: View Toggle + Download */}
+            <div className="flex items-center gap-2 shrink-0">
               <div className="flex rounded-md border border-black p-0.5">
                 <button 
                   onClick={() => setViewMode('list')}
@@ -747,28 +775,6 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
               </button>
             </div>
           </div>
-
-          {/* Folder Navigation */}
-          {!currentFolder && !search && filterStatus === 'ALL' && filterJenjang === 'ALL' && filterJalur === 'ALL' && (
-            <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {['SD', 'SMP', 'SMA', 'SMK'].map((jenjang) => (
-                <button
-                  key={jenjang}
-                  onClick={() => {
-                    setCurrentFolder(jenjang);
-                    setFilterJenjang(jenjang);
-                  }}
-                  className="flex flex-col items-start rounded-xl border border-black bg-neutral-50 p-4 transition-all hover:bg-neutral-100 hover:shadow-md group"
-                >
-                  <Folder className="mb-2 h-8 w-8 text-neutral-400 group-hover:text-black transition-colors" fill="currentColor" />
-                  <span className="text-xs font-bold text-black">{jenjang}</span>
-                  <span className="text-[9px] text-neutral-500 uppercase font-bold tracking-tighter">
-                    {apps.filter(a => a.jenjangTujuan === jenjang).length} pendaftar
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
 
           {/* Desktop Table View - Full width of right section */}
           <div className="flex-1 overflow-hidden flex flex-col">
