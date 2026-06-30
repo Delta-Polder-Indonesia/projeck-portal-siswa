@@ -14,6 +14,11 @@ import {
   submitPPDBApplication,
   updateApplicationStatus,
   updateDocumentValidation,
+  getPPDBNotifications,
+  markNotificationAsRead,
+  getUnreadNotificationCount,
+  getAdminSettings,
+  updateAdminSettings,
   type PPDBApplication,
   type PPDBAuditLog,
 } from '../data/store';
@@ -270,5 +275,27 @@ export const ppdbService = {
   getAdminProfileName: () => {
     if (hasApi) return localStorage.getItem(ADMIN_NAME_KEY) || 'Admin API';
     return getAdminProfileName();
+  },
+
+  getNotifications: () => {
+    return Promise.resolve(getPPDBNotifications());
+  },
+
+  markNotificationAsRead: (id: string) => {
+    markNotificationAsRead(id);
+    return Promise.resolve();
+  },
+
+  getUnreadCount: () => {
+    return Promise.resolve(getUnreadNotificationCount());
+  },
+
+  getAdminSettings: () => {
+    return Promise.resolve(getAdminSettings());
+  },
+
+  updateAdminSettings: (settings: { email: string }) => {
+    updateAdminSettings(settings);
+    return Promise.resolve();
   },
 };

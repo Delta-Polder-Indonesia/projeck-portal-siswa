@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo, type ChangeEvent } from 'react';
-import { ArrowLeft, Check, CheckCircle, Download, Eye, FileText, LogOut, Printer, Search, Trash2, X, XCircle, HelpCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Check, Download, Eye, FileText, LogOut, Printer, Search, Trash2, X, HelpCircle, AlertCircle } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { ppdbService } from '../../services/ppdbService';
-import { type AuditLog, type PPDBApplication, type PPDBApplicationStatus } from '../../data/store';
+import { type PPDBAuditLog, type PPDBApplication, type PPDBApplicationStatus, type PPDBNotification } from '../../data/store';
 import { jsPDF } from 'jspdf';
+import { Mail, Bell, Folder, File, Download as DownloadIcon, LayoutGrid, List } from 'lucide-react';
 
 function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
@@ -33,7 +34,15 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
     byJenjang: { SD: 0, SMP: 0, SMA: 0, SMK: 0 },
     byJalur: { REGULER: 0, ZONASI: 0, PRESTASI: 0, AFIRMASI: 0, PINDAHAN: 0 },
   });
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [auditLogs, setAuditLogs] = useState<PPDBAuditLog[]>([]);
+  const [notifications, setNotifications] = useState<PPDBNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [currentFolder, setCurrentFolder] = useState<string | null>(null);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+
   const [showAudit, setShowAudit] = useState(false);
   const [apiHealth, setApiHealth] = useState({
     mode: 'local', online: true, apiReachable: true,
@@ -87,14 +96,20 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
   }, [selected]);
 
   async function refresh() {
-    const [data, s, logs] = await Promise.all([
+    const [data, s, logs, notifs, count, settings] = await Promise.all([
       ppdbService.getApplications(),
       ppdbService.getStatistics(),
       ppdbService.getAuditLogs(),
+      ppdbService.getNotifications(),
+      ppdbService.getUnreadCount(),
+      ppdbService.getAdminSettings(),
     ]);
     setApps(data);
     setStats(s);
     setAuditLogs(logs);
+    setNotifications(notifs);
+    setUnreadCount(count);
+    setAdminEmail(settings.email);
   }
 
   async function handleLogin() {
@@ -169,6 +184,44 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', `rekap-ppdb-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleUpdateSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await ppdbService.updateAdminSettings({ email: adminEmail });
+    setShowSettings(false);
+    refresh();
+  };
+
+  const handleMarkRead = async (id: string) => {
+    await ppdbService.markNotificationAsRead(id);
+    refresh();
+  };
+
+  const handleDownloadData = (app: PPDBApplication) => {
+    const dataStr = JSON.stringify(app, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ppdb_${app.registrationNo}_${app.namaLengkap.replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadAll = () => {
+    const dataStr = JSON.stringify(apps, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ppdb_all_applications_${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -341,47 +394,233 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
   }
 
   return (
-    <div className="w-full h-full bg-white flex flex-col">
+    <div className={cn("w-full h-full bg-white flex flex-col", embedded && "overflow-hidden")}>
       {/* Header - Full Width, no max-width constraint */}
-      <header className="border-b border-black bg-white w-full shrink-0">
-        <div className="flex w-full items-center justify-between px-6 py-3">
-          <div className="flex items-center gap-2">
-            <span className="rounded border border-black bg-white px-2 py-0.5 text-[10px] font-bold text-black">
-              {apiHealth.mode === 'local' ? 'LOCAL MODE' : apiHealth.apiReachable ? 'API ONLINE' : 'API OFFLINE'}
-            </span>
-            <span className="text-[10px] text-black">{apiHealth.message}</span>
+      {!embedded && (
+        <header className="border-b border-black bg-white w-full shrink-0">
+          <div className="flex w-full items-center justify-between px-6 py-3">
+            <div className="flex items-center gap-2">
+              <span className="rounded border border-black bg-white px-2 py-0.5 text-[10px] font-bold text-black">
+                {apiHealth.mode === 'local' ? 'LOCAL MODE' : apiHealth.apiReachable ? 'API ONLINE' : 'API OFFLINE'}
+              </span>
+              <span className="text-[10px] text-black">{apiHealth.message}</span>
+            </div>
+            <div className="flex items-center gap-4 flex-wrap justify-end">
+              {/* Notification Bell */}
+              <div className="relative">
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="relative rounded-md border border-black p-1.5 text-black hover:bg-black hover:text-white transition-colors"
+                >
+                  <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[8px] font-bold text-white ring-2 ring-white">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+                
+                {showNotifications && (
+                  <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-black bg-white shadow-2xl overflow-hidden">
+                    <div className="border-b border-black bg-neutral-50 px-4 py-2.5">
+                      <h3 className="text-xs font-bold uppercase tracking-wide">Pesan Masuk</h3>
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {notifications.length > 0 ? (
+                        notifications.map((n) => (
+                          <div 
+                            key={n.id} 
+                            onClick={() => {
+                              handleMarkRead(n.id);
+                              setSearch(n.registrationNo);
+                              setShowNotifications(false);
+                            }}
+                            className={cn(
+                              "group cursor-pointer border-b border-neutral-100 p-3 hover:bg-neutral-50 transition-colors",
+                              !n.isRead && "bg-blue-50/50"
+                            )}
+                          >
+                            <div className="flex items-start gap-2.5">
+                              <div className={cn(
+                                "mt-1 h-2 w-2 shrink-0 rounded-full",
+                                n.type === 'NEW_REGISTRATION' ? "bg-green-500" : "bg-blue-500",
+                                n.isRead && "opacity-0"
+                              )} />
+                              <div className="flex-1 space-y-1">
+                                <p className="text-[11px] leading-tight text-neutral-900 font-medium">
+                                  {n.message}
+                                </p>
+                                <p className="text-[9px] text-neutral-500">
+                                  {new Date(n.createdAt).toLocaleString('id-ID')}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-8 text-center">
+                          <Mail className="mx-auto h-8 w-8 text-neutral-200" />
+                          <p className="mt-2 text-[10px] font-bold uppercase text-neutral-400">Tidak ada pesan</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Admin Email Settings */}
+              <button 
+                onClick={() => setShowSettings(true)}
+                className="rounded-md border border-black p-1.5 text-black hover:bg-black hover:text-white transition-colors"
+                title="Pengaturan Email Admin"
+              >
+                <Mail className="h-4 w-4" />
+              </button>
+
+              <button onClick={() => setShowAudit(true)} className="inline-flex items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
+                Audit Log
+              </button>
+              <button onClick={downloadBackup} className="inline-flex items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
+                Backup JSON
+              </button>
+              <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
+                Import JSON
+                <input type="file" accept="application/json" onChange={importBackup} className="hidden" />
+              </label>
+              <button onClick={printRecap} className="inline-flex items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
+                <Printer className="h-3.5 w-3.5" /> Cetak
+              </button>
+              <button onClick={handleExportCSV} className="inline-flex items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
+                <Download className="h-3.5 w-3.5" /> Export
+              </button>
+              <button onClick={refresh} className="rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
+                Refresh
+              </button>
+              {!embedded && (
+                <button onClick={handleLogout} className="flex items-center gap-1 rounded-md border border-black px-3 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
+                  <LogOut className="h-3.5 w-3.5" /> Keluar
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap justify-end">
-            <button onClick={() => setShowAudit(true)} className="inline-flex items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
-              Audit Log
+        </header>
+      )}
+
+      {/* Embedded Utility Bar (Only when embedded) */}
+      {embedded && (
+        <div className="flex items-center justify-between border-b border-black bg-neutral-50/50 px-5 py-2 shrink-0">
+          <div className="flex items-center gap-3">
+            <span className={cn(
+              "flex h-2 w-2 rounded-full",
+              apiHealth.apiReachable ? "bg-green-500" : "bg-red-500 animate-pulse"
+            )} />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-black">
+              {apiHealth.mode === 'local' ? 'Local System' : 'Cloud Sync Active'}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {/* Notification Bell */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative rounded-md border border-black p-1 text-black hover:bg-black hover:text-white transition-colors"
+              >
+                <Bell className="h-3.5 w-3.5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-600 text-[7px] font-bold text-white ring-1 ring-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              
+              {showNotifications && (
+                <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-black bg-white shadow-2xl overflow-hidden">
+                  <div className="border-b border-black bg-neutral-50 px-3 py-2">
+                    <h3 className="text-[10px] font-black uppercase tracking-widest">Pesan Masuk</h3>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((n) => (
+                        <div 
+                          key={n.id} 
+                          onClick={() => {
+                            handleMarkRead(n.id);
+                            setSearch(n.registrationNo);
+                            setShowNotifications(false);
+                          }}
+                          className={cn(
+                            "group cursor-pointer border-b border-neutral-100 p-2.5 hover:bg-neutral-50 transition-colors",
+                            !n.isRead && "bg-blue-50/30"
+                          )}
+                        >
+                          <p className="text-[10px] leading-tight text-neutral-900 font-bold">{n.message}</p>
+                          <p className="mt-1 text-[8px] text-neutral-400">{new Date(n.createdAt).toLocaleString('id-ID')}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-6 text-center">
+                        <p className="text-[9px] font-bold uppercase text-neutral-300 tracking-widest">Kosong</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button onClick={() => setShowSettings(true)} className="rounded-md border border-black p-1 text-black hover:bg-black hover:text-white transition-colors">
+              <Mail className="h-3.5 w-3.5" />
             </button>
-            <button onClick={downloadBackup} className="inline-flex items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
-              Backup JSON
+            <button onClick={() => setShowAudit(true)} className="rounded-md border border-black px-2 py-1 text-[9px] font-black uppercase text-black hover:bg-black hover:text-white transition-colors">
+              Audit
             </button>
-            <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
-              Import JSON
-              <input type="file" accept="application/json" onChange={importBackup} className="hidden" />
-            </label>
-            <button onClick={printRecap} className="inline-flex items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
-              <Printer className="h-3.5 w-3.5" /> Cetak
-            </button>
-            <button onClick={handleExportCSV} className="inline-flex items-center gap-1 rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
-              <Download className="h-3.5 w-3.5" /> Export
-            </button>
-            <button onClick={refresh} className="rounded-md border border-black px-2.5 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
+            <button onClick={refresh} className="rounded-md border border-black px-2 py-1 text-[9px] font-black uppercase text-black hover:bg-black hover:text-white transition-colors">
               Refresh
             </button>
-            {!embedded && (
-              <button onClick={handleLogout} className="flex items-center gap-1 rounded-md border border-black px-3 py-1.5 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
-                <LogOut className="h-3.5 w-3.5" /> Keluar
-              </button>
-            )}
           </div>
         </div>
-      </header>
+      )}
 
       {/* Main Content - Full Width Grid, fills entire container */}
       <main className="flex w-full flex-1 overflow-hidden border-1 border-black-500">
+        {/* Settings Modal */}
+        {showSettings && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-sm rounded-2xl border border-black bg-white p-6 shadow-2xl">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-sm font-black uppercase tracking-tight">Pengaturan Notifikasi</h3>
+                <button onClick={() => setShowSettings(false)} className="text-neutral-400 hover:text-black">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <form onSubmit={handleUpdateSettings} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
+                    Email Notifikasi Admin
+                  </label>
+                  <input
+                    type="email"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    placeholder="admin@sekolah.id"
+                    className="w-full rounded-xl border border-black bg-neutral-50 px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-black/5 transition-all"
+                    required
+                  />
+                  <p className="text-[9px] leading-relaxed text-neutral-400 italic">
+                    * Email ini akan menerima notifikasi otomatis setiap ada pendaftar baru yang masuk ke sistem.
+                  </p>
+                </div>
+                <button 
+                  type="submit"
+                  className="w-full rounded-xl bg-black px-4 py-3 text-xs font-bold text-white transition-all hover:bg-neutral-800 active:scale-[0.98]"
+                >
+                  Simpan Perubahan
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
         {/* Left Sidebar - Fixed width, no max-width */}
         <section className="w-[280px] shrink-0 border-r border-black bg-white px-5 py-5 overflow-y-auto">
           {/* Stats Summary */}
@@ -460,81 +699,183 @@ export default function AdminPanel({ onClose, embedded = false }: AdminPanelProp
 
         {/* Right Section - Fills remaining width completely */}
         <section className="flex-1 bg-white px-5 py-5 flex flex-col overflow-hidden min-w-0">
-          <div className="mb-3">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black">Data Pendaftar</p>
-          </div>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black">Data Pendaftar</p>
+              <div className="mt-1 flex items-center gap-2">
+                <button 
+                  onClick={() => setCurrentFolder(null)}
+                  className={cn(
+                    "text-[11px] font-bold transition-colors",
+                    !currentFolder ? "text-black border-b border-black" : "text-neutral-400 hover:text-black"
+                  )}
+                >
+                  My Files
+                </button>
+                {currentFolder && (
+                  <>
+                    <span className="text-neutral-300">/</span>
+                    <span className="text-[11px] font-bold text-black border-b border-black">
+                      {currentFolder}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
 
-          {/* Mobile Card View */}
-          <div className="space-y-2 md:hidden overflow-y-auto flex-1">
-            {filtered.map((item) => (
-              <div key={item.id} className="rounded-md border border-black bg-white p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-black truncate">{item.namaLengkap}</p>
-                    <p className="text-[10px] text-black font-mono">{item.registrationNo}</p>
-                  </div>
-                  <span className="shrink-0 rounded border border-black bg-neutral-100 px-1.5 py-0.5 text-[10px] font-bold text-black">
-                    {statusText(item.status)}
-                  </span>
-                </div>
-                <div className="mt-2 grid grid-cols-2 gap-1 text-[10px] text-black">
-                  <p>NIK: {item.nik}</p>
-                  <p>Jenjang: {item.jenjangTujuan}</p>
-                  <p>Jalur: {item.jalurPendaftaran}</p>
-                  <p>{formatDate(item.submittedAt)}</p>
-                </div>
-                <button onClick={() => setSelected(item)} className="mt-2 inline-flex items-center gap-1 rounded-md border border-black px-2 py-1 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
-                  <Eye className="h-3 w-3" /> Detail
+            <div className="flex items-center gap-2">
+              <div className="flex rounded-md border border-black p-0.5">
+                <button 
+                  onClick={() => setViewMode('list')}
+                  className={cn("p-1 rounded", viewMode === 'list' ? "bg-black text-white" : "text-black hover:bg-neutral-100")}
+                >
+                  <List className="h-3.5 w-3.5" />
+                </button>
+                <button 
+                  onClick={() => setViewMode('grid')}
+                  className={cn("p-1 rounded", viewMode === 'grid' ? "bg-black text-white" : "text-black hover:bg-neutral-100")}
+                >
+                  <LayoutGrid className="h-3.5 w-3.5" />
                 </button>
               </div>
-            ))}
-            {filtered.length === 0 && (
-              <div className="flex items-center justify-center rounded-md border border-dashed border-black bg-white" style={{ minHeight: '200px' }}>
-                <p className="text-[10px] uppercase tracking-widest text-black font-bold">— Data tidak ditemukan —</p>
-              </div>
-            )}
+              <button 
+                onClick={handleDownloadAll}
+                className="inline-flex items-center gap-1.5 rounded-md border border-black bg-black px-3 py-1.5 text-[10px] font-bold text-white transition-all hover:bg-neutral-800"
+              >
+                <DownloadIcon className="h-3.5 w-3.5" />
+                Download Semua
+              </button>
+            </div>
           </div>
 
+          {/* Folder Navigation */}
+          {!currentFolder && !search && filterStatus === 'ALL' && filterJenjang === 'ALL' && filterJalur === 'ALL' && (
+            <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {['SD', 'SMP', 'SMA', 'SMK'].map((jenjang) => (
+                <button
+                  key={jenjang}
+                  onClick={() => {
+                    setCurrentFolder(jenjang);
+                    setFilterJenjang(jenjang);
+                  }}
+                  className="flex flex-col items-start rounded-xl border border-black bg-neutral-50 p-4 transition-all hover:bg-neutral-100 hover:shadow-md group"
+                >
+                  <Folder className="mb-2 h-8 w-8 text-neutral-400 group-hover:text-black transition-colors" fill="currentColor" />
+                  <span className="text-xs font-bold text-black">{jenjang}</span>
+                  <span className="text-[9px] text-neutral-500 uppercase font-bold tracking-tighter">
+                    {apps.filter(a => a.jenjangTujuan === jenjang).length} pendaftar
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Desktop Table View - Full width of right section */}
-          <div className="hidden overflow-x-auto border border-black bg-white md:block flex-1 rounded-md w-full">
-            <table className="w-full text-left text-xs text-black">
-              <thead>
-                <tr className="border-b border-black bg-neutral-50 text-[10px] font-bold uppercase tracking-wide">
-                  <th className="px-3 py-2.5">Nama</th>
-                  <th className="px-3 py-2.5">Registrasi</th>
-                  <th className="px-3 py-2.5">Jenjang</th>
-                  <th className="px-3 py-2.5">Jalur</th>
-                  <th className="px-3 py-2.5">Status</th>
-                  <th className="px-3 py-2.5">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-black/20">
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {viewMode === 'list' ? (
+              <div className="overflow-x-auto border border-black bg-white rounded-md w-full">
+                <table className="w-full text-left text-xs text-black">
+                  <thead>
+                    <tr className="border-b border-black bg-neutral-50 text-[10px] font-bold uppercase tracking-wide">
+                      <th className="px-3 py-2.5">Item</th>
+                      <th className="px-3 py-2.5">No. Registrasi</th>
+                      <th className="px-3 py-2.5">Jalur</th>
+                      <th className="px-3 py-2.5">Status</th>
+                      <th className="px-3 py-2.5">Terakhir Diubah</th>
+                      <th className="px-3 py-2.5">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-black/20">
+                    {filtered.map((item) => (
+                      <tr key={item.id} className="hover:bg-neutral-50 transition-colors group">
+                        <td className="px-3 py-2.5">
+                          <div className="flex items-center gap-2">
+                            <File className="h-4 w-4 text-neutral-400" />
+                            <div>
+                              <p className="text-xs font-bold text-black">{item.namaLengkap}</p>
+                              <p className="text-[9px] text-neutral-500 font-mono uppercase tracking-tighter">{item.jenjangTujuan}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 py-2.5 text-[10px] font-mono text-black">{item.registrationNo}</td>
+                        <td className="px-3 py-2.5 text-[10px] font-bold uppercase tracking-tighter text-black">{item.jalurPendaftaran}</td>
+                        <td className="px-3 py-2.5">
+                          <span className={cn(
+                            "rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase",
+                            item.status === 'ACCEPTED' ? "border-green-600 bg-green-50 text-green-600" :
+                            item.status === 'REJECTED' ? "border-red-600 bg-red-50 text-red-600" :
+                            item.status === 'VERIFIED' ? "border-blue-600 bg-blue-50 text-blue-600" :
+                            "border-amber-600 bg-amber-50 text-amber-600"
+                          )}>
+                            {statusText(item.status)}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2.5 text-[10px] text-neutral-500">{formatDate(item.submittedAt)}</td>
+                        <td className="px-3 py-2.5">
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => setSelected(item)} className="p-1.5 rounded-md hover:bg-neutral-100" title="Detail">
+                              <Eye className="h-3.5 w-3.5" />
+                            </button>
+                            <button onClick={() => handleDownloadData(item)} className="p-1.5 rounded-md hover:bg-neutral-100" title="Download JSON">
+                              <DownloadIcon className="h-3.5 w-3.5" />
+                            </button>
+                            <button onClick={() => handlePrintDetail(item)} className="p-1.5 rounded-md hover:bg-neutral-100" title="Print PDF">
+                              <FileText className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 overflow-y-auto pr-2">
                 {filtered.map((item) => (
-                  <tr key={item.id} className="hover:bg-neutral-50 transition-colors">
-                    <td className="px-3 py-2.5">
-                      <p className="text-xs font-bold text-black">{item.namaLengkap}</p>
-                      <p className="text-[10px] text-black font-mono">{item.nik}</p>
-                    </td>
-                    <td className="px-3 py-2.5 text-[10px] font-mono text-black">{item.registrationNo}</td>
-                    <td className="px-3 py-2.5 text-xs text-black">{item.jenjangTujuan}</td>
-                    <td className="px-3 py-2.5 text-xs text-black">{item.jalurPendaftaran}</td>
-                    <td className="px-3 py-2.5">
-                      <span className="rounded border border-black bg-neutral-100 px-1.5 py-0.5 text-[10px] font-bold text-black">
+                  <div 
+                    key={item.id}
+                    className="group relative flex flex-col items-center rounded-xl border border-black bg-white p-4 transition-all hover:bg-neutral-50 hover:shadow-lg"
+                  >
+                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => handleDownloadData(item)} className="p-1 text-neutral-400 hover:text-black">
+                        <DownloadIcon className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    
+                    <File className="mb-3 h-12 w-12 text-neutral-200" fill="currentColor" />
+                    <p className="w-full truncate text-center text-xs font-bold text-black">{item.namaLengkap}</p>
+                    <p className="mt-0.5 text-[9px] font-mono text-neutral-500 uppercase tracking-tighter">{item.registrationNo}</p>
+                    
+                    <div className="mt-3 flex items-center gap-1.5">
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[8px] font-bold uppercase text-neutral-600">
+                        {item.jenjangTujuan}
+                      </span>
+                      <span className={cn(
+                        "rounded-full px-2 py-0.5 text-[8px] font-bold uppercase",
+                        item.status === 'ACCEPTED' ? "bg-green-100 text-green-700" :
+                        item.status === 'REJECTED' ? "bg-red-100 text-red-700" :
+                        item.status === 'VERIFIED' ? "bg-blue-100 text-blue-700" :
+                        "bg-amber-100 text-amber-700"
+                      )}>
                         {statusText(item.status)}
                       </span>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <button onClick={() => setSelected(item)} className="inline-flex items-center gap-1 rounded-md border border-black px-2 py-1 text-[10px] font-bold text-black transition-colors hover:bg-black hover:text-white">
-                        <Eye className="h-3 w-3" /> Detail
-                      </button>
-                    </td>
-                  </tr>
+                    </div>
+
+                    <button 
+                      onClick={() => setSelected(item)}
+                      className="mt-4 w-full rounded-lg bg-black py-2 text-[10px] font-bold text-white transition-all hover:bg-neutral-800"
+                    >
+                      Lihat Detail
+                    </button>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
+            
             {filtered.length === 0 && (
-              <div className="flex items-center justify-center" style={{ minHeight: '200px' }}>
-                <p className="text-[10px] uppercase tracking-widest text-black font-bold">— Data tidak ditemukan —</p>
+              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-black bg-neutral-50" style={{ minHeight: '300px' }}>
+                <Folder className="mb-3 h-12 w-12 text-neutral-200" />
+                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 italic">Belum ada file di folder ini</p>
               </div>
             )}
           </div>

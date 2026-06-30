@@ -150,16 +150,38 @@ function MenuRenderer({
 // ── Komponen utama ────────────────────────────────────────────────────────
 export default function AdminMasterPanel({
     setNotice,
+    scope,
     open,
     onClose,
     preAuthorized: _preAuthorized,
 }: AdminGuruPanelProps) {
     const storeVersion = useStoreVersion();
-    const [activeTab, setActiveTab] = useState<TeacherAdminTab>('kelas');
+    const [activeTab, setActiveTab] = useState<TeacherAdminTab>(
+        scope === 'teacher' ? 'kelas' : 'akun-siswa'
+    );
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
     const teachers = useMemo(() => getTeachers(), [storeVersion]);
     const classes = useMemo(() => getClasses(), [storeVersion]);
+
+    // Filter menu berdasarkan scope
+    const filteredGroups = useMemo(() => {
+        return MENU_MASTER_GROUPS.map(group => {
+            let filteredItems = [...group.items];
+            
+            if (scope === 'student') {
+                // Admin Siswa tidak melihat menu Akademik dan Guru
+                if (group.title === 'Akademik' || group.title === 'Guru') {
+                    return null;
+                }
+            } else if (scope === 'teacher') {
+                // Admin Guru sekarang dapat melihat semua menu Siswa termasuk PPDB
+                // (Tidak lagi memfilter ppdb-admin)
+            }
+            
+            return { ...group, items: filteredItems };
+        }).filter(Boolean) as any[];
+    }, [scope]);
 
     const teacherCountByClass = useMemo(() => {
         const countMap = new Map<string, number>();
@@ -210,7 +232,7 @@ export default function AdminMasterPanel({
                     </div>
 
                     <div className="space-y-4">
-                        {MENU_MASTER_GROUPS.map((group) => (
+                        {filteredGroups.map((group) => (
                             <div key={group.title}>
                                 <p className="px-3 mb-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                                     {group.title}
@@ -289,8 +311,8 @@ export default function AdminMasterPanel({
                     {activeTab === 'kelas' && <TabKelolaKelas setNotice={handleNotice} />}
                     {activeTab === 'tambah-guru' && <TabTambahGuru setNotice={handleNotice} />}
                     {activeTab === 'akun-guru' && <TabAkunGuru setNotice={handleNotice} />}
-                    {activeTab === 'tagihan' && <TabTagihanSekolah setNotice={handleNotice} scope="teacher" />}
-                    {activeTab === 'pengumuman-admin' && <TabPengumumanAdmin setNotice={handleNotice} scope="teacher" />}
+                    {activeTab === 'tagihan' && <TabTagihanSekolah setNotice={handleNotice} scope={scope} />}
+                    {activeTab === 'pengumuman-admin' && <TabPengumumanAdmin setNotice={handleNotice} scope={scope} />}
                     {activeTab === 'akun-siswa' && <TabAkunSiswa setNotice={handleNotice} />}
                     {activeTab === 'ppdb-admin' && <AdminPanel onClose={() => setActiveTab('akun-siswa')} embedded />}
                     {activeTab === 'kelola-roster' && <TabKelolaRoster setNotice={handleNotice} />}

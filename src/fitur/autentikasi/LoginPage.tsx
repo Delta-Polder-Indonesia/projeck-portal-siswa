@@ -10,6 +10,7 @@ import TutorialModal from './TutorialModal';
 import ExpectationModal from '../halaman/ExpectationModal';
 import PPDBForm from '../penerimaan-siswa-baru/PPDBForm';
 import LandingPage from '../penerimaan-siswa-baru/LandingPage';
+import CekKelulusanPage from '../penerimaan-siswa-baru/CekKelulusanPage';
 
 const PerpustakaanApp = lazy(() => import('../../fitur/perpustakaan/PerpustakaanApp'));
 
@@ -58,7 +59,7 @@ export default function LoginPage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showExpectation, setShowExpectation] = useState(false);
   const [showPPDB, setShowPPDB] = useState(false);
-  const [ppdbView, setPpdbView] = useState<'landing' | 'form'>('landing');
+  const [ppdbView, setPpdbView] = useState<'landing' | 'form' | 'cek-kelulusan'>('landing');
   const [showPerpustakaan, setShowPerpustakaan] = useState(false);
 
   // Carousel state
@@ -410,9 +411,10 @@ export default function LoginPage() {
           {ppdbView === 'landing' ? (
             <LandingPage
               onOpenForm={() => setPpdbView('form')}
+              onOpenCekKelulusan={() => setPpdbView('cek-kelulusan')}
               onClose={() => setShowPPDB(false)}
             />
-          ) : (
+          ) : ppdbView === 'form' ? (
             <PPDBForm
               isModal={false}
               onBack={() => setPpdbView('landing')}
@@ -420,6 +422,10 @@ export default function LoginPage() {
                 setShowPPDB(false);
                 setPpdbView('landing');
               }}
+            />
+          ) : (
+            <CekKelulusanPage
+              onBack={() => setPpdbView('landing')}
             />
           )}
         </div>

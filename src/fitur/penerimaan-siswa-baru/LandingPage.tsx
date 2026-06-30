@@ -1,18 +1,13 @@
 import { useState } from 'react';
-import { ArrowRight, ShieldCheck, X } from 'lucide-react';
-import { ppdbService } from '../../services/ppdbService';
-import { type PPDBApplication } from '../../data/store';
+import { ArrowRight } from 'lucide-react';
 
 export type LandingPageProps = {
   onOpenForm: () => void;
+  onOpenCekKelulusan: () => void;
   onClose: () => void;
 };
 
-export default function LandingPage({ onOpenForm, onClose }: LandingPageProps) {
-  const [checkRegNo, setCheckRegNo] = useState('');
-  const [checkResult, setCheckResult] = useState<PPDBApplication | null>(null);
-  const [checkError, setCheckError] = useState('');
-  const [showCheckModal, setShowCheckModal] = useState(false);
+export default function LandingPage({ onOpenForm, onOpenCekKelulusan, onClose }: LandingPageProps) {
   const [openDocKey, setOpenDocKey] = useState('Bukti pendaftaran + nomor registrasi');
   const [openPayKey, setOpenPayKey] = useState('Pendaftaran Online');
 
@@ -232,31 +227,6 @@ export default function LandingPage({ onOpenForm, onClose }: LandingPageProps) {
     win.print();
   };
 
-  const handleCheckStatus = async () => {
-    if (!checkRegNo.trim()) {
-      setCheckError('Masukkan nomor registrasi.');
-      return;
-    }
-
-    const result = await ppdbService.getApplicationByRegNo(checkRegNo.trim());
-    if (!result) {
-      setCheckResult(null);
-      setCheckError('Nomor registrasi tidak ditemukan.');
-      return;
-    }
-
-    setCheckResult(result);
-    setCheckError('');
-  };
-
-  const getStatusLabel = (status: string) => {
-    if (status === 'PENDING') return 'Menunggu Verifikasi';
-    if (status === 'VERIFIED') return 'Terverifikasi';
-    if (status === 'ACCEPTED') return 'Diterima';
-    if (status === 'REJECTED') return 'Ditolak';
-    return status;
-  };
-
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
     <header className="fixed left-0 right-0 top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -271,10 +241,10 @@ export default function LandingPage({ onOpenForm, onClose }: LandingPageProps) {
 
           <nav className="flex items-center gap-3 md:gap-5">
             <button
-              onClick={() => setShowCheckModal(true)}
+              onClick={onOpenCekKelulusan}
               className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
             >
-              Cek Status
+              Cek Kelulusan
             </button>
             <button
               onClick={onOpenForm}
@@ -297,10 +267,9 @@ export default function LandingPage({ onOpenForm, onClose }: LandingPageProps) {
         className="relative flex min-h-screen items-end border-b border-slate-200 pt-16"
         style={{
           backgroundImage:
-            `linear-gradient(to top, rgba(15,23,42,0.70), rgba(15,23,42,0.35)), url('${import.meta.env.BASE_URL}images/siswa%20baru/f-2.jpg')`,
-			backgroundSize: 'contain',
+            `linear-gradient(to top, rgba(15,23,42,0.70), rgba(15,23,42,0.35)), url('${import.meta.env.BASE_URL}images/siswa%20baru/f-3.jpg')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center 1%',
           width: '100%',
           
         }}
@@ -322,10 +291,10 @@ export default function LandingPage({ onOpenForm, onClose }: LandingPageProps) {
                 Mulai Pendaftaran <ArrowRight className="h-4 w-4" />
               </button>
               <button
-                onClick={() => setShowCheckModal(true)}
+                onClick={onOpenCekKelulusan}
                 className="rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
               >
-                Cek Status Registrasi
+                Cek Hasil Kelulusan
               </button>
             </div>
           </div>
@@ -759,74 +728,6 @@ export default function LandingPage({ onOpenForm, onClose }: LandingPageProps) {
           </div>
         </div>
       </footer>
-
-      {showCheckModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-          <div className="w-full max-w-md rounded-lg border border-slate-300 bg-white p-6 shadow-2xl">
-            <div className="mb-5 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">Cek Status Registrasi</h3>
-              <button
-                onClick={() => {
-                  setShowCheckModal(false);
-                  setCheckResult(null);
-                  setCheckError('');
-                  setCheckRegNo('');
-                }}
-                className="rounded border border-slate-300 p-1 text-slate-600 transition hover:bg-slate-100"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {!checkResult ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600">
-                    Nomor Registrasi
-                  </label>
-                  <input
-                    value={checkRegNo}
-                    onChange={(e) => setCheckRegNo(e.target.value)}
-                    placeholder="PPDB-2026-XXXXX"
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-600"
-                  />
-                  {checkError && <p className="mt-2 text-sm text-red-600">{checkError}</p>}
-                </div>
-                <button
-                  onClick={handleCheckStatus}
-                  className="w-full rounded-full border border-slate-900 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-900 hover:text-white"
-                >
-                  Cek Status
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="rounded-md border border-slate-200 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</p>
-                  <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
-                    <ShieldCheck className="h-4 w-4" /> {getStatusLabel(checkResult.status)}
-                  </p>
-                </div>
-                <div className="space-y-1 text-sm">
-                  <p className="text-slate-700">Nama: {checkResult.namaLengkap}</p>
-                  <p className="text-slate-700">No Registrasi: {checkResult.registrationNo}</p>
-                  <p className="text-slate-700">Jenjang: {checkResult.jenjangTujuan}</p>
-                  <p className="text-slate-700">Jalur: {checkResult.jalurPendaftaran}</p>
-                </div>
-                <button
-                  onClick={() => {
-                    setCheckResult(null);
-                    setCheckRegNo('');
-                  }}
-                  className="w-full rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
-                >
-                  Cek Nomor Lain
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

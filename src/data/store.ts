@@ -358,12 +358,27 @@ export type TeacherLessonNote = {
 
 // ==================== DATABASE TYPE ====================
 
+export type PPDBNotification = {
+  id: string;
+  applicationId: string;
+  registrationNo: string;
+  namaLengkap: string;
+  type: 'NEW_REGISTRATION' | 'STATUS_CHANGED';
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+};
+
 type Database = {
   announcements: Announcement[];
   teachers: Teacher[];
   classes: SchoolClass[];
   students: Student[];
   ppdbApplications: PPDBApplication[];
+  ppdbNotifications: PPDBNotification[];
+  adminSettings: {
+    email: string;
+  };
   attendances: AttendanceEntry[];
   classRosters: ClassRoster[];
   classAnnouncements: ClassAnnouncement[];
@@ -555,6 +570,10 @@ const initialData: Database = {
     { id: 's3', name: 'Nabila Putri', nis: '2024003', password: 'siswa123', classId: 'c2', gender: 'P' },
   ],
   ppdbApplications: [],
+  ppdbNotifications: [],
+  adminSettings: {
+    email: 'admin@sekolah.id',
+  },
   attendances: [
     { id: 'att-1', classId: 'c1', studentId: 's1', date: '2026-09-25', status: 'Hadir' },
     { id: 'att-2', classId: 'c1', studentId: 's2', date: '2026-09-25', status: 'Hadir' },
@@ -703,6 +722,8 @@ function readDB(): Database {
         gender: student.gender === 'P' ? 'P' : 'L',
       })),
       ppdbApplications: parsed.ppdbApplications ?? initialData.ppdbApplications,
+      ppdbNotifications: parsed.ppdbNotifications ?? initialData.ppdbNotifications,
+      adminSettings: parsed.adminSettings ?? initialData.adminSettings,
       attendances: parsed.attendances ?? initialData.attendances,
       classRosters: parsed.classRosters ?? initialData.classRosters,
       classAnnouncements: parsed.classAnnouncements ?? initialData.classAnnouncements,
@@ -908,6 +929,16 @@ export const submitPPDBApplication = (
 
   applications.push(created);
   savePPDBApplications(applications);
+  
+  // Add Notification
+  addPPDBNotification(
+    created.id,
+    created.registrationNo,
+    created.namaLengkap,
+    'NEW_REGISTRATION',
+    `Pendaftar baru: ${created.namaLengkap} (${created.registrationNo})`
+  );
+
   appendPPDBAuditLog('SUBMIT_APPLICATION', 'PUBLIC_FORM', {
     registrationNo: created.registrationNo,
     namaLengkap: created.namaLengkap,
@@ -935,6 +966,16 @@ export const updateApplicationStatus = (
 
   applications[index] = updated;
   savePPDBApplications(applications);
+
+  // Add Notification
+  addPPDBNotification(
+    updated.id,
+    updated.registrationNo,
+    updated.namaLengkap,
+    'STATUS_CHANGED',
+    `Status pendaftaran ${updated.namaLengkap} diubah menjadi ${status}`
+  );
+
   appendPPDBAuditLog('UPDATE_STATUS', verifiedBy || getAdminProfileName(), {
     registrationNo: updated.registrationNo,
     status,
@@ -996,6 +1037,55 @@ export const getPPDBApplicationById = (id: string): PPDBApplication | null => {
 
 export const getPPDBApplicationByRegNo = (regNo: string): PPDBApplication | null => {
   return getPPDBApplications().find((item) => item.registrationNo === regNo) || null;
+};
+
+// ==================== PPDB NOTIFICATIONS ====================
+
+export const getPPDBNotifications = (): PPDBNotification[] => readDB().ppdbNotifications;
+
+export const addPPDBNotification = (
+  applicationId: string,
+  registrationNo: string,
+  namaLengkap: string,
+  type: 'NEW_REGISTRATION' | 'STATUS_CHANGED',
+  message: string
+) => {
+  const db = readDB();
+  const newNotif: PPDBNotification = {
+    id: createId(),
+    applicationId,
+    registrationNo,
+    namaLengkap,
+    type,
+    message,
+    isRead: false,
+    createdAt: new Date().toISOString(),
+  };
+  db.ppdbNotifications.unshift(newNotif);
+  writeDB(db);
+};
+
+export const markNotificationAsRead = (id: string) => {
+  const db = readDB();
+  const idx = db.ppdbNotifications.findIndex((n) => n.id === id);
+  if (idx >= 0) {
+    db.ppdbNotifications[idx].isRead = true;
+    writeDB(db);
+  }
+};
+
+export const getUnreadNotificationCount = () => {
+  return getPPDBNotifications().filter((n) => !n.isRead).length;
+};
+
+// ==================== ADMIN SETTINGS ====================
+
+export const getAdminSettings = () => readDB().adminSettings;
+
+export const updateAdminSettings = (settings: { email: string }) => {
+  const db = readDB();
+  db.adminSettings = settings;
+  writeDB(db);
 };
 
 export const deletePPDBApplication = (id: string): boolean => {
