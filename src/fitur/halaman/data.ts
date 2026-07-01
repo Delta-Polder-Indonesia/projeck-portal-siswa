@@ -10,6 +10,7 @@ export const navItems: NavItem[] = [
   'Kegiatan Sekolah',
   'Berita',
   'Galeri',
+  'Guru & Pegawai',
   'Kontak',
 ];
 
@@ -17,50 +18,58 @@ export const introItems: SimpleItem[] = [
   {
     title: 'Prakata Kepala Sekolah',
     content:
-      "Bismillahirrahmanirrahim. Assalamu'alaikum Warahmatullahi Wabarakatuh. Kami mengucapkan selamat datang di website kami. Halaman ini ditujukan untuk seluruh unsur pimpinan, guru, karyawan, siswa, dan masyarakat agar mudah mengakses informasi profil, kegiatan, serta fasilitas sekolah.",
+      "Bismillahirrahmanirrahim. Assalamu'alaikum Warahmatullahi Wabarakatuh. " +
+      'Kami mengucapkan selamat datang di website resmi SMP Negeri 1 Majenang. ' +
+      'Halaman ini ditujukan untuk seluruh unsur pimpinan, guru, karyawan, siswa, dan masyarakat ' +
+      'agar mudah mengakses informasi profil, kegiatan, serta fasilitas sekolah.',
   },
   {
     title: 'Program Sekolah',
     content:
-      'Berbagai kegiatan pelatihan dari luar sekolah memudahkan kolaborasi dengan dunia usaha dan dunia industri. Sekolah terus berupaya mengadopsi kemajuan teknologi yang berkembang sangat pesat agar pembelajaran semakin relevan.',
+      'Berbagai program prioritas dirancang untuk membangun kompetensi, karakter, dan kesiapan siswa. ' +
+      'Setiap program dikelola oleh tim pengajar berpengalaman dengan dukungan fasilitas modern ' +
+      'dan kemitraan industri yang kuat.',
   },
   {
     title: 'Program Keahlian',
     content:
-      'Program keahlian di SMK Negeri 1 Cimahi dirancang untuk membekali siswa dengan kemampuan praktis dan daya saing. Kurikulum disusun agar lulusan siap melanjutkan pendidikan maupun siap terjun ke dunia kerja.',
+      'Program keahlian di SMP Negeri 1 Majenang dirancang untuk membekali siswa dengan ' +
+      'kemampuan akademik dan karakter unggul. Kurikulum disusun agar lulusan siap melanjutkan ' +
+      'pendidikan ke jenjang yang lebih tinggi dengan bekal pengetahuan yang kuat.',
   },
 ];
 
 export const newsItems: NewsItem[] = [
   {
-    title:
-      'ACHIEVEMENT MOTIVATION TRAINING SESSION 2, CITARIK, SUKABUMI, 19-20 APRIL 2019 TOGETHER IN HARMONY',
-    date: '24/04/2019',
+    title: 'PELAKSANAAN ASESMEN NASIONAL BERBASIS KOMPUTER (ANBK) TAHUN AJARAN 2026/2027',
+    date: '10/06/2026',
     excerpt:
-      'Pada tanggal 19-20 April 2019, SMKN 1 Cimahi melaksanakan kegiatan outbound Achievement Motivation Training untuk meningkatkan karakter dan kerja sama siswa.',
+      'SMP Negeri 1 Majenang melaksanakan ANBK dengan lancar. Seluruh siswa mengikuti ' +
+      'kegiatan dengan tertib dan didampingi oleh guru pendamping yang berpengalaman.',
   },
   {
-    title: 'DIES NATALIS SMKN 1 CIMAHI KE 42 & PEMBUKAAN PFM ANGKATAN 29',
-    date: '09/04/2019',
+    title: 'DIES NATALIS SMP NEGERI 1 MAJENANG KE 49 & AMBISI SEKOLAH DIGITAL',
+    date: '08/04/2026',
     excerpt:
-      'Pada hari Senin tanggal 8 April 2019 telah dilaksanakan upacara bendera sekaligus rangkaian kegiatan Dies Natalis sekolah.',
+      'Pada hari Senin tanggal 8 April 2026 telah dilaksanakan upacara bendera ' +
+      'sekaligus peringatan Dies Natalis SMP Negeri 1 Majenang yang ke-49.',
   },
 ];
 
 export const activityItems: ActivityItem[] = [
   {
-    title: 'Apel Pagi memperingati HUT PRAMUKA ke-55 di SMK Negeri 1 Cimahi',
+    title: 'Apel Pagi Memperingati HUT Pramuka di SMP Negeri 1 Majenang',
     desc: 'Kegiatan apel pagi dan pembinaan karakter siswa dilaksanakan bersama seluruh civitas sekolah.',
     image: 'images/Dashboard/sekolah-1.jpg',
   },
   {
-    title: 'Upacara Hari Senin Pagi Tanggal 22 Agustus 2016 memperingati HUT RI ke-71',
+    title: 'Upacara Hari Senin Pagi Memperingati HUT RI ke-79',
     desc: 'Kegiatan upacara dilaksanakan dengan tertib, khidmat, dan diikuti seluruh warga sekolah.',
     image: 'images/Dashboard/sekolah-2.jpg',
   },
   {
-    title: 'Pameran Produk Inovasi Anak Bangsa RITECH EXPO 2016 di Gor Manahan SOLO',
-    desc: 'SMK Negeri 1 Cimahi berpartisipasi melalui program keahlian unggulan dan karya inovatif siswa.',
+    title: 'Pameran Karya Siswa dan Inovasi Pendidikan Tahun 2025',
+    desc: 'SMP Negeri 1 Majenang berpartisipasi melalui program unggulan dan karya inovatif siswa.',
     image: 'images/Dashboard/sekolah-3.jpg',
   },
 ];

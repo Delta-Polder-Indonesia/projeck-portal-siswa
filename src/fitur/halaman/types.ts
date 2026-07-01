@@ -1,3 +1,4 @@
+
 export interface ExpectationModalProps {
   open: boolean;
   onClose: () => void;
@@ -14,7 +15,12 @@ export type NavItem =
   | 'Kegiatan Sekolah'
   | 'Berita'
   | 'Galeri'
+  | 'Guru & Pegawai'
   | 'Kontak';
+
+export interface PageProps {
+  onNavigate?: (menu: NavItem) => void;
+}
 
 export interface SimpleItem {
   title: string;
@@ -31,9 +37,4 @@ export interface ActivityItem {
   title: string;
   desc: string;
   image: string;
-}
-
-// ⬇️ TAMBAHAN: Props navigasi untuk semua halaman
-export interface PageProps {
-  onNavigate?: (menu: NavItem) => void;
 }

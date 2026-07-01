@@ -42,7 +42,7 @@ export default function ProgramKeahlianPage({ onNavigate }: PageProps) {
       </div>
 
       <div className="pt-6">
-        {/* Grid layout 4 kolom yang konsisten dengan halaman sebelumnya */}
+        {/* Grid layout 4 kolom yang konsisten */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {majors.map((major) => (
             <div key={major.name} className="border border-gray-200 bg-[#f8f9fc] overflow-hidden hover:shadow-md transition-shadow flex flex-col justify-between">
