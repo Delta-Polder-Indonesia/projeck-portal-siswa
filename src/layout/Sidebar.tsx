@@ -144,9 +144,9 @@ export default function Sidebar({ activePage, onNavigate, collapsed: sidebarColl
         <div className="flex items-center h-14 px-4">
           <div className="flex items-center gap-1">
             <div className="flex items-center gap-2 mr-4 pr-4 border-r border-white/30">
-              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/20 bg-white/10 flex items-center justify-center p-1 shrink-0">
                 <img
-                  src={`${import.meta.env.BASE_URL}images/logo-smpn1-small.png`}
+                  src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
                   alt="Logo SMP 1 Majenang"
                   className="w-full h-full object-cover"
                 />

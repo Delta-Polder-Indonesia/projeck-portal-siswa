@@ -8,7 +8,6 @@ import GtkSiswaPage from './pages/GtkSiswaPage';
 import KegiatanSekolahPage from './pages/KegiatanSekolahPage';
 import KontakPage from './pages/KontakPage';
 import ProfilPage from './pages/ProfilPage';
-import ProgramKeahlianPage from './pages/ProgramKeahlianPage';
 import ProgramSekolahPage from './pages/ProgramSekolahPage';
 import SaranaPrasaranaPage from './pages/SaranaPrasaranaPage';
 
@@ -39,7 +38,6 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
     }
     if (activeMenu === 'Profil') return <ProfilPage {...pageProps} />;
     if (activeMenu === 'Program Sekolah') return <ProgramSekolahPage {...pageProps} />;
-    if (activeMenu === 'Program Keahlian') return <ProgramKeahlianPage {...pageProps} />;
     if (activeMenu === 'GTK & Siswa') return <GtkSiswaPage {...pageProps} />;
     if (activeMenu === 'Sarana Prasarana') return <SaranaPrasaranaPage {...pageProps} />;
     if (activeMenu === 'Kegiatan Sekolah') return <KegiatanSekolahPage {...pageProps} />;
@@ -52,10 +50,10 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
 
   return (
     <div className="fixed inset-0 z-[100] overflow-hidden bg-slate-900/60 p-0 backdrop-blur-sm">
-      <div className="flex h-screen w-full max-w-none flex-col overflow-hidden rounded-none bg-white shadow-2xl animate-modal-in">
+      <div className="flex h-screen w-full max-w-none flex-col overflow-hidden rounded-none bg-[#0b1f46] shadow-2xl animate-modal-in">
         <>
           {/* --- AREA TETAP / STICKY --- */}
-          <div className="flex-shrink-0 shadow-sm">
+          <div className="flex-shrink-0 shadow-sm bg-white">
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-0.5 text-[11px] sm:justify-start">
               <div className="flex items-center gap-2"></div>
             </div>
@@ -104,8 +102,8 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
           </div>
 
           {/* --- AREA DINAMIS CONTENT --- */}
-          <div className="content-scroll-area flex-grow overflow-y-auto min-h-0 flex flex-col">
-            <div key={activeMenu} className="flex-grow animate-content-in">
+          <div className="content-scroll-area flex-grow overflow-y-auto min-h-0 flex flex-col bg-[#0b1f46] overscroll-contain">
+            <div key={activeMenu} className="flex-grow bg-white animate-content-in">
               {renderMenuPage()}
             </div>
 
@@ -113,26 +111,80 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
             <div className="grid grid-cols-1 gap-6 border-t border-blue-900/30 bg-gradient-to-r from-[#12366a] to-[#0f234d] px-6 py-8 text-xs text-gray-300 sm:grid-cols-2 md:grid-cols-4 mt-auto">
               <div>
                 <h4 className="mb-3 border-b border-blue-800 pb-1 font-bold uppercase text-white">Social Media Kami</h4>
-                <p className="text-[11px] text-gray-300">
+                <p className="text-[11px] text-gray-300 mb-3">
                   Ayo follow dan ikuti informasi seputar kegiatan di SMP Negeri 1 Majenang di media sosial kami.
                 </p>
+                
+                {/* TEMPLAT LINK SOSIAL MEDIA */}
+                <ul className="space-y-2 text-[11px] text-amber-300">
+                  <li>
+                    {/* Ganti href="#" dengan url twitter sekolah contoh: href="https://twitter.com/username" */}
+                    <a 
+                      href="#" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex inline-flex items-center gap-2 hover:underline"
+                    >
+                      <img 
+                        src={`${import.meta.env.BASE_URL}images/SosialMedia/twitter.png`} 
+                        alt="Twitter" 
+                        className="h-4 w-4 object-contain"
+                      />
+                      <span>Twitter</span>
+                    </a>
+                  </li>
+                  <li>
+                    {/* Ganti href="#" dengan url facebook sekolah */}
+                    <a 
+                      href="#" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex inline-flex items-center gap-2 hover:underline"
+                    >
+                      <img 
+                        src={`${import.meta.env.BASE_URL}images/SosialMedia/facebook.png`} 
+                        alt="Facebook" 
+                        className="h-4 w-4 object-contain"
+                      />
+                      <span>Facebook</span>
+                    </a>
+                  </li>
+                  <li>
+                    {/* Ganti href="#" dengan url instagram sekolah */}
+                    <a 
+                      href="#" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex inline-flex items-center gap-2 hover:underline"
+                    >
+                      <img 
+                        src={`${import.meta.env.BASE_URL}images/SosialMedia/Instagram.png`} 
+                        alt="Instagram" 
+                        className="h-4 w-4 object-contain"
+                      />
+                      <span>Instagram</span>
+                    </a>
+                  </li>
+                </ul>
               </div>
+              
               <div>
                 <h4 className="mb-3 border-b border-blue-800 pb-1 font-bold uppercase text-white">Tentang SMP Negeri 1 Majenang</h4>
                 <p className="text-justify text-[11px] leading-relaxed text-gray-300">
-                  SMP Negeri 1 Majenang merupakan salah satu lembaga pendidikan menengah kejuruan di Kota Cimahi, Jawa
-                  Barat yang menyelenggarakan program pendidikan kejuruan.
+                  SMP Negeri 1 Majenang merupakan salah satu lembaga pendidikan dasar tingkat menengah pertama negeri yang berlokasi di Kecamatan Majenang, Kabupaten Cilacap, Jawa Tengah yang berkomitmen menghasilkan lulusan berdaya saing tinggi.
                 </p>
               </div>
+              
               <div>
                 <h4 className="mb-3 border-b border-blue-800 pb-1 font-bold uppercase text-white">Link Tautan Kami</h4>
                 <ul className="space-y-1 text-[11px] text-amber-300">
-                  <li className="cursor-pointer hover:underline">DJPSMK - Kementerian Pendidikan dan Kebudayaan</li>
+                  <li className="cursor-pointer hover:underline">Kementerian Pendidikan dan Kebudayaan</li>
                   <li className="cursor-pointer hover:underline">PPDB SMP Negeri 1 Majenang</li>
                   <li className="cursor-pointer hover:underline">e-Perpus SMP Negeri 1 Majenang</li>
                   <li className="cursor-pointer hover:underline">e-Lab SMP Negeri 1 Majenang</li>
                 </ul>
               </div>
+              
               <div>
                 <h4 className="mb-3 border-b border-blue-800 pb-1 font-bold uppercase text-white">Informasi Terkini</h4>
                 <ul className="space-y-2 text-[11px] text-gray-300">
@@ -140,13 +192,13 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
                     className="line-clamp-2 cursor-pointer hover:underline"
                     onClick={() => handleNavigate('Berita')}
                   >
-                    ACHIEVEMENT MOTIVATION TRAINING SESSION 2, CITARIK, SUKABUMI 19-20 APRIL 2019
+                    PELAKSANAAN ASESMEN NASIONAL BERBASIS KOMPUTER (ANBK) TAHUN AJARAN 2026/2027
                   </li>
                   <li 
                     className="line-clamp-2 cursor-pointer hover:underline"
                     onClick={() => handleNavigate('Berita')}
                   >
-                    DIES NATALIS SMP Negeri 1 Majenang KE 42 & PEMBUKAAN PFM ANGKATAN 29
+                    DIES NATALIS SMP NEGERI 1 MAJENANG KE 49 & AMBISI SEKOLAH DIGITAL
                   </li>
                 </ul>
               </div>
@@ -158,12 +210,10 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
                 <span>|</span>
                 <span className="cursor-pointer hover:underline" onClick={() => handleNavigate('Program Sekolah')}>Program Sekolah</span>
                 <span>|</span>
-                <span className="cursor-pointer hover:underline" onClick={() => handleNavigate('Program Keahlian')}>Program Keahlian</span>
-                <span>|</span>
                 <span className="cursor-pointer hover:underline" onClick={() => handleNavigate('Kontak')}>Kontak Kami</span>
               </div>
               <p>All Rights Reserved TIM ICT 2017 - 2026, SMP Negeri 1 Majenang</p>
-              <p className="text-[10px] text-blue-200/60">Proudly powered by WordPress | Education Hub by WEN Themes</p>
+              <p className="text-[10px] text-blue-200/60">Proudly powered by React & Tailwind CSS</p>
             </div>
           </div>
         </>
@@ -177,11 +227,11 @@ export default function ExpectationModal({ open, onClose, onOpenRegistration }: 
           to { opacity: 1; transform: scale(1); }
         }
         @keyframes content-in {
-          from { opacity: 0; transform: translateY(10px); }
+          from { opacity: 0.4; transform: translateY(6px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-modal-in { animation: modal-in 0.25s ease-out; }
-        .animate-content-in { animation: content-in 0.22s ease-out; }
+        .animate-content-in { animation: content-in 0.18s ease-out; }
       `}</style>
     </div>
   );

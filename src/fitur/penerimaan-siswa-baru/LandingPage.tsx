@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowLeft, GraduationCap } from 'lucide-react';
 
 export type LandingPageProps = {
   onOpenForm: () => void;
@@ -229,42 +229,40 @@ export default function LandingPage({ onOpenForm, onOpenCekKelulusan, onClose }:
 
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
-    <header className="fixed left-0 right-0 top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:px-8">
-          <div className="flex items-center gap-3">
-  <img
-    src={`${import.meta.env.BASE_URL}images/siswa%20baru/unique_id.png`}
-    alt="Logo PPDB"
-    className="h-10 w-auto object-contain"
-  />
-</div>
+      {/* HEADER — MODIFIKASI: warna biru #2E86C1, tombol back di kiri, style sesuai kode no 1 */}
+      <header className="sticky top-0 z-40 flex h-14 items-center justify-between bg-[#2E86C1] px-4 lg:px-8">
+        <div className="flex items-center gap-3">
+          {/* Tombol Back di sebelah KIRI */}
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center text-white hover:bg-white/10 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div>
+            <h1 className="text-base font-bold text-white">PPDB Nasional 2026</h1>
+            <p className="text-[11px] text-white/80">Penerimaan Peserta Didik Baru</p>
+          </div>
+        </div>
 
-          <nav className="flex items-center gap-3 md:gap-5">
-            <button
-              onClick={onOpenCekKelulusan}
-              className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
-            >
-              Cek Kelulusan
-            </button>
-            <button
-              onClick={onOpenForm}
-              className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
-            >
-              Daftar Sekarang
-            </button>
-            <button
-              onClick={onClose}
-              className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
-            >
-              Tutup
-            </button>
-          </nav>
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex flex-col items-end mr-2">
+            <span className="text-xs font-bold text-white">UNIVERSITAS HANDAYANI</span>
+            <span className="text-[10px] text-white/70 uppercase tracking-wider">Portal PMB Online</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/20 bg-white/10 flex items-center justify-center p-1 shrink-0">
+            <img
+                  src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
+                  alt="Logo SMP 1 Majenang"
+                  className="w-full h-full object-cover"
+                />
+          </div>
         </div>
       </header>
 
       <main className="overflow-x-hidden">
       <section
-        className="relative flex min-h-screen items-end border-b border-slate-200 pt-16"
+        className="relative flex min-h-screen items-end border-b border-slate-200 pt-14"
         style={{
           backgroundImage:
             `linear-gradient(to top, rgba(15,23,42,0.70), rgba(15,23,42,0.35)), url('${import.meta.env.BASE_URL}images/siswa%20baru/f-3.jpg')`,
@@ -711,18 +709,18 @@ export default function LandingPage({ onOpenForm, onOpenCekKelulusan, onClose }:
         </section>
       </main>
 
-      <footer className="bg-slate-950 text-slate-200">
+       <footer className="bg-[#2E86C1] text-white">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 md:flex-row md:items-start md:justify-between md:px-8">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">PPDB Nasional</p>
-            <p className="mt-2 text-sm text-slate-300">Sistem Penerimaan Peserta Didik Baru Terpadu</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">PPDB Nasional</p>
+            <p className="mt-2 text-sm text-white/90">Sistem Penerimaan Peserta Didik Baru Terpadu</p>
           </div>
-          <div className="text-sm text-slate-300">
+          <div className="text-sm text-white/90">
             <p>(021) 1234-5678</p>
             <p>ppdb@domain.go.id</p>
             <p>Jl. Pendidikan Nasional No. 1</p>
           </div>
-          <div className="text-sm text-slate-300">
+          <div className="text-sm text-white/90">
             <p>Senin - Jumat 08.00 - 16.00</p>
             <p>Sabtu 08.00 - 12.00</p>
           </div>

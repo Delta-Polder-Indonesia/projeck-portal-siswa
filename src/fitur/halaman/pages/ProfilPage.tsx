@@ -33,7 +33,7 @@ export default function ProfilPage() {
         <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 items-center sm:items-start border-b md:border-b-0 md:border-r border-gray-300 pb-6 md:pb-0 md:pr-6 text-center sm:text-left">
           <div className="w-20 h-20 bg-gray-100 flex items-center justify-center flex-shrink-0 border border-gray-900 overflow-hidden">
             <img
-              src={`${import.meta.env.BASE_URL}images/smp.png`}
+              src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
               alt="Logo SMP N 1 Majenang"
               className="w-full h-full object-cover grayscale"
               onError={(e) => {
@@ -245,7 +245,7 @@ export default function ProfilPage() {
               <span>Jumat:</span>
               <span className="font-bold">07.00 - 11.00 WIB</span>
             </div>
-            <div className="flex justify-between border-t border-gray-300 pt-1 mt-1 text-gray-500">
+            <div className="flex justify-between border-t border-red-300 pt-1 mt-1 text-red-500">
               <span>Sabtu - Minggu:</span>
               <span>Tutup / Libur</span>
             </div>

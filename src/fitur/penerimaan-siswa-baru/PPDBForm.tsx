@@ -1,5 +1,5 @@
 import { useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
-import { CheckCircle2, FileText, GraduationCap, MapPin, User, Users, X } from 'lucide-react';
+import { CheckCircle2, FileText, GraduationCap, MapPin, User, Users, ArrowLeft } from 'lucide-react';
 import QRCode from 'qrcode';
 import { ppdbService } from '../../services/ppdbService';
 
@@ -10,8 +10,8 @@ type PPDBFormProps = {
 };
 
 const inputClass =
-  'w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-600';
-const labelClass = 'mb-1 block text-xs font-semibold tracking-wide text-slate-700 uppercase';
+  'w-full border border-[#CCC] bg-white px-3 py-2 text-sm text-[#333] outline-none transition focus:border-[#2E86C1]';
+const labelClass = 'mb-1.5 block text-xs font-bold text-[#333]';
 
 export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -78,7 +78,7 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
   const [files, setFiles] = useState<Record<string, File | null>>({
     pasFoto: null,
     kartuKeluarga: null,
-    aktaKelahiran: null,
+    altaKelahiran: null,
     sklIjazah: null,
     piagamPrestasi: null,
     suratPindah: null,
@@ -220,19 +220,19 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
         <head>
           <title>Bukti Pendaftaran PPDB - ${submitInfo.registrationNo}</title>
           <style>
-            body { font-family: Arial, sans-serif; color: #0f172a; margin: 0; padding: 32px; }
+            body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 32px; }
             .paper { max-width: 800px; margin: 0 auto; }
-            .head { border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; }
-            .head h1 { margin: 0; font-size: 20px; }
-            .head p { margin: 4px 0 0; font-size: 12px; color: #475569; }
-            .title { font-size: 18px; font-weight: bold; margin-bottom: 16px; }
-            .row { display: flex; border-bottom: 1px solid #cbd5e1; padding: 10px 0; font-size: 14px; }
-            .label { width: 220px; color: #334155; }
-            .value { flex: 1; font-weight: 600; }
-            .note { margin-top: 18px; font-size: 12px; color: #475569; line-height: 1.5; }
+            .head { border-bottom: 2px solid #2E86C1; padding-bottom: 12px; margin-bottom: 20px; }
+            .head h1 { margin: 0; font-size: 20px; color: #2E86C1; }
+            .head p { margin: 4px 0 0; font-size: 12px; color: #666; }
+            .title { font-size: 18px; font-weight: bold; margin-bottom: 16px; color: #333; }
+            .row { display: flex; border-bottom: 1px solid #DDD; padding: 10px 0; font-size: 14px; }
+            .label { width: 220px; color: #666; }
+            .value { flex: 1; font-weight: 600; color: #333; }
+            .note { margin-top: 18px; font-size: 12px; color: #666; line-height: 1.5; }
             .qr-wrap { margin-top: 20px; display: flex; gap: 20px; align-items: center; }
-            .qr-wrap img { width: 120px; height: 120px; border: 1px solid #cbd5e1; }
-            .signature { margin-top: 52px; display: flex; justify-content: space-between; font-size: 13px; }
+            .qr-wrap img { width: 120px; height: 120px; border: 1px solid #DDD; }
+            .signature { margin-top: 52px; display: flex; justify-content: space-between; font-size: 13px; color: #333; }
           </style>
         </head>
         <body>
@@ -252,9 +252,9 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
                administrasi di sekolah tujuan.
             </div>
             ${submitInfo.qrDataUrl
-        ? `<div class="qr-wrap"><img src="${submitInfo.qrDataUrl}" alt="QR Registrasi" /><div><strong>QR Verifikasi</strong><p style="font-size:12px;color:#475569;margin-top:6px;">Dipindai oleh petugas untuk membuka data registrasi.</p></div></div>`
-        : ''
-      }
+              ? `<div class="qr-wrap"><img src="${submitInfo.qrDataUrl}" alt="QR Registrasi" /><div><strong>QR Verifikasi</strong><p style="font-size:12px;color:#666;margin-top:6px;">Dipindai oleh petugas untuk membuka data registrasi.</p></div></div>`
+              : ''
+            }
             <div class="signature">
               <div>Orang Tua/Wali</div>
               <div>Petugas PPDB</div>
@@ -274,34 +274,34 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
 
   if (submitInfo) {
     return (
-      <div className={`${isModal ? 'fixed inset-0 z-[100] overflow-y-auto bg-slate-50 text-slate-900' : 'bg-slate-50 text-slate-900'}`}>
+      <div className={`${isModal ? 'fixed inset-0 z-[100] overflow-y-auto bg-[#F5F5F5] text-[#333]' : 'bg-[#F5F5F5] text-[#333]'}`}>
         <div className="mx-auto w-full max-w-3xl px-4 py-10 md:px-8">
-          <div className="border border-slate-200 bg-white p-8 animate-in fade-in zoom-in-95 duration-200">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Pendaftaran Berhasil</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Data Berhasil Dikirim</h2>
-            <p className="mt-3 text-sm text-slate-600">
+          <div className="border border-[#DDD] bg-white p-8">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#666]">Pendaftaran Berhasil</p>
+            <h2 className="mt-2 text-3xl font-bold text-[#333]">Data Berhasil Dikirim</h2>
+            <p className="mt-3 text-sm text-[#666]">
               Simpan nomor registrasi berikut untuk cek status dan verifikasi administrasi.
             </p>
 
-            <div className="mt-6 divide-y divide-slate-200 border-y border-slate-200">
+            <div className="mt-6 divide-y divide-[#DDD] border-y border-[#DDD]">
               <div className="flex items-center justify-between py-3">
-                <p className="text-sm text-slate-600">Nomor Registrasi</p>
-                <p className="text-lg font-semibold text-slate-900">{submitInfo.registrationNo}</p>
+                <p className="text-sm text-[#666]">Nomor Registrasi</p>
+                <p className="text-lg font-bold text-[#333]">{submitInfo.registrationNo}</p>
               </div>
               <div className="flex items-center justify-between py-3">
-                <p className="text-sm text-slate-600">Nama Siswa</p>
-                <p className="text-sm font-semibold text-slate-900">{submitInfo.namaLengkap}</p>
+                <p className="text-sm text-[#666]">Nama Siswa</p>
+                <p className="text-sm font-bold text-[#333]">{submitInfo.namaLengkap}</p>
               </div>
               <div className="flex items-center justify-between py-3">
-                <p className="text-sm text-slate-600">Jenjang</p>
-                <p className="text-sm font-semibold text-slate-900">{submitInfo.jenjangTujuan}</p>
+                <p className="text-sm text-[#666]">Jenjang</p>
+                <p className="text-sm font-bold text-[#333]">{submitInfo.jenjangTujuan}</p>
               </div>
             </div>
 
             {submitInfo.qrDataUrl && (
-              <div className="mt-5 flex items-center gap-4 border border-slate-200 p-3">
-                <img src={submitInfo.qrDataUrl} alt="QR Bukti Registrasi" className="h-24 w-24 border border-slate-200" />
-                <p className="text-sm text-slate-600">QR ini digunakan petugas untuk validasi cepat nomor registrasi di loket.</p>
+              <div className="mt-5 flex items-center gap-4 border border-[#DDD] p-3">
+                <img src={submitInfo.qrDataUrl} alt="QR Bukti Registrasi" className="h-24 w-24 border border-[#DDD]" />
+                <p className="text-sm text-[#666]">QR ini digunakan petugas untuk validasi cepat nomor registrasi di loket.</p>
               </div>
             )}
 
@@ -309,14 +309,14 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
               <button
                 type="button"
                 onClick={handlePrintReceipt}
-                className="rounded-full border border-slate-900 px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-900 hover:text-white cursor-pointer"
+                className="border border-[#2E86C1] bg-[#2E86C1] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#2471A3] cursor-pointer"
               >
                 Cetak Bukti Pendaftaran (A4)
               </button>
               <button
                 type="button"
                 onClick={handleClose}
-                className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 cursor-pointer"
+                className="border border-[#CCC] px-5 py-2.5 text-sm font-bold text-[#333] transition hover:bg-[#F5F5F5] cursor-pointer"
               >
                 Kembali ke Portal
               </button>
@@ -328,40 +328,20 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
   }
 
   const formContent = (
-    <div className="mx-auto w-full max-w-6xl bg-white p-6 rounded-2xl border border-slate-200 shadow-sm animate-in fade-in duration-200">
-      <header className="mb-8 border-b border-slate-200 pb-5">
-        <div className="mb-3 border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 rounded">
-         <div className="flex items-center gap-3">
-<img
-    src={`${import.meta.env.BASE_URL}images/siswa%20baru/unique_id.png`}
-    alt="Logo PPDB"
-    className="h-10 w-auto object-contain"
-  />
-  <div>
-    <p className="text-base font-semibold"> Kementerian Pendidikan Republik Indonesia - Sistem Penerimaan Peserta Didik Baru Terpadu</p>
-  </div>
-  
-</div>
-        </div>
+    <div className="mx-auto w-full max-w-6xl bg-white p-6 border border-[#DDD]">
+      <header className="mb-6 border-b-2 border-[#F39C12] pb-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Portal Resmi PPDB</p>
-            <h2 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Formulir Pendaftaran Siswa Baru</h2>
-            <p className="mt-2 max-w-3xl text-sm text-slate-600">
-              Lengkapi data sesuai dokumen resmi. Seluruh data akan diverifikasi oleh tim administrasi sekolah.
+            <p className="text-xs font-bold uppercase tracking-wider text-[#666]">Formulir Elektronik</p>
+            <h2 className="mt-1 text-xl font-bold text-[#333]">Isi Data Calon Siswa Baru dengan Benar</h2>
+            <p className="mt-2 max-w-3xl text-sm text-[#666]">
+              Lengkapi seluruh kolom berkas di bawah ini. Pastikan berkas fisik orisinal disiapkan pada saat validasi di loket pendaftaran.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
-          >
-              Tutup
-            </button>
         </div>
       </header>
 
-      <section className="mb-8 grid gap-3 md:grid-cols-5">
+      <section className="mb-6 grid gap-2 md:grid-cols-5">
         {stepItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentStep === item.step;
@@ -369,32 +349,32 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
           return (
             <div
               key={item.step}
-              className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition ${isActive
-                  ? 'border-slate-900 bg-slate-900 text-white shadow-md'
+              className={`flex items-center gap-2 border px-3 py-2 transition ${isActive
+                  ? 'border-[#2E86C1] bg-[#2E86C1] text-white'
                   : isDone
-                    ? 'border-slate-300 bg-slate-50 text-slate-800'
-                    : 'border-slate-200 bg-white text-slate-400'
+                    ? 'border-[#CCC] bg-[#F5F5F5] text-[#333]'
+                    : 'border-[#DDD] bg-white text-[#999]'
                 }`}
             >
               <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition ${isActive ? 'bg-white text-slate-900' : isDone ? 'bg-slate-700 text-white' : 'bg-slate-100 text-slate-450'
+                className={`flex h-7 w-7 shrink-0 items-center justify-center text-xs font-bold transition ${isActive ? 'bg-white text-[#2E86C1]' : isDone ? 'bg-[#2E86C1] text-white' : 'bg-[#F5F5F5] text-[#999]'
                   }`}
               >
                 {isDone ? <CheckCircle2 className="h-4 w-4" /> : item.step}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-xs font-bold uppercase tracking-wider">{item.label}</p>
-                <Icon className="mt-0.5 h-4 w-4" />
+                <p className="truncate text-[10px] font-bold uppercase">{item.label}</p>
+                <Icon className="mt-0.5 h-3.5 w-3.5" />
               </div>
             </div>
           );
         })}
       </section>
 
-      <form onSubmit={handleSubmitPPDB} className="space-y-8">
+      <form onSubmit={handleSubmitPPDB} className="space-y-6">
         {currentStep === 1 && (
-          <section className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-200">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2">I. Pilihan Instansi Pendidikan</h3>
+          <section className="space-y-4">
+            <h3 className="text-base font-bold text-[#333] border-b border-[#DDD] pb-2">I. Pilihan Instansi Pendidikan</h3>
             <div className="grid gap-4 md:grid-cols-3">
               <div>
                 <label className={labelClass}>Jenjang Pendidikan Tujuan</label>
@@ -427,7 +407,7 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
             </div>
 
             {formData.jenjangTujuan === 'SMK' && (
-              <div className="max-w-md animate-in fade-in duration-200">
+              <div className="max-w-md">
                 <label className={labelClass}>Kompetensi Keahlian</label>
                 <select name="majorId" value={formData.majorId} onChange={handleInputChange} className={inputClass} required>
                   <option value="">Pilih jurusan...</option>
@@ -442,8 +422,8 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
         )}
 
         {currentStep === 2 && (
-          <section className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-200">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2">II. Identitas Calon Siswa</h3>
+          <section className="space-y-4">
+            <h3 className="text-base font-bold text-[#333] border-b border-[#DDD] pb-2">II. Identitas Calon Siswa</h3>
             <div className="grid gap-4 md:grid-cols-3">
               <div>
                 <label className={labelClass}>NIK</label>
@@ -485,8 +465,8 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
         )}
 
         {currentStep === 3 && (
-          <section className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-200">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2">III. Alamat dan Kontak</h3>
+          <section className="space-y-4">
+            <h3 className="text-base font-bold text-[#333] border-b border-[#DDD] pb-2">III. Alamat dan Kontak</h3>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="md:col-span-3">
                 <label className={labelClass}>Alamat Lengkap</label>
@@ -527,14 +507,14 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
         )}
 
         {currentStep === 4 && (
-          <section className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-200">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2">IV. Data Orang Tua / Wali</h3>
-            <div className="grid gap-5 md:grid-cols-2">
-              <div className="rounded-xl border border-slate-200 p-5 bg-slate-50/50">
-                <p className="mb-4 text-sm font-bold text-slate-800 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>Data Ayah
+          <section className="space-y-4">
+            <h3 className="text-base font-bold text-[#333] border-b border-[#DDD] pb-2">IV. Data Orang Tua / Wali</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="border border-[#DDD] p-4 bg-[#FAFAFA]">
+                <p className="mb-3 text-sm font-bold text-[#333] flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[#2E86C1]"></span>Data Ayah
                 </p>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
                     <label className={labelClass}>Nama Ayah</label>
                     <input name="namaAyah" value={formData.namaAyah} onChange={handleInputChange} className={inputClass} required />
@@ -545,11 +525,11 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
                   </div>
                 </div>
               </div>
-              <div className="rounded-xl border border-slate-200 p-5 bg-slate-50/50">
-                <p className="mb-4 text-sm font-bold text-slate-800 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-pink-500"></span>Data Ibu
+              <div className="border border-[#DDD] p-4 bg-[#FAFAFA]">
+                <p className="mb-3 text-sm font-bold text-[#333] flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[#E74C3C]"></span>Data Ibu
                 </p>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
                     <label className={labelClass}>Nama Ibu</label>
                     <input name="namaIbu" value={formData.namaIbu} onChange={handleInputChange} className={inputClass} required />
@@ -565,17 +545,17 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
         )}
 
         {currentStep === 5 && (
-          <section className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-200">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2">V. Dokumen Pendukung</h3>
-            <p className="text-sm text-slate-600">
+          <section className="space-y-4">
+            <h3 className="text-base font-bold text-[#333] border-b border-[#DDD] pb-2">V. Dokumen Pendukung</h3>
+            <p className="text-sm text-[#666]">
               Unggah dokumen PDF/JPG/PNG. Ukuran maksimal tiap berkas 3MB.
             </p>
             <div className="grid gap-4 md:grid-cols-3">
-              <label className="rounded-xl border border-slate-350 p-4 text-sm font-medium text-slate-700 bg-slate-55 flex flex-col justify-between hover:bg-slate-50 select-none cursor-pointer transition">
+              <label className="border border-[#DDD] p-4 text-sm font-bold text-[#333] bg-white flex flex-col justify-between hover:bg-[#FAFAFA] select-none cursor-pointer transition">
                 <span>Pas Foto 3x4 (Wajib)</span>
                 <input type="file" accept="image/*" onChange={(e) => handleFileChange('pasFoto', e)} className="mt-3 block w-full text-xs" required />
               </label>
-              <label className="rounded-xl border border-slate-350 p-4 text-sm font-medium text-slate-700 bg-slate-55 flex flex-col justify-between hover:bg-slate-50 select-none cursor-pointer transition">
+              <label className="border border-[#DDD] p-4 text-sm font-bold text-[#333] bg-white flex flex-col justify-between hover:bg-[#FAFAFA] select-none cursor-pointer transition">
                 <span>Kartu Keluarga (Wajib)</span>
                 <input
                   type="file"
@@ -586,7 +566,7 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
                 />
               </label>
               {formData.jenjangTujuan !== 'SD' && formData.jenjangTujuan !== '' && (
-                <label className="rounded-xl border border-slate-350 p-4 text-sm font-medium text-slate-700 bg-slate-55 flex flex-col justify-between hover:bg-slate-50 select-none cursor-pointer transition">
+                <label className="border border-[#DDD] p-4 text-sm font-bold text-[#333] bg-white flex flex-col justify-between hover:bg-[#FAFAFA] select-none cursor-pointer transition">
                   <span>SKL / Ijazah (Wajib)</span>
                   <input
                     type="file"
@@ -601,12 +581,12 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
           </section>
         )}
 
-        <footer className="flex items-center justify-between border-t border-slate-200 pt-5">
+        <footer className="flex items-center justify-between border-t border-[#DDD] pt-4">
           <button
             type="button"
             onClick={prevStep}
             disabled={currentStep === 1}
-            className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
+            className="text-sm font-bold text-[#333] transition hover:text-[#2E86C1] cursor-pointer"
           >
             Kembali
           </button>
@@ -615,7 +595,7 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
             <button
               type="button"
               onClick={nextStep}
-              className="text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
+              className="text-sm font-bold text-[#333] transition hover:text-[#2E86C1] cursor-pointer"
             >
               Lanjutkan
             </button>
@@ -623,7 +603,7 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center gap-2 rounded-full bg-slate-900 border border-slate-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 border border-[#2E86C1] bg-[#2E86C1] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#2471A3] disabled:opacity-50 cursor-pointer"
             >
               <CheckCircle2 className="h-4 w-4" />
               {isSubmitting ? 'Mengirim...' : 'Kirim Data Pendaftaran'}
@@ -634,13 +614,71 @@ export default function PPDBForm({ onBack, isModal = false, onClose }: PPDBFormP
     </div>
   );
 
+  const fullLayout = (
+    <div className="flex flex-col min-h-screen bg-[#F5F5F5]">
+      {/* HEADER ATAS (SAMA PERSIS DENGAN CEK KELULUSAN) */}
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-[#2E86C1] px-4 lg:px-8">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="flex h-8 w-8 items-center justify-center text-white hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div>
+            <h1 className="text-base font-bold text-white">Pendaftaran Siswa Baru</h1>
+            <p className="text-[11px] text-white/80">Penerimaan Siswa Baru</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex flex-col items-end mr-2">
+            <span className="text-xs font-bold text-white">UNIVERSITAS HANDAYANI</span>
+            <span className="text-[10px] text-white/70 uppercase tracking-wider">Portal PMB Online</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/20 bg-white/10 flex items-center justify-center p-1 shrink-0">
+            <img
+                  src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
+                  alt="Logo SMP 1 Majenang"
+                  className="w-full h-full object-cover"
+                />
+          </div>
+        </div>
+      </header>
+
+      {/* CONTENT */}
+      <main className="flex-1 max-w-6xl mx-auto w-full p-4 lg:p-6">
+        {formContent}
+      </main>
+
+      <footer className="bg-[#2E86C1] text-white">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 md:flex-row md:items-start md:justify-between md:px-8">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">PPDB Nasional</p>
+            <p className="mt-2 text-sm text-white/90">Sistem Penerimaan Peserta Didik Baru Terpadu</p>
+          </div>
+          <div className="text-sm text-white/90">
+            <p>(021) 1234-5678</p>
+            <p>ppdb@domain.go.id</p>
+            <p>Jl. Pendidikan Nasional No. 1</p>
+          </div>
+          <div className="text-sm text-white/90">
+            <p>Senin - Jumat 08.00 - 16.00</p>
+            <p>Sabtu 08.00 - 12.00</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+
   if (isModal) {
     return (
-      <div className="fixed inset-0 z-[100] overflow-y-auto bg-slate-50 text-slate-900">
-        <div className="px-4 py-8 md:px-8 bg-slate-50 min-h-screen flex items-center justify-center">{formContent}</div>
+      <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#F5F5F5] text-[#333]">
+        {fullLayout}
       </div>
     );
   }
 
-  return <div className="px-4 py-8 md:px-8 bg-slate-50 min-h-screen flex items-center justify-center">{formContent}</div>;
+  return fullLayout;
 }

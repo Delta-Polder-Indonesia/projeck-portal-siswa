@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import {
   GraduationCap, BookOpen, Eye, EyeOff, ArrowLeft,
-  User, HelpCircle, BookMarked, ChevronLeft, ChevronRight
+  User, HelpCircle, BookMarked
 } from 'lucide-react';
 import AdminMasterPanel from '../admin/PanelAdminModal';
 import TutorialModal from './TutorialModal';
@@ -14,36 +14,32 @@ import CekKelulusanPage from '../penerimaan-siswa-baru/CekKelulusanPage';
 
 const PerpustakaanApp = lazy(() => import('../../fitur/perpustakaan/PerpustakaanApp'));
 
-const BG_IMAGE = `${import.meta.env.BASE_URL}images/login-bg.jpg`;
-const LOGO_SMP = `${import.meta.env.BASE_URL}images/smp.png`;
+const LOGO_SMP = `${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`;
 
 const ADMIN_LOGIN = {
   master: { username: 'admin', password: 'admin' },
 } as const;
 
-// ============================================
-// GANTI ATAU TAMBAH FOTO DI SINI BUNG (BISA 10 - 20 FOTO)
-// ============================================
-const CAROUSEL_IMAGES = [
+const BACKGROUND_IMAGES = [
   {
     src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-1.jpg`,
-    caption: 'Fasilitas Pembelajaran Modern ( DEMO )'
+    caption: 'Fasilitas Pembelajaran Modern'
   },
   {
     src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-2.jpg`,
-    caption: 'Kegiatan Ekstrakurikuler ( DEMO )'
+    caption: 'Kegiatan Ekstrakurikuler'
   },
   {
     src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-3.jpg`,
-    caption: 'Prestasi Siswa Berprestasi ( DEMO )'
+    caption: 'Prestasi Siswa Berprestasi'
   },
   {
     src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-4.jpg`,
-    caption: 'Lingkungan Belajar Nyaman ( DEMO )'
+    caption: 'Lingkungan Belajar Nyaman'
   },
   {
-    src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-5.jpeg`,
-    caption: 'Alumni Siswa Tahun Ajaran 2024/2025 ( DEMO )'
+    src: `${import.meta.env.BASE_URL}images/Dashboard/sekolah-5.jpg`,
+    caption: 'Alumni Siswa Tahun Ajaran 2024/2025'
   },
 ];
 
@@ -62,31 +58,16 @@ export default function LoginPage() {
   const [ppdbView, setPpdbView] = useState<'landing' | 'form' | 'cek-kelulusan'>('landing');
   const [showPerpustakaan, setShowPerpustakaan] = useState(false);
 
-  // Carousel state
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
+    setCurrentSlide((prev) => (prev + 1) % BACKGROUND_IMAGES.length);
   }, []);
 
-  const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + CAROUSEL_IMAGES.length) % CAROUSEL_IMAGES.length);
-  }, []);
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-    setIsAutoPlaying(false);
-    // Resume autoplay setelah 5 detik jika user klik manual
-    setTimeout(() => setIsAutoPlaying(true), 5000);
-  };
-
-  // Auto-slide setiap 5 detik
   useEffect(() => {
-    if (!isAutoPlaying) return;
     const interval = setInterval(nextSlide, 5000);
     return () => clearInterval(interval);
-  }, [isAutoPlaying, nextSlide]);
+  }, [nextSlide]);
 
   const handleSelectRole = (selectedRole: UserRole) => {
     setRole(selectedRole);
@@ -118,18 +99,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] flex flex-col bg-slate-950 font-sans antialiased selection:bg-cyan-500 selection:text-slate-900 overflow-hidden">
-
-      {/* Background Layer */}
-      <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat scale-105 transition-all duration-1000 z-0"
-        style={{ backgroundImage: `url(${BG_IMAGE})` }}
-      />
-      <div className="fixed inset-0 bg-black/0 z-0" />
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-0" />
+    <div className="relative min-h-screen w-full flex flex-col bg-slate-950 font-sans antialiased selection:bg-cyan-500 selection:text-slate-900 overflow-hidden">
 
       {/* STICKY HEADER */}
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-[#2E86C1] backdrop-blur-xl border-b border-white/10">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 w-full">
 
@@ -156,7 +129,7 @@ export default function LoginPage() {
                 className="flex items-center gap-2 p-1 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white bg-transparent border-none"
               >
                 <User className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Halaman</span>
+                <span>Halaman Kami</span>
               </button>
 
               <button
@@ -182,138 +155,54 @@ export default function LoginPage() {
         </div>
       </header>
 
-      {/* Spacer untuk header fixed */}
-      <div className="h-16" />
-
-      {/* MAIN CONTENT WORKSPACE */}
-      <main className="relative z-10 flex-1 flex w-full max-w-7xl items-center justify-end gap-12 lg:gap-20 mx-auto px-4 sm:px-6 lg:px-8 py-8 max-[900px]:justify-center">
-
-        {/* LEFT SIDE - Image Carousel */}
-        <div className="hidden lg:flex flex-1 max-w-[700px] h-[420px] relative rounded-3xl overflow-hidden group">
-          
-          {/* Images dengan fade transition */}
-          {CAROUSEL_IMAGES.map((image, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-              }`}
-            >
-              <img
-                src={image.src}
-                alt={image.caption}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            </div>
-          ))}
-
-          {/* Caption */}
-          <div className="absolute bottom-4 left-0 right-0 z-20 px-8 pb-6">
-            <div className="transform transition-all duration-500 translate-y-0">
-              <h3 className="text-white text-2xl font-bold mb-1 drop-shadow-lg">
-                {CAROUSEL_IMAGES[currentSlide].caption}
-              </h3>
-              <p className="text-white/70 text-sm">
-                SMP Negeri 1 Majenang
-              </p>
-            </div>
+      {/* MAIN WORKSPACE - Terbagi Menjadi 7:3 Berdampingan */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-10 h-screen w-full pt-16 box-border">
+        
+        {/* SISI KIRI (7/10 bagian) - Background Slideshow & Info */}
+        <div className="relative lg:col-span-7 w-full h-full overflow-hidden flex flex-col justify-end p-8 md:p-16 text-left">
+          {/* Slideshow Layer */}
+          <div className="absolute inset-0 z-0">
+            {BACKGROUND_IMAGES.map((image, index) => (
+              <div
+                key={index}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+                  index === currentSlide ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                <img
+                  src={image.src}
+                  alt={image.caption}
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
+            ))}
+            {/* Overlay gradien gelap miring */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-slate-950/70" />
+            <div className="absolute inset-0 bg-slate-950/30" />
           </div>
 
-          {/* Navigation Arrows */}
-          <button
-            onClick={() => {
-              prevSlide();
-              setIsAutoPlaying(false);
-              setTimeout(() => setIsAutoPlaying(true), 5000);
-            }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60 cursor-pointer"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => {
-              nextSlide();
-              setIsAutoPlaying(false);
-              setTimeout(() => setIsAutoPlaying(true), 5000);
-            }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60 cursor-pointer"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-
-          {/* Indikator Dot Dinamis - Maksimal Terkunci 5 Titik Saja */}
-          <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2">
-            {CAROUSEL_IMAGES.map((_, index) => {
-              const totalDots = CAROUSEL_IMAGES.length;
-              
-              // Jika foto <= 5, tampilkan semua titik normal
-              if (totalDots <= 5) {
-                return (
-                  <button
-                    key={index}
-                    type="button"
-              onClick={() => goToSlide(index)}
-              className={`h-2 w-2 rounded-full transition-all ${
-                index === currentSlide
-                  ? "bg-white"
-                  : "bg-white/70 hover:bg-white"
-              }`}
-            />
-                );
-              }
-
-              // Hitung rentang jendela (window) 5 titik aktif di sekitar slide saat ini
-              let start = currentSlide - 2;
-              let end = currentSlide + 2;
-
-              if (start < 0) {
-                end = end - start;
-                start = 0;
-              }
-              if (end >= totalDots) {
-                start = start - (end - totalDots + 1);
-                end = totalDots - 1;
-              }
-
-              start = Math.max(0, start);
-
-              // Sembunyikan titik yang berada di luar rentang jendela 5 titik
-              if (index < start || index > end) return null;
-
-              // Efek visual mengecil untuk titik paling ujung (indikasi masih ada slide selanjutnya)
-              const isEdge = (index === start && start > 0) || (index === end && end < totalDots - 1);
-
-              return (
-                <button
-                  key={index}
-                  type="button"
-              onClick={() => goToSlide(index)}
-              className={`h-2 w-2 rounded-full transition-all ${
-                index === currentSlide
-                  ? "bg-white"
-                  : "bg-white/70 hover:bg-white"
-              }`}
-            />
-              );
-            })}
+          {/* Informasi Latar Belakang */}
+          <div className="relative z-10 max-w-[600px] mt-auto">
+            <span className="text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase mb-2 block animate-pulse">
+              Sekilas Info
+            </span>
+            <h1 className="text-white text-2xl md:text-4xl font-black tracking-tight leading-tight mb-2 drop-shadow-xl transition-all duration-500">
+              {BACKGROUND_IMAGES[currentSlide].caption}
+            </h1>
+            <p className="text-slate-200/90 text-sm font-medium drop-shadow-md">
+              Selamat datang di Portal Utama Akademik SMP Negeri 1 Majenang.
+            </p>
           </div>
         </div>
 
-        {/* RIGHT SIDE - Login Card */}
-        <div className="flex-shrink-0 w-full max-w-[420px]">
-          <div className="rounded-3xl p-10 max-[600px]:p-6"
-            style={{
-              background: 'rgba(255,255,255,0.08)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.15)'
-            }}
-          >
+        {/* SISI KANAN (3/10 bagian) - Ruang Login (Tanpa Card/Container) */}
+        <div className="lg:col-span-3 w-full h-full bg-slate-950 flex items-center justify-center p-6 md:p-10 border-t lg:border-t-0 lg:border-l border-white/10 overflow-y-auto">
+          <div className="w-full max-w-[340px] py-4">
 
             {role !== null && (
               <button
                 onClick={handleBack}
-                className="flex items-center gap-2 text-white/60 hover:text-white mb-4 transition-all text-sm cursor-pointer"
+                className="flex items-center gap-2 text-white/50 hover:text-white mb-6 transition-all text-sm cursor-pointer border-none bg-transparent p-0"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
@@ -321,28 +210,38 @@ export default function LoginPage() {
             )}
 
             {error && (
-              <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-xs font-medium">
+              <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-200 text-xs font-medium">
                 {error}
               </div>
             )}
 
             {role === null ? (
-              <div className="text-center space-y-5">
-                <h2 className="text-2xl font-bold text-white">Pilih Peran</h2>
-                <div className="flex flex-col gap-4">
-                  <button onClick={() => handleSelectRole('teacher')} className="flex items-center justify-center gap-3 p-4 rounded-xl text-white font-semibold border border-white/20 bg-white/5 hover:bg-white/15 cursor-pointer transition-all">
-                    <BookOpen className="w-6 h-6 text-blue-400" /> Masuk sebagai Guru
+              <div className="space-y-6">
+                <div className="text-left">
+                  <h2 className="text-2xl font-black text-white tracking-tight">Selamat Datang</h2>
+                  <p className="text-slate-400 text-xs mt-1">Silakan pilih peran Anda untuk melanjutkan masuk ke sistem.</p>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <button onClick={() => handleSelectRole('teacher')} className="flex items-center justify-between gap-3 p-4 rounded-xl text-white text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-500/40 cursor-pointer transition-all group">
+                    <div className="flex items-center gap-3">
+                      <BookOpen className="w-5 h-5 text-blue-400" /> 
+                      <span>Masuk sebagai Guru</span>
+                    </div>
                   </button>
-                  <button onClick={() => handleSelectRole('student')} className="flex items-center justify-center gap-3 p-4 rounded-xl text-white font-semibold border border-white/20 bg-white/5 hover:bg-white/15 cursor-pointer transition-all">
-                    <GraduationCap className="w-6 h-6 text-emerald-400" /> Masuk sebagai Siswa
+                  <button onClick={() => handleSelectRole('student')} className="flex items-center justify-between gap-3 p-4 rounded-xl text-white text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-500/40 cursor-pointer transition-all group">
+                    <div className="flex items-center gap-3">
+                      <GraduationCap className="w-5 h-5 text-emerald-400" /> 
+                      <span>Masuk sebagai Siswa</span>
+                    </div>
                   </button>
                 </div>
 
-                <div className="pt-1 flex justify-end">
+                <div className="pt-2 flex justify-center">
                   <button
                     type="button"
                     onClick={() => setShowTutorial(true)}
-                    className="flex items-center gap-2 text-xs text-slate-300 hover:text-cyan-400 font-medium transition-colors py-1 cursor-pointer"
+                    className="flex items-center gap-2 text-xs text-slate-500 hover:text-cyan-400 font-medium transition-colors py-1 cursor-pointer border-none bg-transparent"
                   >
                     <HelpCircle className="w-4 h-4" />
                     <span>Butuh Bantuan?</span>
@@ -350,46 +249,55 @@ export default function LoginPage() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-white">Login {role === 'teacher' ? 'Guru' : 'Siswa'}</h2>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="text-left">
+                  <h2 className="text-2xl font-black text-white tracking-tight">
+                    Portal {role === 'teacher' ? 'Guru' : 'Siswa'}
+                  </h2>
+                  <p className="text-slate-400 text-xs mt-1">Masukkan kredensial akun resmi Anda di bawah ini.</p>
                 </div>
-                <input
-                  type="text"
-                  id="login-id"
-                  name="username"
-                  autoComplete="username"
-                  value={id}
-                  onChange={e => setId(e.target.value)}
-                  className="w-full px-4 py-4 rounded-xl text-white text-[16px] border border-white/20 bg-white/10 outline-none focus:border-cyan-500/50 transition-all"
-                  placeholder={role === 'teacher' ? "NIP / Username Guru" : "NISN / Username Siswa"} required
-                />
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="login-password"
-                    name="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="w-full px-4 py-4 rounded-xl text-white text-[16px] border border-white/20 bg-white/10 outline-none focus:border-cyan-500/50 transition-all"
-                    placeholder="Kata Sandi" required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors cursor-pointer"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                <button type="submit" className="w-full py-4 rounded-xl bg-cyan-500 text-slate-900 font-bold hover:bg-cyan-400 cursor-pointer transition-colors shadow-lg shadow-cyan-500/10">Masuk</button>
 
-                <div className="pt-1 flex justify-end">
+                <div className="space-y-3.5">
+                  <input
+                    type="text"
+                    id="login-id"
+                    name="username"
+                    autoComplete="username"
+                    value={id}
+                    onChange={e => setId(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-xl text-white text-sm border border-white/10 bg-white/5 outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all"
+                    placeholder={role === 'teacher' ? "NIP / Username" : "NISN / Username"} required
+                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      id="login-password"
+                      name="password"
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl text-white text-sm border border-white/10 bg-white/5 outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all"
+                      placeholder="Kata Sandi" required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer border-none bg-transparent"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" className="w-full py-3.5 rounded-xl bg-cyan-500 text-slate-900 text-sm font-bold hover:bg-cyan-400 cursor-pointer transition-colors shadow-lg shadow-cyan-500/10">
+                  Masuk Sekarang
+                </button>
+
+                <div className="pt-2 flex justify-center">
                   <button
                     type="button"
                     onClick={() => setShowTutorial(true)}
-                    className="flex items-center gap-2 text-xs text-slate-300 hover:text-cyan-400 font-medium transition-colors py-1 cursor-pointer"
+                    className="flex items-center gap-2 text-xs text-slate-500 hover:text-cyan-400 font-medium transition-colors py-1 cursor-pointer border-none bg-transparent"
                   >
                     <HelpCircle className="w-4 h-4" />
                     <span>Butuh Bantuan?</span>
@@ -399,7 +307,7 @@ export default function LoginPage() {
             )}
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Modals */}
       <TutorialModal open={showTutorial} onClose={() => setShowTutorial(false)} />

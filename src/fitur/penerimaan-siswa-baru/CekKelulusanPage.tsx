@@ -2,22 +2,12 @@ import { useState, useMemo } from 'react';
 import { Search, ChevronLeft, ChevronRight, GraduationCap, ArrowLeft } from 'lucide-react';
 import { getPPDBApplications } from '../../data/store';
 
-// ============================================
-// KOMPONEN UTAMA
-// ============================================
 export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
-  // Form state
   const [noReg, setNoReg] = useState('');
   const [nama, setNama] = useState('');
-
-  // Data from store
   const allApplications = useMemo(() => getPPDBApplications(), []);
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  
-  // Filtered data
   const [filteredData, setFilteredData] = useState(allApplications);
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -27,7 +17,6 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setHasSearched(true);
-    
     const filtered = allApplications.filter((item) => {
       const matchReg = noReg ? item.registrationNo.toLowerCase().includes(noReg.toLowerCase()) : true;
       const matchNama = nama ? item.namaLengkap.toLowerCase().includes(nama.toLowerCase()) : true;
@@ -40,23 +29,20 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
   const getStatusBadge = (status: string) => {
     if (status === 'ACCEPTED') {
       return (
-        <div>
-          <span className="inline-flex items-center rounded bg-blue-600 px-2 py-1 text-[10px] font-bold text-white uppercase">
-            LULUS
-          </span>
-          <p className="mt-1 text-[9px] text-blue-600 font-medium italic">Silahkan daftar ulang</p>
-        </div>
+        <span className="inline-flex items-center bg-[#2E86C1] px-3 py-1 text-xs font-bold text-white">
+          LULUS
+        </span>
       );
     }
     if (status === 'REJECTED') {
       return (
-        <span className="inline-flex items-center rounded bg-red-600 px-2 py-1 text-[10px] font-bold text-white uppercase">
+        <span className="inline-flex items-center bg-[#E74C3C] px-3 py-1 text-xs font-bold text-white">
           TIDAK LULUS
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center rounded bg-amber-500 px-2 py-1 text-[10px] font-bold text-white uppercase">
+      <span className="inline-flex items-center bg-[#F39C12] px-3 py-1 text-xs font-bold text-white">
         PROSES
       </span>
     );
@@ -80,47 +66,50 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <div className="flex flex-col min-h-screen bg-[#F5F5F5]">
       {/* HEADER */}
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-white border-b border-slate-200 px-4 lg:px-8">
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-[#2E86C1] px-4 lg:px-8">
+        <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 transition-colors"
+            className="flex h-8 w-8 items-center justify-center text-white hover:bg-white/10 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-lg font-bold text-slate-900">Cek Kelulusan</h1>
-            <p className="text-xs text-slate-500">Penerimaan Siswa Baru</p>
+            <h1 className="text-base font-bold text-white">Cek Kelulusan</h1>
+            <p className="text-[11px] text-white/80">Penerimaan Siswa Baru</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="hidden sm:flex flex-col items-end mr-2">
-            <span className="text-xs font-bold text-slate-900">UNIVERSITAS HANDAYANI</span>
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider">Portal PMB Online</span>
+            <span className="text-xs font-bold text-white">UNIVERSITAS HANDAYANI</span>
+            <span className="text-[10px] text-white/70 uppercase tracking-wider">Portal PMB Online</span>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
-            <GraduationCap className="h-6 w-6" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/20 bg-white/10 flex items-center justify-center p-1 shrink-0">
+            <img
+                  src={`${import.meta.env.BASE_URL}images/logo/logo-sekolah.svg`}
+                  alt="Logo SMP 1 Majenang"
+                  className="w-full h-full object-cover"
+                />
           </div>
         </div>
       </header>
 
       {/* CONTENT */}
-      <main className="flex-1 max-w-6xl mx-auto w-full p-4 lg:p-8">
+      <main className="flex-1 max-w-6xl mx-auto w-full p-4 lg:p-6">
         {/* SEARCH BOX */}
-        <div className="mb-8 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="bg-blue-600 px-6 py-4">
-            <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Pencarian Status Kelulusan
+        <div className="mb-6 bg-white border border-[#DDD]">
+          <div className="border-b-2 border-[#F39C12] px-5 py-3">
+            <h2 className="text-sm font-bold text-[#333]">
+              Silahkan Masukkan NO. Registrasi / Nama
             </h2>
           </div>
-          <form onSubmit={handleSearch} className="p-6">
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <form onSubmit={handleSearch} className="p-5">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                <label className="mb-1.5 block text-xs font-bold text-[#333]">
                   No. Registrasi
                 </label>
                 <input
@@ -128,11 +117,11 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
                   value={noReg}
                   onChange={(e) => setNoReg(e.target.value)}
                   placeholder="Contoh: PPDB-24-NAS-000001"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                  className="w-full border border-[#CCC] bg-white px-3 py-2 text-sm text-[#333] outline-none focus:border-[#2E86C1] transition-colors"
                 />
               </div>
               <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                <label className="mb-1.5 block text-xs font-bold text-[#333]">
                   Nama Lengkap
                 </label>
                 <input
@@ -140,16 +129,16 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
                   value={nama}
                   onChange={(e) => setNama(e.target.value)}
                   placeholder="Nama lengkap pendaftar"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                  className="w-full border border-[#CCC] bg-white px-3 py-2 text-sm text-[#333] outline-none focus:border-[#2E86C1] transition-colors"
                 />
               </div>
               <div className="flex items-end">
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 bg-[#2E86C1] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#2471A3]"
                 >
                   <Search className="h-4 w-4" />
-                  Cari Data
+                  Cari
                 </button>
               </div>
             </div>
@@ -157,51 +146,50 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
         </div>
 
         {/* RESULTS TABLE */}
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800">Hasil Pengumuman</h3>
-            <span className="text-xs font-medium px-3 py-1 bg-slate-100 text-slate-600 rounded-full">
-              Total: {totalRecords} Pendaftar
+        <div className="bg-white border border-[#DDD]">
+          <div className="border-b-2 border-[#F39C12] px-5 py-3">
+            <h3 className="text-lg font-bold text-[#333]">Daftar Pengumuman Lulus PMB</h3>
+          </div>
+
+          <div className="px-5 py-2 border-b border-[#EEE]">
+            <span className="text-xs text-[#666]">
+              Total Camaba : <strong className="text-[#333]">{totalRecords}</strong>
             </span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/50">
-                  <th className="px-6 py-4 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">No. Registrasi</th>
-                  <th className="px-6 py-4 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Nama Lengkap</th>
-                  <th className="px-6 py-4 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Asal Sekolah</th>
-                  <th className="px-6 py-4 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Jalur</th>
-                  <th className="px-6 py-4 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Status</th>
+                <tr className="border-b border-[#DDD] bg-[#FAFAFA]">
+                  <th className="px-4 py-3 text-left text-xs font-bold text-[#333] uppercase">No. Registrasi</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-[#333] uppercase">Nama Lengkap</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-[#333] uppercase">Asal Sekolah</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-[#333] uppercase">Jalur</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-[#333] uppercase">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody>
                 {filteredData.length > 0 ? (
-                  filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item, idx) => (
-                    <tr key={item.id} className="transition hover:bg-blue-50/30">
-                      <td className="px-6 py-4 font-mono text-xs text-blue-600 font-semibold">{item.registrationNo}</td>
-                      <td className="px-6 py-4 font-bold text-slate-800">{item.namaLengkap}</td>
-                      <td className="px-6 py-4 text-slate-600">{item.sekolahAsal}</td>
-                      <td className="px-6 py-4">
-                        <span className="px-2 py-1 rounded bg-slate-100 text-slate-600 text-[10px] font-bold">
-                          {item.jalurPendaftaran}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
+                  filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item) => (
+                    <tr key={item.id} className="border-b border-[#EEE] transition hover:bg-[#F9F9F9]">
+                      <td className="px-4 py-3 font-mono text-xs text-[#2E86C1] font-semibold">{item.registrationNo}</td>
+                      <td className="px-4 py-3 font-bold text-[#333]">{item.namaLengkap}</td>
+                      <td className="px-4 py-3 text-[#666]">{item.sekolahAsal}</td>
+                      <td className="px-4 py-3 text-[#666] text-xs">{item.jalurPendaftaran}</td>
+                      <td className="px-4 py-3">
                         {getStatusBadge(item.status)}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center">
+                    <td colSpan={5} className="px-4 py-12 text-center">
                       <div className="flex flex-col items-center gap-2">
-                        <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                          <Search className="h-6 w-6" />
+                        <div className="h-10 w-10 border border-[#CCC] bg-[#F5F5F5] flex items-center justify-center text-[#999]">
+                          <Search className="h-5 w-5" />
                         </div>
-                        <p className="text-slate-500 font-medium">Data tidak ditemukan</p>
-                        <p className="text-xs text-slate-400">Pastikan nomor registrasi atau nama yang anda masukkan benar</p>
+                        <p className="text-[#666] font-medium text-sm">Data tidak ditemukan</p>
+                        <p className="text-xs text-[#999]">Pastikan nomor registrasi atau nama yang anda masukkan benar</p>
                       </div>
                     </td>
                   </tr>
@@ -209,18 +197,18 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
               </tbody>
               {filteredData.length > 0 && (
                 <tfoot>
-                  <tr className="border-t border-slate-200 bg-slate-50/50">
-                    <td colSpan={5} className="px-6 py-4">
-                      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-slate-500">Tampilkan</span>
+                  <tr className="border-t border-[#DDD] bg-[#FAFAFA]">
+                    <td colSpan={5} className="px-4 py-3">
+                      <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-[#666]">Tampilkan</span>
                           <select
                             value={pageSize}
                             onChange={(e) => {
                               setPageSize(Number(e.target.value));
                               setCurrentPage(1);
                             }}
-                            className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                            className="border border-[#CCC] bg-white px-2 py-1 text-xs text-[#333] outline-none"
                           >
                             {[5, 10, 25, 50].map((size) => (
                               <option key={size} value={size}>{size}</option>
@@ -232,22 +220,22 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
                           <button
                             onClick={() => setCurrentPage(1)}
                             disabled={currentPage === 1}
-                            className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-white disabled:opacity-30 transition-all"
+                            className="px-2 py-1 border border-[#CCC] text-[#666] hover:bg-[#F5F5F5] disabled:opacity-40 transition-all text-xs"
                           >
                             <ChevronLeft className="h-4 w-4" />
                           </button>
                           
-                          <div className="flex items-center gap-1 mx-2">
+                          <div className="flex items-center gap-1 mx-1">
                             {getPageNumbers().map((page, idx) => (
                               <button
                                 key={idx}
                                 onClick={() => typeof page === 'number' && setCurrentPage(page)}
                                 disabled={typeof page !== 'number'}
                                 className={`
-                                  h-8 w-8 rounded-lg text-xs font-bold transition-all
+                                  h-7 w-7 text-xs font-bold transition-all
                                   ${currentPage === page
-                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
-                                    : page === '...' ? 'text-slate-400 cursor-default' : 'text-slate-600 hover:bg-white border border-slate-200'
+                                    ? 'bg-[#2E86C1] text-white'
+                                    : page === '...' ? 'text-[#999] cursor-default' : 'text-[#333] hover:bg-[#F5F5F5] border border-[#CCC]'
                                   }
                                 `}
                               >
@@ -259,7 +247,7 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
                           <button
                             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                             disabled={currentPage === totalPages}
-                            className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-white disabled:opacity-30 transition-all"
+                            className="px-2 py-1 border border-[#CCC] text-[#666] hover:bg-[#F5F5F5] disabled:opacity-40 transition-all text-xs"
                           >
                             <ChevronRight className="h-4 w-4" />
                           </button>
@@ -274,10 +262,21 @@ export default function CekKelulusanPage({ onBack }: { onBack?: () => void }) {
         </div>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-6">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col items-center gap-2 text-center">
-          <p className="text-xs font-bold text-slate-800">UNIVERSITAS HANDAYANI</p>
-          <p className="text-[10px] text-slate-400 uppercase tracking-widest">Copyright &copy; {new Date().getFullYear()} &bull; Version 2.4.0</p>
+      <footer className="bg-[#2E86C1] text-white">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 md:flex-row md:items-start md:justify-between md:px-8">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">PPDB Nasional</p>
+            <p className="mt-2 text-sm text-white/90">Sistem Penerimaan Peserta Didik Baru Terpadu</p>
+          </div>
+          <div className="text-sm text-white/90">
+            <p>(021) 1234-5678</p>
+            <p>ppdb@domain.go.id</p>
+            <p>Jl. Pendidikan Nasional No. 1</p>
+          </div>
+          <div className="text-sm text-white/90">
+            <p>Senin - Jumat 08.00 - 16.00</p>
+            <p>Sabtu 08.00 - 12.00</p>
+          </div>
         </div>
       </footer>
     </div>
