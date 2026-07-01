@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import {
-  GraduationCap, BookOpen, Eye, EyeOff, ArrowLeft,
-  User, HelpCircle, BookMarked
+  GraduationCap, BookOpen, Eye, EyeOff,
+  User, HelpCircle, BookMarked, ChevronDown
 } from 'lucide-react';
 import AdminMasterPanel from '../admin/PanelAdminModal';
 import TutorialModal from './TutorialModal';
@@ -45,13 +45,14 @@ const BACKGROUND_IMAGES = [
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const [role, setRole] = useState<UserRole | null>(null);
+  // Mengatur role default awal ke 'student' (Murid)
+  const [role, setRole] = useState<UserRole>('student');
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [openAdminPanel, setOpenAdminPanel] = useState(false);
-  const [adminScope, setAdminScope] = useState<'teacher' | 'student'>('teacher');
+  const [adminScope, setAdminScope] = useState<'teacher' | 'student'>('student');
   const [showTutorial, setShowTutorial] = useState(false);
   const [showExpectation, setShowExpectation] = useState(false);
   const [showPPDB, setShowPPDB] = useState(false);
@@ -69,26 +70,13 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, [nextSlide]);
 
-  const handleSelectRole = (selectedRole: UserRole) => {
-    setRole(selectedRole);
-    setError('');
-    setId('');
-    setPassword('');
-    setShowPassword(false);
-  };
-
-  const handleBack = () => {
-    setRole(null);
-    setError('');
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!role) return;
 
     if (id.trim() === ADMIN_LOGIN.master.username && password === ADMIN_LOGIN.master.password) {
-      setAdminScope(role);
+      setAdminScope(role === 'teacher' ? 'teacher' : 'student');
       setOpenAdminPanel(true);
       return;
     }
@@ -102,53 +90,53 @@ export default function LoginPage() {
     <div className="relative min-h-screen w-full flex flex-col bg-slate-950 font-sans antialiased selection:bg-cyan-500 selection:text-slate-900 overflow-hidden">
 
       {/* STICKY HEADER */}
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-[#2E86C1] backdrop-blur-xl border-b border-white/10">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-slate-900/70 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 w-full">
 
             {/* Sisi Kiri: Identitas Sekolah */}
             <div className="flex items-center gap-3 justify-start pl-0">
-              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/20 bg-white/10 flex items-center justify-center p-1 shrink-0">
+              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xl border border-white/10 bg-white/5 flex items-center justify-center p-1 shrink-0">
                 <img src={LOGO_SMP} alt="Logo" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col items-start justify-center text-left">
-                <p className="text-cyan-400 text-[10px] uppercase tracking-[0.2em] font-extrabold leading-none block w-full m-0 p-0">
+                <p className="text-cyan-400 text-[9px] uppercase tracking-[0.25em] font-extrabold leading-none block w-full m-0 p-0">
                   Sistem Informasi Academic
                 </p>
-                <h3 className="text-white font-black text-base uppercase tracking-tight leading-none mt-1 block w-full p-0">
+                <h3 className="text-white font-black text-sm uppercase tracking-tight leading-none mt-1.5 block w-full p-0">
                   SMP Negeri 1 Majenang
                 </h3>
               </div>
             </div>
 
             {/* Sisi Kanan: Menu Navigasi */}
-            <nav className="flex items-center gap-4 bg-transparent p-0 border-none rounded-none">
+            <nav className="flex items-center gap-2 sm:gap-4 bg-transparent p-0 border-none rounded-none">
               <button
                 type="button"
                 onClick={() => setShowExpectation(true)}
-                className="flex items-center gap-2 p-1 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white bg-transparent border-none"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-white/5 border-none"
               >
                 <User className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Halaman Kami</span>
+                <span className="hidden sm:inline">Halaman Kami</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowPPDB(true)}
-                className="flex items-center gap-2 p-1 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white bg-transparent border-none"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-white/5 border-none"
               >
                 <GraduationCap className="w-4 h-4 text-cyan-400" />
-                <span>Pendaftaran</span>
+                <span className="hidden sm:inline">Pendaftaran</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowPerpustakaan(true)}
-                className="flex items-center gap-2 p-1 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white bg-transparent border-none"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-white/5 border-none"
                 title="Sistem Informasi Perpustakaan"
               >
                 <BookMarked className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Perpustakaan</span>
+                <span className="hidden sm:inline">Perpustakaan</span>
               </button>
             </nav>
           </div>
@@ -159,15 +147,15 @@ export default function LoginPage() {
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-10 h-screen w-full pt-16 box-border">
         
         {/* SISI KIRI (7/10 bagian) - Background Slideshow & Info */}
-        <div className="relative lg:col-span-7 w-full h-full overflow-hidden flex flex-col justify-end p-8 md:p-16 text-left">
+        <div className="relative lg:col-span-7 w-full h-full overflow-hidden flex flex-col justify-end p-8 md:p-16 text-left border-b lg:border-b-0 border-white/5">
           {/* Slideshow Layer */}
           <div className="absolute inset-0 z-0">
             {BACKGROUND_IMAGES.map((image, index) => (
               <div
                 key={index}
                 className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
-                  index === currentSlide ? 'opacity-100' : 'opacity-0'
-                }`}
+                  index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                } transform transition-transform duration-[5000ms]`}
               >
                 <img
                   src={image.src}
@@ -176,88 +164,77 @@ export default function LoginPage() {
                 />
               </div>
             ))}
-            {/* Overlay gradien gelap miring */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-slate-950/70" />
-            <div className="absolute inset-0 bg-slate-950/30" />
+            {/* Overlay gradien gelap berlapis mewah */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-900/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/20 via-transparent to-slate-950/80 hidden lg:block" />
           </div>
 
           {/* Informasi Latar Belakang */}
           <div className="relative z-10 max-w-[600px] mt-auto">
-            <span className="text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase mb-2 block animate-pulse">
-              Sekilas Info
-            </span>
-            <h1 className="text-white text-2xl md:text-4xl font-black tracking-tight leading-tight mb-2 drop-shadow-xl transition-all duration-500">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-3 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+              <span className="text-cyan-400 text-[10px] font-bold tracking-[0.2em] uppercase">
+                Sekilas Info
+              </span>
+            </div>
+            <h1 className="text-white text-2xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-2xl transition-all duration-500">
               {BACKGROUND_IMAGES[currentSlide].caption}
             </h1>
-            <p className="text-slate-200/90 text-sm font-medium drop-shadow-md">
-              Selamat datang di Portal Utama Akademik SMP Negeri 1 Majenang.
+            <p className="text-slate-300 text-sm font-medium leading-relaxed drop-shadow-md max-w-md">
+              Selamat datang di Portal Utama Akademik SMP Negeri 1 Majenang. Akses informasi, manajemen data, dan fasilitas pembelajaran digital terpadu.
             </p>
           </div>
         </div>
 
-        {/* SISI KANAN (3/10 bagian) - Ruang Login (Tanpa Card/Container) */}
-        <div className="lg:col-span-3 w-full h-full bg-slate-950 flex items-center justify-center p-6 md:p-10 border-t lg:border-t-0 lg:border-l border-white/10 overflow-y-auto">
-          <div className="w-full max-w-[340px] py-4">
+        {/* SISI KANAN (3/10 bagian) - Ruang Login Langsung */}
+        <div className="relative lg:col-span-3 w-full h-full bg-slate-950 flex items-center justify-center p-6 md:p-10 lg:border-l border-white/5 overflow-y-auto">
+          
+          {/* BACKGROUND GRAFIS UNTUK PANEL LOGIN */}
+          <div className="absolute inset-0 z-0 opacity-40 pointer-events-none overflow-hidden">
+            <div className="absolute top-[-20%] left-[-20%] w-[300px] h-[300px] rounded-full bg-cyan-500/10 blur-[80px]" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[250px] h-[250px] rounded-full bg-blue-600/10 blur-[100px]" />
+            {/* Garis Grid Tipis Estetik */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:24px_24px]" />
+          </div>
 
-            {role !== null && (
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-2 text-white/50 hover:text-white mb-6 transition-all text-sm cursor-pointer border-none bg-transparent p-0"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Kembali</span>
-              </button>
-            )}
+          <div className="relative z-10 w-full max-w-[340px] py-6 flex flex-col h-full justify-center">
 
             {error && (
-              <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-200 text-xs font-medium">
-                {error}
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-medium flex items-start gap-2 animate-shake">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0" />
+                <span>{error}</span>
               </div>
             )}
 
-            {role === null ? (
-              <div className="space-y-6">
-                <div className="text-left">
-                  <h2 className="text-2xl font-black text-white tracking-tight">Selamat Datang</h2>
-                  <p className="text-slate-400 text-xs mt-1">Silakan pilih peran Anda untuk melanjutkan masuk ke sistem.</p>
-                </div>
+            {/* Form Login Terpadu */}
+<form onSubmit={handleSubmit} className="space-y-5">
+  <div className="text-left mb-2">
+    <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
+      Portal <span className={
+        role === 'teacher' ? 'text-blue-400' :
+        role === 'student' ? 'text-emerald-400' :
+        role === 'parent' ? 'text-purple-400' :
+        role === 'guest' ? 'text-amber-400' :
+        'text-cyan-400'
+      }>
+        {role === 'teacher' ? 'Guru' :
+         role === 'student' ? 'Siswa' :
+         role === 'parent' ? 'Orang Tua' :
+         role === 'guest' ? 'Tamu' :
+         'Pengguna'}
+      </span>
+    </h2>
+    <p className="text-slate-400 text-xs mt-1.5 leading-relaxed">
+      Aplikasi Sistem Informasi Akademik untuk Siswa, Guru, dan Orang Tua di lingkungan SMP Negeri 1 Majenang
+    </p>
+  </div>
 
-                <div className="flex flex-col gap-3">
-                  <button onClick={() => handleSelectRole('teacher')} className="flex items-center justify-between gap-3 p-4 rounded-xl text-white text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-500/40 cursor-pointer transition-all group">
-                    <div className="flex items-center gap-3">
-                      <BookOpen className="w-5 h-5 text-blue-400" /> 
-                      <span>Masuk sebagai Guru</span>
-                    </div>
-                  </button>
-                  <button onClick={() => handleSelectRole('student')} className="flex items-center justify-between gap-3 p-4 rounded-xl text-white text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 hover:border-cyan-500/40 cursor-pointer transition-all group">
-                    <div className="flex items-center gap-3">
-                      <GraduationCap className="w-5 h-5 text-emerald-400" /> 
-                      <span>Masuk sebagai Siswa</span>
-                    </div>
-                  </button>
-                </div>
-
-                <div className="pt-2 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => setShowTutorial(true)}
-                    className="flex items-center gap-2 text-xs text-slate-500 hover:text-cyan-400 font-medium transition-colors py-1 cursor-pointer border-none bg-transparent"
-                  >
-                    <HelpCircle className="w-4 h-4" />
-                    <span>Butuh Bantuan?</span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="text-left">
-                  <h2 className="text-2xl font-black text-white tracking-tight">
-                    Portal {role === 'teacher' ? 'Guru' : 'Siswa'}
-                  </h2>
-                  <p className="text-slate-400 text-xs mt-1">Masukkan kredensial akun resmi Anda di bawah ini.</p>
-                </div>
-
-                <div className="space-y-3.5">
+              <div className="space-y-4">
+                {/* 1. Input Username */}
+                <div className="space-y-1.5 text-left">
+                  <label htmlFor="login-id" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">
+                    Identitas Pengguna
+                  </label>
                   <input
                     type="text"
                     id="login-id"
@@ -265,9 +242,17 @@ export default function LoginPage() {
                     autoComplete="username"
                     value={id}
                     onChange={e => setId(e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-xl text-white text-sm border border-white/10 bg-white/5 outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all"
-                    placeholder={role === 'teacher' ? "NIP / Username" : "NISN / Username"} required
+                    className="w-full px-4 py-3.5 rounded-xl text-white text-sm border border-white/5 bg-white/[0.03] outline-none focus:border-cyan-500/40 focus:bg-white/[0.07] focus:shadow-[0_0_15px_rgba(6,182,212,0.05)] transition-all placeholder:text-slate-600"
+                    placeholder="Masukkan username anda" 
+                    required
                   />
+                </div>
+
+                {/* 2. Input Password */}
+                <div className="space-y-1.5 text-left">
+                  <label htmlFor="login-password" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">
+                    Kata Sandi
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -276,35 +261,63 @@ export default function LoginPage() {
                       autoComplete="current-password"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      className="w-full px-4 py-3.5 rounded-xl text-white text-sm border border-white/10 bg-white/5 outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all"
-                      placeholder="Kata Sandi" required
+                      className="w-full px-4 py-3.5 rounded-xl text-white text-sm border border-white/5 bg-white/[0.03] outline-none focus:border-cyan-500/40 focus:bg-white/[0.07] focus:shadow-[0_0_15px_rgba(6,182,212,0.05)] transition-all placeholder:text-slate-600"
+                      placeholder="Masukkan password anda" 
+                      required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer border-none bg-transparent"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors cursor-pointer border-none bg-transparent"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
 
-                <button type="submit" className="w-full py-3.5 rounded-xl bg-cyan-500 text-slate-900 text-sm font-bold hover:bg-cyan-400 cursor-pointer transition-colors shadow-lg shadow-cyan-500/10">
-                  Masuk Sekarang
-                </button>
-
-                <div className="pt-2 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => setShowTutorial(true)}
-                    className="flex items-center gap-2 text-xs text-slate-500 hover:text-cyan-400 font-medium transition-colors py-1 cursor-pointer border-none bg-transparent"
-                  >
-                    <HelpCircle className="w-4 h-4" />
-                    <span>Butuh Bantuan?</span>
-                  </button>
+                {/* 3. Dropdown Seleksi Peran Sederhana */}
+                <div className="space-y-1.5 text-left">
+                  <label htmlFor="login-role" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">
+                    Login Sebagai
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="login-role"
+                      value={role}
+                      onChange={e => setRole(e.target.value as UserRole)}
+                      className="w-full px-4 py-3.5 rounded-xl text-white text-sm border border-white/5 bg-slate-900 outline-none focus:border-cyan-500/40 focus:bg-white/[0.07] transition-all cursor-pointer appearance-none pr-10"
+                    >
+                      <option value="teacher" className="bg-slate-950 text-white">Guru</option>
+                      <option value="student" className="bg-slate-950 text-white">Murid</option>
+                      <option value="parent" className="bg-slate-950 text-white">Orang Tua</option>
+                      <option value="guest" className="bg-slate-950 text-white">Tamu</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
+                  </div>
                 </div>
-              </form>
-            )}
+              </div>
+
+              {/* Tombol Submit */}
+              <button type="submit" className="w-full py-3.5 rounded-xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 active:scale-[0.98] cursor-pointer transition-all shadow-xl shadow-cyan-500/10 tracking-wide mt-4">
+                Masuk
+              </button>
+
+              {/* Tautan Bantuan */}
+<div className="pt-4 border-t border-white/5 flex flex-col items-center gap-2">
+  <p className="text-xs text-slate-500">
+    Memiliki kendala login?{' '}
+    <button
+      type="button"
+      onClick={() => setShowTutorial(true)}
+      className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors cursor-pointer border-none bg-transparent"
+    >
+      hubungi admin
+    </button>
+  </p>
+</div>
+            </form>
           </div>
         </div>
       </div>

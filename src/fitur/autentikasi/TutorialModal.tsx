@@ -1,5 +1,5 @@
 // TutorialModal.tsx
-import { BookOpen, GraduationCap, User, Shield, X } from 'lucide-react';
+import { BookOpen, GraduationCap, User, Shield } from 'lucide-react';
 
 interface TutorialModalProps {
     open: boolean;
@@ -19,11 +19,11 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                     <div className="relative text-center pb-5 mb-6 border-b-4 border-double border-gray-900 pt-14 md:pt-10">
                         <div className="absolute top-14 md:top-10 right-0 z-10">
                             <button
-            onClick={onClose}
-            className="mr-0 text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
-        >
-            Tutup
-        </button>
+                                onClick={onClose}
+                                className="mr-0 text-sm font-medium text-slate-700 transition hover:text-slate-900 cursor-pointer"
+                            >
+                                Tutup
+                            </button>
                         </div>
 
                         <p className="text-xs uppercase tracking-widest font-sans font-bold text-gray-900 mb-1">
@@ -90,12 +90,38 @@ export default function TutorialModal({ open, onClose }: TutorialModalProps) {
                                 Tekan tombol <span className="font-bold uppercase font-sans text-xs border border-gray-900 px-1">Masuk</span> untuk validasi. Jika Anda mengalami kendala login atau lupa password, silakan hubungi petugas Tata Usaha untuk reset kata sandi.
                             </p>
                         </div>
+
+                        {/* Langkah 4 (Pindahan Narahubung Baru) */}
+                        <div className="text-justify">
+                            <h4 className="font-bold text-sm uppercase font-sans text-gray-900 mb-1">
+                                Langkah 4: Hubungi Narahubung Jam Kerja
+                            </h4>
+                            <div className="text-sm leading-relaxed text-gray-900 pl-4 border-l-2 border-gray-900">
+                                <p className="mb-2">
+                                    Jika masih menemui kendala teknis atau masalah otentikasi login, Anda dapat menghubungi tim narahubung resmi pada <span className="font-bold">Jam Kerja SMP Negeri 1 Majenang</span> (Senin - Jum'at: 08.30 - 15.30 WIB). Harap sebutkan Nama, NIM/NIP, Program Studi, beserta detail pertanyaan Anda secara jelas:
+                                </p>
+                                <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 font-sans" id="list-narahubung">
+                                    <li className="p-3 bg-white rounded border border-gray-400" data-phone="085179611794">
+                                        <h5 className="font-bold text-xs uppercase tracking-wide">nama (Layanan I)</h5>
+                                        <p className="text-xs font-mono mt-0.5 text-gray-800">isi no hp di sini</p>
+                                    </li>
+                                    <li className="p-3 bg-white rounded border border-gray-400" data-phone="082173777307">
+                                        <h5 className="font-bold text-xs uppercase tracking-wide">nama (Layanan II)</h5>
+                                        <p className="text-xs font-mono mt-0.5 text-gray-800">isi no hp di sini</p>
+                                    </li>
+                                    <li className="p-3 bg-white rounded border border-gray-400" data-phone="081325030289">
+                                        <h5 className="font-bold text-xs uppercase tracking-wide">nama (Layanan III)</h5>
+                                        <p className="text-xs font-mono mt-0.5 text-gray-800">isi no hp di sini</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Seksi Akun Uji Coba */}
                     <div className="pt-6 pb-6 border-b border-gray-400">
                         <h3 className="text-base font-black uppercase tracking-tight border-b border-gray-900 pb-1 mb-4 font-serif text-gray-900">
-                            II. Lampiran Akun Uji Coba (Demo)
+                            II. Lampiran Akun Uji Coba (Demo) jika sudah release hapus
                         </h3>
                         <p className="text-xs text-gray-900 italic mb-4">
                             *Tabel di bawah ini memuat data akun percontohan guna keperluan pengujian sistem oleh pihak internal:
